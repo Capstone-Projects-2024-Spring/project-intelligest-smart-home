@@ -85,6 +85,13 @@ The smart home ASL integration aims to provide an inclusive and accessible home 
             <sub><b>Oladapo Oladele</b></sub>
         </a>    
     </td>
+    <td align="center">
+        <a href="https://github.com/KevinXJarema">
+            <img src="https://avatars.githubusercontent.com/u/123217322?v=4" width="100;" alt="KevinXJarema"/>
+            <br />
+            <sub><b>Kevin Jarema</b></sub>
+        </a>    
+    </td>
    </tr>
 </table>
 
