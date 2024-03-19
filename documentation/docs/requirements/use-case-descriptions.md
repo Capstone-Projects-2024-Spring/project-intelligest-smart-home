@@ -26,7 +26,6 @@ Objective: As a Deaf user, I want to use gestures to seek information about the 
 3.	Then, the User sees a certain color and knows it is processing the request.
 4.	Finally, the User sees on the display the Weather for the rest of the day.
 
-
 ## Use Case 3 "Changing the Kitchen Light Color"
 
 Scenario: A user is cooking dinner in the kitchen and wants to change the kitchen's atmosphere by adjusting the light color.
@@ -36,7 +35,6 @@ Objective: As a user, I want to change the color of my kitchen lights with gestu
 2.	The user sees a certain light strip color and knows IntelliGest caught the gesture.
 3.	Then, the User sees a certain color and knows it is processing the request.
 4.	Finally, the User sees the kitchen light is changed to yellow by IntelliGest.
-
 
 ## Use Case 4 "Smart lock setup and control"
 
@@ -84,8 +82,3 @@ Objective: As a user, I want to easily turn on my TV without the need for my rem
 2. The user performs the action to turn on the TV.
 3. IntelliGest provides feedback that it is processing their request.
 4. The channel is automatically turned on by the system.
-
-
-
-
-

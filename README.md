@@ -11,11 +11,11 @@
 
 ## Keywords
 
-Section 001, Smart home, ASL, American Sign Language, Deaf/Mute Accessibility, Hand Signals, Home Automation, Home Assistant, IoT, AI/ML, Accessible Technology, Embedded Systems, Python
+Section 001, Smart home, ASL, American Sign Language, Deaf Accessibility, Hand Signals, Home Automation, Home Assistant, IoT, AI/ML, Accessible Technology, Embedded Systems, Python
 
 ## Project Abstract
 
-IntelliGest Home revolutionizes the landscape of smart home accessibility by introducing an innovative solution for individuals who are deaf and/or mute. This application aims to empower users to seamlessly interact with their smart home devices through American Sign Language (ASL) or hand signals. Unlike traditional smart home systems requiring speech recognition, IntelliGest will detect common ASL and gestures to control a home.. IntelliGest will utilize the robust and open-source [Home Assistant](https://www.home-assistant.io/)  software and API to serve as the foundations for the home assistant. Image recognition will be utilized to detect common ASL words and utilize them to control a smart home using a predefined set of actions available.
+IntelliGest Home revolutionizes the landscape of smart home accessibility by introducing an innovative solution for Deaf individuals. This application aims to empower users to seamlessly interact with their smart home devices through American Sign Language (ASL) or hand signals. Unlike traditional smart home systems requiring speech recognition, IntelliGest will detect common ASL and gestures to control a home. IntelliGest will utilize the robust and open-source [Home Assistant](https://www.home-assistant.io/)  software and API to serve as the foundations for the home assistant. Image recognition will be utilized to detect common ASL words and utilize them to control a smart home using a predefined set of actions available.
 
 ## High Level Requirement
 
@@ -30,7 +30,7 @@ Due to the need for Machine Learning, a Python backend may be preferred but Node
 
 ## Background
 
-The smart home ASL integration aims to provide an inclusive and accessible home automation solution. It utilizing computer vision techniques to interpret ASL and gestures, translating them into commands for your smart home. Home Assistant provides public integrations, and through a quick browse, you can find that there are no [integrations](https://www.home-assistant.io/integrations/) focused on accessibility. Popular smart home systems like [Google Home](https://home.google.com/welcome/) and [Amazon Alexa](https://alexa.amazon.com/) do provide smart home accessibility options, but those who are mute are left to have to manually perform actions on a device or screen. Our solution would alleviate that and allow smart home users to control their home via cameras detecting their ASL/gestures.
+The smart home ASL integration aims to provide an inclusive and accessible home automation solution. It utilizing computer vision techniques to interpret ASL and gestures, translating them into commands for your smart home. Home Assistant provides public integrations, and through a quick browse, you can find that there are no [integrations](https://www.home-assistant.io/integrations/) focused on accessibility. Popular smart home systems like [Google Home](https://home.google.com/welcome/) and [Amazon Alexa](https://alexa.amazon.com/) do provide smart home accessibility options, but those who are Non-verbal are left to have to manually perform actions on a device or screen. Our solution would alleviate that and allow smart home users to control their home via cameras detecting their ASL/gestures.
 
 ## Required Resources
 
@@ -83,6 +83,27 @@ The smart home ASL integration aims to provide an inclusive and accessible home 
             <img src="https://avatars.githubusercontent.com/u/118932320?v=4" width="100;" alt="oladapo"/>
             <br />
             <sub><b>Oladapo Oladele</b></sub>
+        </a>    
+    </td>
+    <td align="center">
+    <a href="https://github.com/Caseymonroe1">
+        <img src="https://avatars.githubusercontent.com/u/82054873?v=4" width="100;" alt="Caseymonroe1"/>
+        <br />
+        <sub><b>Casey Monroe</b></sub>
+    </a>
+</td>
+    <td align="center">
+        <a href="https://github.com/KevinXJarema">
+            <img src="https://avatars.githubusercontent.com/u/123217322?v=4" width="100;" alt="KevinXJarema"/>
+            <br />
+            <sub><b>Kevin Jarema</b></sub>
+        </a>    
+    </td>
+    <td align="center">
+        <a href="https://github.com/jzcodess">
+            <img src="https://avatars.githubusercontent.com/u/123219710?v=4" width="100;" alt="Jiajun Zhou"/>
+            <br />
+            <sub><b>Jiajun Zhou</b></sub>
         </a>    
     </td>
    </tr>
