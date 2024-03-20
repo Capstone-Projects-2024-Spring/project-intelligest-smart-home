@@ -4,8 +4,6 @@ import mediapipe as mp
 import time
 import numpy as np
 from tensorflow.keras.models import load_model
-#this requires python_weather, which is not included in requirements.txt, 
-#so you will need to install it with pip install python_weather
 #queue to find the right gesture
 from collections import deque
 def IdentifyGesture(prediction):
