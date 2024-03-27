@@ -9,3 +9,5 @@
 .env.production.local
 
 /venv/
+.venv/
+venv/
