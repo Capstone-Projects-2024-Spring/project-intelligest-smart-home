@@ -10,7 +10,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 1. Light Control through ASL Gestures"}>
 
-![Light Managment System](../../static/img/LightManagementSystem.png)
+![Light Managment System](../../static/img/1_Light_Management_System.png)
 
 </Figure>
 
@@ -18,7 +18,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 2. Weather Seeking through Gestures"}>
 
-![Weather Seeking through Gestures](../../static/img/WeatherSeekingthroughGestures.png)
+![Weather Seeking through Gestures](../../static/img/2_Weather_Seeking_through_Gestures.png)
 
 </Figure>
 
@@ -26,7 +26,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 3. Changing Kitchen Light Color"}>
 
-![Changing the Kitchen Light Color](../../static/img/ChangingKitchenLightColor.png)
+![Changing the Kitchen Light Color](../../static/img/3_Changing_Kitchen_Light_Color.png)
 
 </Figure>
 
@@ -34,7 +34,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 4. Smart Lock Setup and Control"}>
 
-![Smart Lock Setup and Control](../../static/img/Smartlocksetupandcontrol.png)
+![Smart Lock Setup and Control](../../static/img/4_Smart_Lock_Control.png)
 
 </Figure>
 
@@ -42,7 +42,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 6. Adding Reminders through Gestures"}>
 
-![Temperature Adjustment with ASL](../../static/img/AddingremindersthroughGestures.png)
+![Temperature Adjustment with ASL](../../static/img/5_Adding-Reminders-through-Gestures.png)
 
 </Figure>
 
@@ -50,7 +50,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 6. Temperature Adjustments with ASL"}>
 
-![Temperature Adjustment with ASL](../../static/img/TemperatureadjustmentwithASL.png)
+![Temperature Adjustment with ASL](../../static/img/6_Temperature_Adjustment_with_ASL.png)
 
 </Figure>
 
@@ -58,6 +58,6 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 7. Changing TV Channels"}>
 
-![Changing Channels](../../static/img/ChangingChannels.png)
+![Changing Channels](../../static/img/7_Changing_TV_Channels.png)
 
 </Figure>
