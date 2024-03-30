@@ -42,7 +42,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 6. Adding Reminders through Gestures"}>
 
-![Temperature Adjustment with ASL](../../static/img/5_Adding-Reminders-through-Gestures.png)
+![Temperature Adjustment with ASL](../../static/img/5-Adding-Reminders-through-Gestures.png)
 
 </Figure>
 
