@@ -8,6 +8,12 @@ import Figure from "../../src/components/Figure";
 
 ## Algorithms for Hand Signal Detection
 
+<Figure caption={"Use UML State Diagram"}>
+
+![UML State Diagram](../../static/img/StateDiagram.png)
+
+</Figure>
+
 ### Step 1: Continuous Motion Detection
 
 The Raspberry Pi camera feed is monitored using OpenCV motion detection continually until motion is detected. Once motion is detected, [Step 2](#step-2-hand-isolation) is activated.
