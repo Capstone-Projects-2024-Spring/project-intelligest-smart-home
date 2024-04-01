@@ -8,19 +8,19 @@ sidebar_position: 2
 
 ### Home Assistant
 
-Home Assistant is the core of our system, acting as the server. It’s responsible for managing the state of all connected devices and automations. It communicates with the user interface to display device statuses. It also communicates with the IntelliGest system by receiving data payloads sent through an MQTT Broker which include a prediction for the action. It also interacts with the devices themselves to control their states based on user input and automation rules.
+Home Assistant is the core of our system, acting as the server. It’s responsible for managing the state of all connected devices and automations. It communicates with the user interface to display device statuses. It also communicates with the IntelliGest system (Raspberry Pi) by receiving data payloads sent through an MQTT Broker which include a prediction for the action. It also interacts with the devices themselves to control their states based on user input and automation rules.
 
-### User Interface
+### Dashboard
 
-The user interface is the Home Assistant dashboard that allows users to interact with the system. It sends user commands to the Home Assistant and displays the status of the devices. The dashboard is highly customizable and can display information from various components. We will be creating custom cards for the dashboard to display ASL images.
+IntelliGest's Dashboard allows users to interact with the system. It sends user commands to the Home Assistant and displays the status of the devices. The dashboard is highly customizable and can display information from various components. We will be creating custom cards for the dashboard to display ASL images.
 
-### Devices
+### IntelliGest Devices
 
-These are the actual smart home devices (like lights, thermostats, cameras, etc.) that are being controlled. They communicate with Home Assistant to receive commands and send status updates. The devices are controlled using the built-in components provided by Home Assistant, but can be written to include other devices.
+It includes the actual Smart Home Appliances: Lights, TV, Thermostats, Alaram, and Locks. This devices can be controlled. They communicate with Home Assistant to receive commands and send status updates. The devices are controlled using the built-in components provided by Home Assistant, but can be written to include other devices.
 
 ### Python Scripts
 
-These are scripts that we will write to load the machine learning model into the Coral TPU, capture and pre-process images using OpenCV, and make predictions. The scripts will be run on a Raspberry Pi 4, with a Coral TPU co-processor.
+These are scripts that we will write to load the Machine Learning model on the TPU Coral (to decrease processing tiem), capture, and pre-process images using OpenCV, and make predictions. The scripts will be run on a Raspberry Pi 4, with a Coral TPU co-processor.
 
 The OpenCV library will be used to capture images or video frames from a camera connected to the Raspberry Pi. These images will then be preprocessed (e.g., resized, normalized) to be compatible with the input requirements of the TensorFlow Lite model.
 
@@ -38,14 +38,14 @@ title: IntelliGest Home
 ---
 
 classDiagram
-    HomeAssistant --|> UserInterface : sends commands and updates
-    HomeAssistant --|> Device : interacts with
-    HomeAssistant --|> PythonScripts : uses
-    UserInterface --|> JavaScriptCustomCards : uses
-    PythonScripts --|> Camera : captures image from
-    PythonScripts --|> TPU : loads model into
-    Camera --|> PythonScripts : sends image to
-    TPU --|> PythonScripts : sends prediction to
+    HomeAssistant <|--|> Dashboard : sends commands and updates
+    HomeAssistant <|--|> IntelliGestDevice : interacts with
+    HomeAssistant <|--|> PythonScripts : uses
+    UserInterface <|--|> JavaScriptCustomCards : uses
+    PythonScripts <|--|> Camera : captures image from
+    PythonScripts <|--|> TPU : loads model into
+    Camera <|--|> PythonScripts : sends image to
+    TPU <|--|> PythonScripts : sends prediction to
     class HomeAssistant {
         -devices[]
         -automations[]
