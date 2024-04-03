@@ -8,6 +8,12 @@ import Figure from "../../src/components/Figure";
 
 ## Algorithms for Hand Signal Detection
 
+<Figure caption={"Use UML State Diagram"}>
+
+![UML State Diagram](../../static/img/StateDiagram.png)
+
+</Figure>
+
 ### Step 1: Continuous Motion Detection
 
 The Raspberry Pi camera feed is monitored using OpenCV motion detection continually until motion is detected. Once motion is detected, [Step 2](#step-2-hand-isolation) is activated.
@@ -16,7 +22,7 @@ The Raspberry Pi camera feed is monitored using OpenCV motion detection continua
 
 An OpenCV hand detection model is used to draw a box around the user’s hand. The hand will be cropped, then preprocessed for [Step 3](#step-3-device-choice). If no hand is detected for 5 seconds, this process will cease and return to [Step 1](#step-1-continuous-motion-detection).
 
-### Step 3: Device Choice
+### Step 3: Detecting Home Device
 
 The prepared image of the hand will be input into an ASL recognition model, and the results from the model will be used to update the Raspberry Pi to show the intended device the user wants to send instructions to. A hand signal can be given to go back to [Step 2](#step-2-hand-isolation) if the model detects the hand gesture incorrectly.
 

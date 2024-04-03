@@ -222,3 +222,76 @@ Function loads Machine Learning model
 ##### `+make_prediction()`
 
 This function makes a prediction based on the preprocessed image using the model loaded into the Coral TPU.
+
+
+## Home Assistant RESTful API
+
+### Class Purpose
+
+RESTful API is responsible to establish communication between Home Assistant and IntelliGest, Home appliances. It will also get the state (On/off, etc) of Home appliances and will have power to change it as well.
+
+##### /api/ 
+Returns a message if the API is up and running.
+
+{
+  "message": "API running."
+}
+
+##### /api/services
+Returns an array of service objects. Each object contains the domain and which services it contains.
+
+[
+    {
+      "domain": "browser",
+      "services": [
+        "browse_url"
+      ]
+    },
+    {
+      "domain": "keyboard",
+      "services": [
+        "volume_up",
+        "volume_down"
+      ]
+    }
+]
+
+##### /api/states
+Returns an array of state objects. Each state has the following attributes: entity_id, state, last_changed and attributes
+
+[
+    {
+        "attributes": {},
+        "entity_id": "sun.sun",
+        "last_changed": "2016-05-30T21:43:32.418320+00:00",
+        "state": "below_horizon"
+    },
+    {
+        "attributes": {},
+        "entity_id": "process.Dropbox",
+        "last_changed": "22016-05-30T21:43:32.418320+00:00",
+        "state": "on"
+    }
+]
+
+
+##### /api/calendars
+Returns the list of calendar entities.
+
+[
+  {
+    "entity_id": "calendar.holidays",
+    "name": "National Holidays",
+  },
+  {
+    "entity_id": "calendar.personal",
+    "name": "Personal Calendar",
+  }
+]
+
+
+
+
+
+
+
