@@ -232,14 +232,14 @@ RESTful API is responsible to establish communication between Home Assistant and
 
 ##### /api/ 
 Returns a message if the API is up and running.
-
+```
 {
   "message": "API running."
 }
-
+```
 ##### /api/services
 Returns an array of service objects. Each object contains the domain and which services it contains.
-
+```
 [
     {
       "domain": "browser",
@@ -255,10 +255,10 @@ Returns an array of service objects. Each object contains the domain and which s
       ]
     }
 ]
-
+```
 ##### /api/states
 Returns an array of state objects. Each state has the following attributes: entity_id, state, last_changed and attributes
-
+```
 [
     {
         "attributes": {},
@@ -273,11 +273,12 @@ Returns an array of state objects. Each state has the following attributes: enti
         "state": "on"
     }
 ]
-
+```
 
 ##### /api/calendars
 Returns the list of calendar entities.
 
+```
 [
   {
     "entity_id": "calendar.holidays",
@@ -288,6 +289,7 @@ Returns the list of calendar entities.
     "name": "Personal Calendar",
   }
 ]
+```
 
 
 
