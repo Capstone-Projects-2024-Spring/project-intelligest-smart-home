@@ -1,9 +1,9 @@
 import cv2
-import python_weather, asyncio, os
+import  asyncio, os
 import mediapipe as mp
-import time
+import time, math
 import numpy as np
-from tensorflow.keras.models import load_model
+#from tensorflow.keras.models import load_model
 #this requires python_weather, which is not included in requirements.txt, 
 #so you will need to install it with pip install python_weather
 #queue to find the right gesture
@@ -29,18 +29,108 @@ def IdentifyGesture(prediction):
     elif prediction == 8:
         return "Two fingers pointing in a direction"
     else:
-        return "None"
+        print(prediction)
+        return "none"
 
+def calculate_angle(p1, p2, p3):
+    """Calculate the angle between three points."""
+    a = math.sqrt((p2.x - p3.x)**2 + (p2.y - p3.y)**2)
+    b = math.sqrt((p1.x - p3.x)**2 + (p1.y - p3.y)**2)
+    c = math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
+    angle = math.acos((a**2 + c**2 - b**2) / (2 * a * c))
+    return math.degrees(angle)
+
+    # In your existing thumbClassifier, incorporate angle calculations where needed.
+    # For example, to check if the thumb is extended in a thumbs-up gesture:
+    
+class hand:
+    def __init__(self,hand):
+        self.wrist = hand.landmark[0]
+        self.thumb = finger(hand.landmark[1:5],self.wrist)
+        self.indexFinger = finger(hand.landmark[5:9],self.wrist)
+        self.middleFinger = finger(hand.landmark[9:13],self.wrist)
+        self.ringFinger = finger(hand.landmark[13:17],self.wrist)
+        self.pinky = finger(hand.landmark[17:21],self.wrist)
+        self.fingers = [self.thumb,self.indexFinger,self.middleFinger,self.ringFinger,self.pinky]
+        self.fingersUp, self.fingersDown,self.fingersFlat = self.getFingerDirections()
+        self.gesture = self.getGesture()
+    def getFingerDirections(self):
+        up,down,flat=0,0,0
+        for finger in self.fingers:
+            if finger.direction == 'up':
+                up+=1
+            elif finger.direction =='down':
+                down+=1
+            else:
+                flat+=1
+        return up,down,flat
+    
+    def getGesture(self):
+        # Refine gesture detection using counts
+        if self.fingersUp == 4 and self.thumb.direction == 'up':
+            return 'five fingers up'
+        elif self.fingersUp == 4:
+            return 'four fingers up'
+        elif self.fingersUp == 3:
+            return 'three fingers up'
+        elif self.fingersUp == 2:
+            return 'two fingers up'
+        elif self.indexFinger.direction == 'up' and self.fingersUp == 1:
+            return 'one finger up - index'
+        elif self.thumb.direction == 'up':
+            return 'thumbs up'
+        elif self.thumb.direction == 'down':
+            return 'thumbs down'
+        elif self.thumb.direction == 'flat':
+            return 'thumb flat'
+        else:
+            return 'unknown gesture'
+            
+
+class finger:
+    def __init__(self, points, wrist):
+        self.wrist = wrist
+        self.points = points
+        self.direction=self.getDirection()
+        self.angle = self.calculate_angle(points[-1], wrist, points[0])
+        #print(self.angle)
+    def getDirection(self):
+        upPoints=0
+        downPoints=0
+        for i in range(len(self.points)-1):
+            if self.points[i].y > self.points[i+1].y:
+                upPoints+=1
+            else:
+                downPoints+=1
+        if abs(self.points[2].y - self.wrist.y)<0.2:
+            return 'flat'
+        else:
+            return 'up' if upPoints>downPoints else 'down'
+    
+    def calculate_angle(self,p1, p2, p3):
+        # Calculate the sides of the triangle
+        a = math.sqrt((p2.x - p3.x) ** 2 + (p2.y - p3.y) ** 2)
+        b = math.sqrt((p1.x - p3.x) ** 2 + (p1.y - p3.y) ** 2)
+        c = math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
+
+        # Calculate the angle at p1 using the cosine rule
+        angle = math.acos((b ** 2 + c ** 2 - a ** 2) / (2 * b * c))
+        return math.degrees(angle)
+    
+            
 def thumbClassifier(results):
-    thumb_tip, wrist = results.multi_hand_landmarks[0].landmark[4], results.multi_hand_landmarks[0].landmark[0]
-    difference = abs(thumb_tip.y - wrist.y)
-    if difference < .2:
-        return 'undefined'
-    elif thumb_tip.y < wrist.y:
-        return 'Thumbs up'
-    else:
-        return 'Thumbs down'
+    res=results.multi_hand_landmarks[0].landmark
+    GestureObject = hand(results.multi_hand_landmarks[0])
+    
+    # print('Thumb angle: ', thumb.angle)
+    # print('Ring Finger angle: ', ringFinger.angle)
+    # print('Middle Finger angle: ', middleFinger.angle)
+    # print('Index Finger angle: ', indexFinger.angle)
+    # print('Pinky Finger angle: ', pinkyFinger.angle)
+    # print(wrist.x, wrist.y, wrist.z)
 
+    return GestureObject.gesture
+    
 def createSquare(results, img):
     h, w, c = img.shape
     min_x, min_y = w, h
@@ -84,10 +174,10 @@ def createSquare(results, img):
 
 def preprocessHandRegion(handRegion):
     #resize the image to the same resolution used in the dataset
-    resized_hand = cv2.resize(handRegion, (64,64))
+    resized_hand = cv2.resize(handRegion, (224,224))
     normalized_hand = resized_hand / 255.0
     
-    reshaped_hand = np.reshape(normalized_hand, (64,64, 3))
+    reshaped_hand = np.reshape(normalized_hand, (224,224, 3))
     batch_hand = np.expand_dims(reshaped_hand, axis=0)
     return batch_hand
 
@@ -103,8 +193,9 @@ def getHandFromImage(img,hands):
             print("error in getHandFromImage")
             return None, img
         return handRegion, img
-    
+
 def detectHand(hands, cap, cTime, pTime, ASLModel, colors):
+    
     gestureName=""
     success, img = cap.read()
     cv2.putText(img, "looking for ASL gestures", (int(img.shape[1]/2),20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
@@ -122,10 +213,11 @@ def detectHand(hands, cap, cTime, pTime, ASLModel, colors):
             #Preprocess the hand region for the ASL model
             preprocessedHand = preprocessHandRegion(handRegion) 
             #Predict the ASL gesture given by user
-            asl_prediction = ASLModel.predict(preprocessedHand) 
-
+            #asl_prediction = ASLModel.predict(preprocessedHand) 
+            asl_prediction = 1
             #turning the gesture from clas number to real name and adding to video feed
-            gestureName = "Detected Gesture: " + IdentifyGesture(np.argmax(asl_prediction)) 
+            #gestureName = "Detected Gesture: " + IdentifyGesture(np.argmax(asl_prediction)) 
+            gestureName = thumbClassifier(results)
     cTime = time.time()
     fps = 1/(cTime-pTime)
     pTime = cTime
@@ -241,37 +333,34 @@ def main():
 
 
     firstDetected,secondDetected=None, None
-    ASLModel=load_model('ASLModelV3.h5')
-
+    #ASLModel=load_model('v5model')
+    ASLModel = ""
 
 
     queue=deque(maxlen=10)
     queueTwo=deque(maxlen=30)
     while True:
+        print('start')
         pTime,cTime, detected = detectHand(hands,cap, cTime, pTime, ASLModel, 155)
         if detected!='': queue.append(detected)
         if len(queue)==10 and len(set(queue))==1:
             queue.clear()
             firstDetected=detected
-            print(f'{firstDetected} is the one.')
+            #print(f'{firstDetected} is the one.')
             break
     while True:
         pTime, cTime, detected = InstructionCommand(hands,cap,cTime,pTime, firstDetected)
-        if detected in ('Thumbs up', 'Thumbs down'): queueTwo.append(detected)
-        print(detected)
+        if detected: queueTwo.append(detected)
+        #print(detected)
         if len(queueTwo)==30 and len(set(queueTwo))==1:
             queue.clear()
             secondDetected=detected
             print(f'{firstDetected} then {secondDetected} is your first/second command, exiting now.')
             break
-    if secondDetected == 'Thumbs up':
-        makeTheTemperature(hands, cap, cTime, pTime,firstDetected)
-        
-        
-        # Your existing hand detection and command logic here
         
     # cap.release()
     # cv2.destroyAllWindows()
-main()
+if __name__ == "__main__":
+    main()
 
 
