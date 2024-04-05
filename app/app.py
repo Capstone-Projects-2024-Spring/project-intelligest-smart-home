@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, jsonify
 import cv2
 import time
 import cv2
@@ -72,34 +72,10 @@ def detectHand(hands, img, cTime, pTime, ASLModel, colors):
     cv2.putText(img,str(int(fps)), (10,70), cv2.FONT_HERSHEY_PLAIN, 3, (colors,50,colors), 3)
     #cv2.imshow("Image", img)
     cv2.waitKey(1)
+    global latest_gesture  # Declare it as global inside the function if you're updating it
+    # Update this line accordingly in your detectHand function
+    latest_gesture = gestureName  # gestureName is the detected gesture
     return pTime, cTime, gestureName,img
-
-def InstructionCommand(hands, img, cTime, pTime,firstDetected):
-    result = ""
-    
-    cv2.putText(img, f'''Thumbs for  {firstDetected}''', (int(img.shape[1]/3),20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
-    if img is None:
-        print("empty camera frame!!!!!")
-    
-    results = hands.process(img)
-    if results.multi_hand_landmarks:
-        #get the dimensions for the cropped image
-        minX,minY,maxX,maxY=createSquare(results,img)
-        # Draw the square bounding box
-        cv2.rectangle(img, (minX, minY), (maxX, maxY), (0, 0, 0), 2)
-        if minX < maxX and minY < maxY:
-            result = thumbClassifier(results)
-        
-    cTime = time.time()
-    fps = 1/(cTime-pTime)
-    pTime = cTime
-        
-    cv2.putText(img,result, (10,130), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
-    cv2.putText(img,str(int(fps))+' FPS', (10,70), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
-    cv2.imshow("Image", img)
-    cv2.waitKey(1)
-    return pTime, cTime, result
-
 
 app = Flask(__name__)
 mpHands = mp.solutions.hands
@@ -108,6 +84,7 @@ hands = mpHands.Hands(static_image_mode=False,
                     min_detection_confidence=0.5,
                     min_tracking_confidence=0.5)
 
+latest_gesture = 'No gesture detected yet'
 
 # Your existing code modified for Flask will go here
 
@@ -139,6 +116,10 @@ def video_feed():
 def index():
     """Video streaming home page."""
     return render_template('index.html')
+
+@app.route('/current_gesture')
+def current_gesture():
+    return jsonify(gesture=latest_gesture)
 
 if __name__ == "__main__":
     app.run(debug=True)

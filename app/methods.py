@@ -1,6 +1,7 @@
 import math,cv2
 
 
+
 class hand:
     def __init__(self,hand):
         self.wrist = hand.landmark[0]
@@ -127,3 +128,30 @@ def getHandFromImage(img,hands):
             print("error in getHandFromImage")
             return None, img
         return handRegion, img
+    
+def InstructionCommand(hands, img, cTime, pTime,firstDetected):
+    result = ""
+    
+    cv2.putText(img, f'''Thumbs for  {firstDetected}''', (int(img.shape[1]/3),20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
+    if img is None:
+        print("empty camera frame!!!!!")
+    
+    results = hands.process(img)
+    if results.multi_hand_landmarks:
+        #get the dimensions for the cropped image
+        minX,minY,maxX,maxY=createSquare(results,img)
+        # Draw the square bounding box
+        cv2.rectangle(img, (minX, minY), (maxX, maxY), (0, 0, 0), 2)
+        if minX < maxX and minY < maxY:
+            result = thumbClassifier(results)
+        
+    cTime = time.time()
+    fps = 1/(cTime-pTime)
+    pTime = cTime
+        
+    cv2.putText(img,result, (10,130), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
+    cv2.putText(img,str(int(fps))+' FPS', (10,70), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
+    cv2.imshow("Image", img)
+    cv2.waitKey(1)
+    return pTime, cTime, result
+
