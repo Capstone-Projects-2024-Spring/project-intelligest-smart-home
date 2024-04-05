@@ -28,6 +28,7 @@ def thumbClassifier(results):
     return GestureObject.gesture
 
 
+
 def preprocessHandRegion(handRegion):
     #resize the image to the same resolution used in the dataset
     resized_hand = cv2.resize(handRegion, (224,224))
@@ -83,8 +84,9 @@ hands = mpHands.Hands(static_image_mode=False,
                     max_num_hands=1,
                     min_detection_confidence=0.5,
                     min_tracking_confidence=0.5)
-
 latest_gesture = 'No gesture detected yet'
+firstGesture, secondGesture = 'No gesture detected yet','No gesture detected yet'
+firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
 
 # Your existing code modified for Flask will go here
 
@@ -99,6 +101,30 @@ def gen_frames(cap):  # Generator function
             # Instead of cv2.imshow, convert frame to bytes and yield
             pTime,cTime, detected, frame = detectHand(hands,img, 0,0, '', 155)
             print(detected)
+            if detected: firstQueue.append(detected)
+            if len(firstQueue) ==30 and len(set(firstQueue))==1:
+                print("first gesture detected")
+                global firstGesture
+                firstGesture = set(firstQueue).pop()
+                firstQueue.clear()
+                while True:
+                    print('made it into second loop')
+                    success, img = cap.read()
+                    if not success:
+                        break
+                    else:
+                        pTime,cTime, detected, frame = detectHand(hands,img, pTime,cTime, '', 155)
+                    if detected: secondQueue.append(detected)
+                    ret, buffer = cv2.imencode('.jpg', img)
+                    img = buffer.tobytes()
+                    if len(secondQueue)== 30 and len(set(secondQueue))==1:
+                        global secondGesture
+                        secondGesture = set(secondQueue).pop()
+                        print('both gestures are',firstGesture,secondGesture)
+                        time.sleep(3)
+                        quit()
+                    yield (b'--frame\r\n'
+                        b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
             #cv2.putText(img,'put text on the frame', (10,130), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
             ret, buffer = cv2.imencode('.jpg', img)
             img = buffer.tobytes()
@@ -119,9 +145,7 @@ def index():
 
 @app.route('/current_gesture')
 def current_gesture():
-    return jsonify(gesture=latest_gesture)
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture)
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    
-    
+    app.run(debug=True) 

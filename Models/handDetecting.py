@@ -299,27 +299,7 @@ def makeTheTemperature(hands, cap, cTime, pTime,firstDetected):
     cv2.waitKey(1)
     return pTime, cTime, result
 
-def runFirstIteration(hands, cap, cTime, pTime, ASLModel):
-    queue=deque(maxlen=10)
-    while True:
-        pTime,cTime, detected = detectHand(hands,cap, cTime, pTime, ASLModel, 155)
-        if detected!='': queue.append(detected)
-        if len(queue)==10 and len(set(queue))==1:
-            queue.clear()
-            firstDetected=detected
-            print(f'{firstDetected} is the one.')
-            return detected
-    
-def runSecondIteration(hands, cap, cTime, pTime, firstDetected):
-    queueTwo=deque(maxlen=30)
-    while True:
-        pTime, cTime, detected = InstructionCommand(hands,cap,cTime,pTime, firstDetected)
-        if detected in ('Thumbs up', 'Thumbs down'): queueTwo.append(detected)
-        print(detected)
-        if len(queueTwo)==30 and len(set(queueTwo))==1:
-            secondDetected=detected
-            print(f'{firstDetected} then {secondDetected} is your first/second command, exiting now.')
-            return detected
+
     
 def main():
     cap = cv2.VideoCapture(0)
@@ -362,5 +342,3 @@ def main():
     # cv2.destroyAllWindows()
 if __name__ == "__main__":
     main()
-
-

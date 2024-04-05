@@ -1,5 +1,4 @@
-import math,cv2
-
+import math,cv2, time
 
 
 class hand:
@@ -128,6 +127,22 @@ def getHandFromImage(img,hands):
             print("error in getHandFromImage")
             return None, img
         return handRegion, img
+    
+
+def thumbClassifier(results):
+    res=results.multi_hand_landmarks[0].landmark
+    GestureObject = hand(results.multi_hand_landmarks[0])
+    
+    # print('Thumb angle: ', thumb.angle)
+    # print('Ring Finger angle: ', ringFinger.angle)
+    # print('Middle Finger angle: ', middleFinger.angle)
+    # print('Index Finger angle: ', indexFinger.angle)
+    # print('Pinky Finger angle: ', pinkyFinger.angle)
+    # print(wrist.x, wrist.y, wrist.z)
+
+    return GestureObject.gesture
+
+
     
 def InstructionCommand(hands, img, cTime, pTime,firstDetected):
     result = ""
