@@ -18,6 +18,8 @@ Light controlling through HA(Home Assistant) and MQTT includes configuring both 
             2. RGB color values for color control
             3. Brightness levels to adjust the light brightness
 
+    [viste web for more information](https://www.home-assistant.io/integrations/light.mqtt/)
+
 # To connect light to MQTT and integrate them into HA setup
 
     - Organize Configuration files
@@ -37,3 +39,5 @@ Light controlling through HA(Home Assistant) and MQTT includes configuring both 
     
     - Test setup
         Now, should be able to test for the result. To test setup by controlling lights through HA and checking if the state changes are correctly reflected and synchronized through MQTT
+
+    [viste web for more information](https://hoij.net/howto/connect-home-assistant-lights-to-mqtt/)
