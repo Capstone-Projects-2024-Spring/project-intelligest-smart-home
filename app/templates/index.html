@@ -97,9 +97,9 @@
     <style>
         .content-container {
             display: flex; /* Enables flexbox layout */
-            align-items: start; /* Align items at the start of the cross axis */
-            justify-content: center; /* Center items on the main axis */
-            flex-wrap: wrap; /* Allow items to wrap as needed */
+            justify-content: space-between; /* Center items on the main axis */
+            align-items: flex-start; /* Align items at the start of the cross axis */
+            /* flex-wrap: wrap; Allow items to wrap as needed */ 
         }
     
         .video-container {
@@ -109,7 +109,7 @@
     
         .blocks-container {
             display: flex; /* Use flexbox */
-            flex-direction: column; /* Align children in a row */
+            flex-direction: row; /* Align children in a row */
             justify-content: space-around; /* Distribute space around the items */
             width: 100%; /* Fill the width of the parent */
             box-sizing: border-box; /* Include padding and border in the element's width and height */
@@ -132,9 +132,10 @@
 <body>
     <div class="content-container">
         <!-- Video Stream -->
-        <div class="video-container">
+        <div class="video-container" justify-content= "right">
             <h1>Video Stream</h1>
-            <img src="{{ url_for('video_feed') }}" alt="Video Feed" style="width: 100%; max-width: 640px; height: auto;">
+            <!-- <img src="{{ url_for('video_feed') }}" alt="Video Feed" style="width: 100%; max-width: 640px; height: auto;"> -->
+            <img src="{{ url_for('static', filename='images/all-gestures.png') }}" alt="Video Feed" style="width: 500px; height: auto;">
             <div id="gesture">Current Gesture: No gesture detected yet</div>
             <div id="gestures">
                 <p>First Gesture: <span id="firstGesture">Waiting...</span></p>
