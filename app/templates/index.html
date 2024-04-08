@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Stream</title>
+    <style>
+        .content-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .video-container {
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .all-gestures-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-container img,
+        .all-gestures-container img {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <!-- Video Stream -->
+        <div class="video-container" justify-content= "left">
+            <h1>Video Stream</h1>
+            <img src="{{ url_for('video_feed') }}" alt="Video Feed" style="width: 500px;">
+            <!--<img src="{{ url_for('static', filename='images/all-gestures.png') }}" alt="Video Feed" style="width: 500px;">-->
+            <div id="gesture">Current Gesture: No gesture detected yet</div>
+            <div id="gestures">
+                <p>First Gesture: <span id="firstGesture">Waiting...</span></p>
+                <p>Second Gesture: <span id="secondGesture">Waiting...</span></p>
+            </div>
+        </div>
+        
+        <!-- Blocks Container (already correctly styled) -->
+        <div class="blocks-container" justify-content= "right">
+            <div class="block">
+                <img src="{{ url_for('static', filename='images/all-gestures.png') }}" alt="Gestures" style="width: 500px;">
+                <p>Light Gesture</p>
+            </div>
+            <!--<div class="block">
+                <img src="{{ url_for('static', filename='images/news.png') }}" alt="News">
+                <p>News Gesture</p>
+            </div>
+            <div class="block">
+                <img src="{{ url_for('static', filename='images/weather.png') }}" alt="Weather">
+                <p>Weather Gesture</p>
+            </div> -->
+        </div>
+    </div>
+    <script>
+    setInterval(function() {
+        fetch('/current_gesture')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('gesture').innerHTML = 'Current Gesture: ' + data.gesture;
+                document.getElementById('firstGesture').textContent = data.firstGesture || 'No gesture detected yet';
+                document.getElementById('secondGesture').textContent = data.secondGesture || 'No gesture detected yet';
+        
+            });
+    }, 1000);
+    </script>
+    
+    
+</body>
+</html>
