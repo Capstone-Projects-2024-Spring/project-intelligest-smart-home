@@ -1,5 +1,5 @@
 import math,cv2, time
-
+import numpy as np
 
 class hand:
     def __init__(self,hand):
@@ -142,6 +142,15 @@ def thumbClassifier(results):
 
     return GestureObject.gesture
 
+
+def preprocessHandRegion(handRegion):
+    #resize the image to the same resolution used in the dataset
+    resized_hand = cv2.resize(handRegion, (224,224))
+    normalized_hand = resized_hand / 255.0
+    
+    reshaped_hand = np.reshape(normalized_hand, (224,224, 3))
+    batch_hand = np.expand_dims(reshaped_hand, axis=0)
+    return batch_hand
 
     
 def InstructionCommand(hands, img, cTime, pTime,firstDetected):

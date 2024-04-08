@@ -3,36 +3,65 @@
 <head>
     <title>Video Stream</title>
     <style>
+        html, body {
+            margin: 0; /* Removes the margin from the body */
+            padding: 0; /* Removes padding from the body */
+            overflow: auto; /* Prevents scrolling */
+            height: 100%; /* Ensures the body takes full viewport height */
+        }
+    
         .content-container {
-            display: flex; /* Enables flexbox layout */
-            align-items: start; /* Align items at the start of the cross axis */
-            justify-content: center; /* Center items on the main axis */
-            flex-wrap: wrap; /* Allow items to wrap as needed */
+            display: flex;
+            font-size = 20px;
+            flex-direction: row; /* Adjusts direction to row to place video and blocks side by side */
+            align-items: start;
+            justify-content: center;
+            flex-wrap: nowrap; /* Prevents wrapping to ensure no scrolling */
+            height: 100vh; /* Sets the container height to fill the viewport */
         }
     
         .video-container {
-            /* Adjustments as needed, e.g., margins */
-            margin-right: 20px; /* Adds some space between the video and the blocks */
+            flex: 1; /* Allows the video container to grow and fill available space */
+            max-width: 40%; /* Limits the maximum width of the video container */
+            /* Adjusts margin and padding as needed */
         }
     
         .blocks-container {
-            display: flex; /* Use flexbox */
-            flex-direction: row; /* Align children in a row */
-            justify-content: space-around; /* Distribute space around the items */
-            width: 100%; /* Fill the width of the parent */
-            box-sizing: border-box; /* Include padding and border in the element's width and height */
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            margin-left: auto;
+            flex-grow: 0;
+            width: 20%;
+            height: 100vh;
+            overflow-y: hidden;
+            padding: 10px 0; /* Adds padding to the top and bottom */
         }
         
         .block {
-            flex-grow: 1; /* Allow the blocks to grow and fill the container */
-            margin: 5px; /* Optional: Adds some space between the blocks */
-            /* Other styles remain the same */
+            margin: 5px 10px; /* Adjust margins for left and right */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Ensures space is distributed between img and text */
+            align-items: center;
+            flex-grow: 1; /* Allows block to grow as needed */
+            min-height: 100px; /* Sets a minimum height */
         }
         
         .block img {
-            width: 100%; /* Make images fill the block */
-            height: auto; /* Keep the image aspect ratio */
-            /* Other styles remain the same */
+            width: auto; /* Allows width to adjust based on height */
+            max-height: 60%; /* Limits image height to leave space for text */
+            object-fit: contain; /* Ensures image is scaled properly without distortion */
+        }
+        
+        .block p {
+            text-align: center;
+            margin-top: 5px; /* Ensures a small space between the image and the text */
+            flex-shrink: 0; /* Prevents text from shrinking */
+            width: 100%; /* Ensures text width matches block width */
+            overflow: hidden; /* Hides overflow text */
+            text-overflow: ellipsis; /* Adds an ellipsis to text that overflows */
+            white-space: nowrap; /* Keeps text in a single line */
         }
         /* Your existing .block and .block img styles */
     </style>
@@ -41,10 +70,10 @@
     <div class="content-container">
         <!-- Video Stream -->
         <div class="video-container">
-            <h1>Video Stream</h1>
             <img src="{{ url_for('video_feed') }}" alt="Video Feed" style="width: 100%; max-width: 640px; height: auto;">
-            <div id="gesture">Current Gesture: No gesture detected yet</div>
+            
             <div id="gestures">
+                <p>Current Gesture: <span id="currentGesture">Waiting...</span></p>
                 <p>First Gesture: <span id="firstGesture">Waiting...</span></p>
                 <p>Second Gesture: <span id="secondGesture">Waiting...</span></p>
             </div>
@@ -71,7 +100,7 @@
         fetch('/current_gesture')
             .then(response => response.json())
             .then(data => {
-                document.getElementById('gesture').innerHTML = 'Current Gesture: ' + data.gesture;
+                document.getElementById('currentGesture').textContent = data.gesture || 'No gesture detected yet';
                 document.getElementById('firstGesture').textContent = data.firstGesture || 'No gesture detected yet';
                 document.getElementById('secondGesture').textContent = data.secondGesture || 'No gesture detected yet';
         

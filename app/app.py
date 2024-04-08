@@ -28,23 +28,11 @@ def thumbClassifier(results):
     return GestureObject.gesture
 
 
-
-def preprocessHandRegion(handRegion):
-    #resize the image to the same resolution used in the dataset
-    resized_hand = cv2.resize(handRegion, (224,224))
-    normalized_hand = resized_hand / 255.0
-    
-    reshaped_hand = np.reshape(normalized_hand, (224,224, 3))
-    batch_hand = np.expand_dims(reshaped_hand, axis=0)
-    return batch_hand
-
-
-
-def detectHand(hands, img, cTime, pTime, ASLModel, colors):
+def detectHand(hands, img, ASLModel):
     
     gestureName=""
-    #success, img = cap.read()
-    cv2.putText(img, "looking for ASL gestures", (int(img.shape[1]/2),20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
+    
+    #cv2.putText(img, "looking for ASL gestures", (int(img.shape[1]/2),20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
     if img is None:
         print("empty camera frame!!!!!")
         
@@ -53,7 +41,7 @@ def detectHand(hands, img, cTime, pTime, ASLModel, colors):
         #get the dimensions for the cropped image
         minX,minY,maxX,maxY=createSquare(results,img)
         # Draw the square bounding box
-        cv2.rectangle(img, (minX, minY), (maxX, maxY), (colors, colors, colors), 2)
+        cv2.rectangle(img, (minX, minY), (maxX, maxY), (155, 155, 155), 2)
         if minX < maxX and minY < maxY:
             handRegion = img[minY:maxY, minX:maxX]
             #Preprocess the hand region for the ASL model
@@ -64,19 +52,17 @@ def detectHand(hands, img, cTime, pTime, ASLModel, colors):
             #turning the gesture from clas number to real name and adding to video feed
             #gestureName = "Detected Gesture: " + IdentifyGesture(np.argmax(asl_prediction)) 
             gestureName = thumbClassifier(results)
-    cTime = time.time()
-    fps = 1/(cTime-pTime)
-    pTime = cTime
+    
     
     #adding all the text before displaying the image
-    cv2.putText(img, gestureName, (10, 130), cv2.FONT_HERSHEY_PLAIN, 2, (colors, colors, colors), 2)
-    cv2.putText(img,str(int(fps)), (10,70), cv2.FONT_HERSHEY_PLAIN, 3, (colors,50,colors), 3)
+    #cv2.putText(img, gestureName, (10, 130), cv2.FONT_HERSHEY_PLAIN, 2, (colors, colors, colors), 2)
+    #cv2.putText(img,str(int(fps)), (10,70), cv2.FONT_HERSHEY_PLAIN, 3, (colors,50,colors), 3)
     #cv2.imshow("Image", img)
-    cv2.waitKey(1)
+    
     global latest_gesture  # Declare it as global inside the function if you're updating it
     # Update this line accordingly in your detectHand function
     latest_gesture = gestureName  # gestureName is the detected gesture
-    return pTime, cTime, gestureName,img
+    return gestureName,img
 
 app = Flask(__name__)
 mpHands = mp.solutions.hands
@@ -88,18 +74,37 @@ latest_gesture = 'No gesture detected yet'
 firstGesture, secondGesture = 'No gesture detected yet','No gesture detected yet'
 firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
 
-# Your existing code modified for Flask will go here
+def detect_motion(last_frame, current_frame, threshold=50):
+    # Convert frames to grayscale
+    gray_last = cv2.cvtColor(last_frame, cv2.COLOR_BGR2GRAY)
+    gray_current = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
+    
+    # Apply Gaussian Blur to reduce noise and detail
+    gray_last = cv2.GaussianBlur(gray_last, (21, 21), 0)
+    gray_current = cv2.GaussianBlur(gray_current, (21, 21), 0)
+    
+    # Compute the absolute difference between the current frame and reference frame
+    frame_diff = cv2.absdiff(gray_last, gray_current)
+    
+    # Threshold the difference
+    _, thresh = cv2.threshold(frame_diff, threshold, 255, cv2.THRESH_BINARY)
+    
+    # Find contours to see if there are significant changes
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Return True if contours are found
+    return len(contours) > 0
 
-
-def gen_frames(cap):  # Generator function
+def gen_frames(cap): 
+    inMotion = False
+    last_frame = None
     while True:
         success, img = cap.read()
         if not success:
             break
         else:
-            # Your hand detection and instructions code integrated here
-            # Instead of cv2.imshow, convert frame to bytes and yield
-            pTime,cTime, detected, frame = detectHand(hands,img, 0,0, '', 155)
+            
+            detected, frame = detectHand(hands,img, '')
             print(detected)
             if detected: firstQueue.append(detected)
             if len(firstQueue) ==30 and len(set(firstQueue))==1:
@@ -113,7 +118,7 @@ def gen_frames(cap):  # Generator function
                     if not success:
                         break
                     else:
-                        pTime,cTime, detected, frame = detectHand(hands,img, pTime,cTime, '', 155)
+                        detected, frame = detectHand(hands,img, '')
                     if detected: secondQueue.append(detected)
                     ret, buffer = cv2.imencode('.jpg', img)
                     img = buffer.tobytes()
@@ -122,7 +127,10 @@ def gen_frames(cap):  # Generator function
                         secondGesture = set(secondQueue).pop()
                         print('both gestures are',firstGesture,secondGesture)
                         time.sleep(3)
-                        quit()
+                        firstGesture,secondGesture = 'No gesture detected yet','No gesture detected yet'
+                        secondQueue.clear()
+                        
+                        break
                     yield (b'--frame\r\n'
                         b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
             #cv2.putText(img,'put text on the frame', (10,130), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
