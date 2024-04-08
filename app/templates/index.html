@@ -11,57 +11,35 @@
         }
     
         .content-container {
-            display: flex;
-            font-size = 20px;
-            flex-direction: row; /* Adjusts direction to row to place video and blocks side by side */
-            align-items: start;
-            justify-content: center;
-            flex-wrap: nowrap; /* Prevents wrapping to ensure no scrolling */
-            height: 100vh; /* Sets the container height to fill the viewport */
+            display: flex; /* Enables flexbox layout */
+            align-items: start; /* Align items at the start of the cross axis */
+            justify-content: center; /* Center items on the main axis */
+            flex-wrap: wrap; /* Allow items to wrap as needed */
         }
-    
+
         .video-container {
-            flex: 1; /* Allows the video container to grow and fill available space */
-            max-width: 40%; /* Limits the maximum width of the video container */
-            /* Adjusts margin and padding as needed */
+            /* Adjustments as needed, e.g., margins */
+            margin-right: 20px; /* Adds some space between the video and the blocks */
         }
     
         .blocks-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: start;
-            margin-left: auto;
-            flex-grow: 0;
-            width: 20%;
-            height: 100vh;
-            overflow-y: hidden;
-            padding: 10px 0; /* Adds padding to the top and bottom */
+            display: flex; /* Use flexbox */
+            flex-direction: row; /* Align children in a row */
+            justify-content: space-around; /* Distribute space around the items */
+            width: 100%; /* Fill the width of the parent */
+            box-sizing: border-box; /* Include padding and border in the element's width and height */
         }
         
         .block {
-            margin: 5px 10px; /* Adjust margins for left and right */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; /* Ensures space is distributed between img and text */
-            align-items: center;
-            flex-grow: 1; /* Allows block to grow as needed */
-            min-height: 100px; /* Sets a minimum height */
+            flex-grow: 1; /* Allow the blocks to grow and fill the container */
+            margin: 5px; /* Optional: Adds some space between the blocks */
+            /* Other styles remain the same */
         }
         
         .block img {
-            width: auto; /* Allows width to adjust based on height */
-            max-height: 60%; /* Limits image height to leave space for text */
-            object-fit: contain; /* Ensures image is scaled properly without distortion */
-        }
-        
-        .block p {
-            text-align: center;
-            margin-top: 5px; /* Ensures a small space between the image and the text */
-            flex-shrink: 0; /* Prevents text from shrinking */
-            width: 100%; /* Ensures text width matches block width */
-            overflow: hidden; /* Hides overflow text */
-            text-overflow: ellipsis; /* Adds an ellipsis to text that overflows */
-            white-space: nowrap; /* Keeps text in a single line */
+            width: 100%; /* Make images fill the block */
+            height: auto; /* Keep the image aspect ratio */
+            /* Other styles remain the same */
         }
         /* Your existing .block and .block img styles */
     </style>
@@ -70,8 +48,9 @@
     <div class="content-container">
         <!-- Video Stream -->
         <div class="video-container">
+            <h1>Video Stream</h1>
             <img src="{{ url_for('video_feed') }}" alt="Video Feed" style="width: 100%; max-width: 640px; height: auto;">
-            
+            <div id="gesture">Current Gesture: No gesture detected yet</div>
             <div id="gestures">
                 <p>Current Gesture: <span id="currentGesture">Waiting...</span></p>
                 <p>First Gesture: <span id="firstGesture">Waiting...</span></p>
@@ -80,19 +59,19 @@
         </div>
         
         <!-- Blocks Container (already correctly styled) -->
-        <div class="blocks-container">
+        <div class="blocks-container" justify-content= "right">
             <div class="block">
-                <img src="{{ url_for('static', filename='images/light.png') }}" alt="Light">
+                <img src="{{ url_for('static', filename='images/all-gestures.png') }}" alt="Gestures" style="width: 500px;">
                 <p>Light Gesture</p>
             </div>
-            <div class="block">
+            <!--<div class="block">
                 <img src="{{ url_for('static', filename='images/news.png') }}" alt="News">
                 <p>News Gesture</p>
             </div>
             <div class="block">
                 <img src="{{ url_for('static', filename='images/weather.png') }}" alt="Weather">
                 <p>Weather Gesture</p>
-            </div>
+            </div> -->
         </div>
     </div>
     <script>
