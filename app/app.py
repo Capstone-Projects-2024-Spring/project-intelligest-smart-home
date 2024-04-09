@@ -14,9 +14,6 @@ from methods import *
 #queue to find the right gesture
 from collections import deque
 
-deviceStatus = "N/A"
-deviceChoice = "N/A"
-
 
 #https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/gesture_recognizer/python/gesture_recognizer.ipynb#scrollTo=TUfAcER1oUS6
 #https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer/python#video
@@ -80,6 +77,7 @@ def toggle_light():
     response = requests.post(url, json=data, headers=headers)
     if response.status_code == 200:
         # Get the new state of the light
+        time.sleep(1)
         light_state = requests.get(f"http://localhost:8123/api/states/{data['entity_id']}", headers=headers).json()
         return light_state['state'] == 'on' 
     return None
@@ -200,12 +198,12 @@ def video_feed():
 @app.route('/')
 def index():
     
-    return render_template('index.html', deviceChoice=deviceChoice, deviceStatus=deviceStatus)
+    return render_template('index.html')
 
 @app.route('/current_gesture')
 def current_gesture():
     
-    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture)
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus)
 
 if __name__ == "__main__":
     app.run(debug=True) 

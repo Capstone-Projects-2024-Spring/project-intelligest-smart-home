@@ -109,6 +109,8 @@
                 document.getElementById('currentGesture').textContent = data.gesture || 'No gesture detected yet';
                 document.getElementById('firstGesture').textContent = data.firstGesture || 'No gesture detected yet';
                 document.getElementById('secondGesture').textContent = data.secondGesture || 'No gesture detected yet';
+                document.getElementById('deviceChoice').textContent = data.deviceChoice || 'N/A';
+                document.getElementById('deviceStatus').textContent = data.deviceStatus || 'N/A';
         
             });
     }, 1000);
