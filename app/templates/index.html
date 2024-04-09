@@ -76,10 +76,11 @@
                 <p>Current Gesture: <span id="currentGesture">Waiting...</span></p>
                 <p>First Gesture: <span id="firstGesture">Waiting...</span></p>
                 <p>Second Gesture: <span id="secondGesture">Waiting...</span></p>
+                <p>Device Choice: <span id="deviceChoice">N/A</p>
+                <p>Device Status: <span id="deviceStatus">N/A</p>
             </div>
         </div>
         
-        <!-- Blocks Container (already correctly styled) -->
         <div class="blocks-container">
             <div class="block">
                 <img src="{{ url_for('static', filename='images/light.png') }}" alt="Light">
@@ -108,6 +109,8 @@
                 document.getElementById('currentGesture').textContent = data.gesture || 'No gesture detected yet';
                 document.getElementById('firstGesture').textContent = data.firstGesture || 'No gesture detected yet';
                 document.getElementById('secondGesture').textContent = data.secondGesture || 'No gesture detected yet';
+                document.getElementById('deviceChoice').textContent = data.deviceChoice || 'N/A';
+                document.getElementById('deviceStatus').textContent = data.deviceStatus || 'N/A';
         
             });
     }, 1000);

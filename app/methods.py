@@ -74,6 +74,22 @@ class finger:
     
     
     
+def thumbClassifier(results):
+    res=results.multi_hand_landmarks[0].landmark
+    GestureObject = hand(results.multi_hand_landmarks[0])
+    
+    # print('Thumb angle: ', thumb.angle)
+    # print('Ring Finger angle: ', ringFinger.angle)
+    # print('Middle Finger angle: ', middleFinger.angle)
+    # print('Index Finger angle: ', indexFinger.angle)
+    # print('Pinky Finger angle: ', pinkyFinger.angle)
+    # print(wrist.x, wrist.y, wrist.z)
+
+    return GestureObject.gesture
+
+
+
+    
 def createSquare(results, img):
     h, w, c = img.shape
     min_x, min_y = w, h
