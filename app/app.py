@@ -19,19 +19,6 @@ from collections import deque
 #https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer/python#video
 
 
-def thumbClassifier(results):
-    res=results.multi_hand_landmarks[0].landmark
-    GestureObject = hand(results.multi_hand_landmarks[0])
-    
-    # print('Thumb angle: ', thumb.angle)
-    # print('Ring Finger angle: ', ringFinger.angle)
-    # print('Middle Finger angle: ', middleFinger.angle)
-    # print('Index Finger angle: ', indexFinger.angle)
-    # print('Pinky Finger angle: ', pinkyFinger.angle)
-    # print(wrist.x, wrist.y, wrist.z)
-
-    return GestureObject.gesture
-
 
 def detectHand(hands, img, ASLModel):
     #comment this in if meidapipe doesnt work
@@ -56,6 +43,8 @@ def detectHand(hands, img, ASLModel):
 
 def detect_motion(last_frame, current_frame, threshold=20):
     # Convert frames to grayscale
+    if last_frame is None:
+        last_frame = current_frame
     gray_last = cv2.cvtColor(last_frame, cv2.COLOR_BGR2GRAY)
     gray_current = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
     
@@ -74,7 +63,7 @@ def detect_motion(last_frame, current_frame, threshold=20):
     
     # Return True if contours are found
     print('checking for motion', len(contours))
-    return len(contours) > 0
+    return len(contours) > 0, current_frame
 
 def toggle_light():
     #action = "turn_on" if state else "turn_off"
@@ -84,76 +73,88 @@ def toggle_light():
         "Content-Type": "application/json",
     }
     data = {"entity_id": "switch.living_room_light_1"}
-
+    print('toggling light',data)
     response = requests.post(url, json=data, headers=headers)
     return response.status_code == 200        
+
+def black_image(img):
+    black_screen = np.zeros_like(img)
+    img = black_screen 
+    print('no motion')
+    ret, buffer = cv2.imencode('.jpg', img)
+    img = buffer.tobytes()
+    
+    yield (b'--frame\r\n'
+        b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
 
 def gen_frames(cap): 
     inMotion = False
     last_frame = None
+    last_motion = None
+    #loop to keep the iterations of the model going 
     while True:
-        
         success, img = cap.read()
-        if last_frame is None:
-            last_frame = img
-        inMotion = detect_motion(last_frame, img)
-        last_frame = img
+        if not success:
+            print('failed to read frame')
+            break
         
-        if not success or not inMotion: 
-            black_screen = np.zeros_like(img)
-            img = black_screen 
-            print('no motion')
-            ret, buffer = cv2.imencode('.jpg', img)
-            img = buffer.tobytes()
-            
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
-            continue
+        inMotion,last_frame = detect_motion(last_frame, img)
+        
+        if not inMotion: 
+            if last_motion and time.time()-last_motion > 2:
+                print('no motion detected, black screen being shown.')
+                img = np.zeros_like(img)
+                ret, buffer = cv2.imencode('.jpg', img)
+                img = buffer.tobytes()
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+                continue
         else:
-            
-            detected, frame = detectHand(hands,img, '')
-            print(detected)
-            if detected: firstQueue.append(detected)
-            if len(firstQueue) ==30 and len(set(firstQueue))==1 and set(firstQueue).pop() != 'No gesture detected':
-                print("first gesture detected")
-                global firstGesture
-                firstGesture = set(firstQueue).pop()
-                firstQueue.clear()
+            last_motion = time.time()
+        
+        detected, frame = detectHand(hands,img, '')
+        print(detected)
+        if detected: firstQueue.append(detected)
+        if len(firstQueue) ==30 and len(set(firstQueue))==1 and set(firstQueue).pop() != 'No gesture detected':
+            print("first gesture detected")
+            global firstGesture
+            firstGesture = set(firstQueue).pop()
+            firstQueue.clear()
 
-                if firstGesture == "Turn Light On":  
-                    toggle_light("switch.living_room_light_1", True)  
-                elif firstGesture == "Turn Light Off":  
-                    toggle_light("switch.living_room_light_1", False)
-
-                while True:
-                    print('made it into second loop')
-                    success, img = cap.read()
-                    if not success:
-                        break
-                    else:
-                        detected, frame = detectHand(hands,img, '')
-                    if detected: secondQueue.append(detected)
-                    
-                    if len(secondQueue)== 30 and len(set(secondQueue))==1 and set(secondQueue).pop() != 'No gesture detected':
-                        global secondGesture
-                        secondGesture = set(secondQueue).pop()
-                        print('both gestures are',firstGesture,secondGesture)
-                        if firstGesture == 'thumbs up' and secondGesture == 'thumbs up':
+            while True:
+                print('made it into second loop')
+                success, img = cap.read()
+                if not success:
+                    break
+                else:
+                    detected, frame = detectHand(hands,img, '')
+                if detected: secondQueue.append(detected)
+                
+                if len(secondQueue)== 30 and len(set(secondQueue))==1 and set(secondQueue).pop() != 'No gesture detected':
+                    global secondGesture
+                    secondGesture = set(secondQueue).pop()
+                    print('both gestures are',firstGesture,secondGesture)
+                    if firstGesture == 'thumbs up' and secondGesture == 'thumbs up':
+                        try:   
                             toggle_light()
-                        time.sleep(2)
-                        firstGesture,secondGesture = 'No gesture detected','No gesture detected'
-                        secondQueue.clear()
-                        
-                        break
-                    ret, buffer = cv2.imencode('.jpg', img)
-                    img = buffer.tobytes()
-                    yield (b'--frame\r\n'
-                        b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
-            ret, buffer = cv2.imencode('.jpg', img)
-            img = buffer.tobytes()
-            
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+                        except:
+                            print('toggle light didnt work')
+                    time.sleep(2)
+                    firstGesture,secondGesture = 'No gesture detected','No gesture detected'
+                    secondQueue.clear()
+                    break
+                
+                #writing the image in the second gesture loop, shouldn't be changed
+                ret, buffer = cv2.imencode('.jpg', img)
+                img = buffer.tobytes()
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+        
+        #writing the image in the first gesture loop, shouldn't be changed
+        ret, buffer = cv2.imencode('.jpg', img)
+        img = buffer.tobytes()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
 
 app = Flask(__name__)
 #comment this out if mediapipe doesnt work
@@ -176,16 +177,17 @@ def video_feed():
     return Response(gen_frames(cv2.VideoCapture(0)),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
     
+
+    
 @app.route('/')
 def index():
-    """Video streaming home page."""
+    
     return render_template('index.html')
 
 @app.route('/current_gesture')
 def current_gesture():
+    
     return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture)
 
 if __name__ == "__main__":
-    
-    
     app.run(debug=True) 

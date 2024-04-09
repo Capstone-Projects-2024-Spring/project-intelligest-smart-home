@@ -3,4 +3,4 @@ Make sure web page loads and looks okay on raspberry pi screen
 Add in method to turn on and off light based on first and second gesture.
 Get the available devices displayed in a grid format after the first gesture. Must have for demo after this one
 Make html look more official, use css to make it look more like home assistant
-
+Make screen go dark when inmotion is false. Add a different and better way to 
