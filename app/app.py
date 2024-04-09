@@ -85,8 +85,9 @@ def detection(cap,queue):
             queue.clear()
             return firstGesture
 
-def toggle_light(light_id, state):
-    url = f"http://localhost:8123/api/services/light/turn_on"
+def toggle_light(state):
+    action = "turn_on" if state else "turn_off"
+    url = f"http://localhost:8123/api/services/light/{action}"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
         "Content-Type": "application/json",
@@ -94,7 +95,7 @@ def toggle_light(light_id, state):
     data = {"entity_id": "switch.living_room_light_1"}
     
     response = requests.post(url, json=data, headers=headers)
-    return response.status_code == 200        
+    return response.status_code == 200 
 
 def gen_frames(cap): 
     inMotion = False
