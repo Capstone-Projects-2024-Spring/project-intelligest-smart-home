@@ -9,7 +9,7 @@
 5. Once the Raspberry Pi is connected and configured, navigate to the `app` subfolder of the `Project-Intelligest-Smart-Home` repository.
 This can be done using the `cd` command if you are using the terminal and have opened the repository
 6. Once in the `app` subfolder, run the command `python -m flask run` to start the program. The program should take a few seconds to start up.
-7. Once the program has output the link to the flask server, open the link in a web browser.
+7. Once the program has output the link to the flask server, open the link in a web browser and enter full-screen mode.
 8. The web page should display a live feed from the camera, and the program should be running.
 9. To test the program, make a thumbs up, thumbs down, and thumbs flat gesture to make sure the model is correctly detecting gestures.
 10. After this test, hold your index finger up for the camera until the gesture is detected as your first gesture.
