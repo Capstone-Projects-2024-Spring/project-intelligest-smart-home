@@ -119,6 +119,12 @@ def gen_frames(cap):
                 global firstGesture
                 firstGesture = set(firstQueue).pop()
                 firstQueue.clear()
+
+                if firstGesture == "Turn Light On":  
+                    toggle_light("switch.living_room_light_1", True)  
+                elif firstGesture == "Turn Light Off":  
+                    toggle_light("switch.living_room_light_1", False)
+
                 while True:
                     print('made it into second loop')
                     success, img = cap.read()
@@ -148,7 +154,6 @@ def gen_frames(cap):
             
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
-
 
 app = Flask(__name__)
 #comment this out if mediapipe doesnt work
