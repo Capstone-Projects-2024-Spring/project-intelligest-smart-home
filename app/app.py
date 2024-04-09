@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Response, jsonify
 import cv2
+import requests
 import time
 import cv2
 import  asyncio, os
@@ -12,6 +13,10 @@ from methods import *
 #so you will need to install it with pip install python_weather
 #queue to find the right gesture
 from collections import deque
+
+
+#https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/gesture_recognizer/python/gesture_recognizer.ipynb#scrollTo=TUfAcER1oUS6
+#https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer/python#video
 
 
 def thumbClassifier(results):
@@ -49,7 +54,7 @@ def detectHand(hands, img, ASLModel):
 
 
 
-def detect_motion(last_frame, current_frame, threshold=50):
+def detect_motion(last_frame, current_frame, threshold=20):
     # Convert frames to grayscale
     gray_last = cv2.cvtColor(last_frame, cv2.COLOR_BGR2GRAY)
     gray_current = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
@@ -68,23 +73,20 @@ def detect_motion(last_frame, current_frame, threshold=50):
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     # Return True if contours are found
+    print('checking for motion', len(contours))
     return len(contours) > 0
 
-def detection(cap,queue):
-    while True:
-        success, img = cap.read()
-        if not success:
-            return False, None
-        detected, frame = detectHand(hands,img, '')
-        print(detected)
-        if detected: queue.append(detected)
-        if len(queue) ==30 and len(set(queue))==1:
-            global firstGesture
-            firstGesture = set(queue).pop()
-            queue.clear()
-            return firstGesture
-        
-        
+def toggle_light():
+    #action = "turn_on" if state else "turn_off"
+    url = f"http://localhost:8123/api/services/light/toggle"
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
+        "Content-Type": "application/json",
+    }
+    data = {"entity_id": "switch.living_room_light_1"}
+
+    response = requests.post(url, json=data, headers=headers)
+    return response.status_code == 200        
 
 def gen_frames(cap): 
     inMotion = False
@@ -92,14 +94,27 @@ def gen_frames(cap):
     while True:
         
         success, img = cap.read()
-        if not success:
-            break
+        if last_frame is None:
+            last_frame = img
+        inMotion = detect_motion(last_frame, img)
+        last_frame = img
+        
+        if not success or not inMotion: 
+            black_screen = np.zeros_like(img)
+            img = black_screen 
+            print('no motion')
+            ret, buffer = cv2.imencode('.jpg', img)
+            img = buffer.tobytes()
+            
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+            continue
         else:
             
             detected, frame = detectHand(hands,img, '')
             print(detected)
             if detected: firstQueue.append(detected)
-            if len(firstQueue) ==30 and len(set(firstQueue))==1:
+            if len(firstQueue) ==30 and len(set(firstQueue))==1 and set(firstQueue).pop() != 'No gesture detected':
                 print("first gesture detected")
                 global firstGesture
                 firstGesture = set(firstQueue).pop()
@@ -113,10 +128,12 @@ def gen_frames(cap):
                         detected, frame = detectHand(hands,img, '')
                     if detected: secondQueue.append(detected)
                     
-                    if len(secondQueue)== 30 and len(set(secondQueue))==1:
+                    if len(secondQueue)== 30 and len(set(secondQueue))==1 and set(secondQueue).pop() != 'No gesture detected':
                         global secondGesture
                         secondGesture = set(secondQueue).pop()
                         print('both gestures are',firstGesture,secondGesture)
+                        if firstGesture == 'thumbs up' and secondGesture == 'thumbs up':
+                            toggle_light()
                         time.sleep(2)
                         firstGesture,secondGesture = 'No gesture detected','No gesture detected'
                         secondQueue.clear()
@@ -126,7 +143,6 @@ def gen_frames(cap):
                     img = buffer.tobytes()
                     yield (b'--frame\r\n'
                         b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
-            #cv2.putText(img,'put text on the frame', (10,130), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
             ret, buffer = cv2.imencode('.jpg', img)
             img = buffer.tobytes()
             
@@ -144,8 +160,8 @@ hands = mpHands.Hands(static_image_mode=False,
 #until here
 #comment the next line in if mediapipe doesn't work
 #hands = ""
-latest_gesture = 'No gesture detected'
-firstGesture, secondGesture = 'No gesture detected yet','No gesture detected'
+
+latest_gesture, firstGesture, secondGesture = 'No gesture detected yet','No gesture detected','No gesture detected'
 firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
 
 
