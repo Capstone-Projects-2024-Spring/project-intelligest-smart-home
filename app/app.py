@@ -29,50 +29,25 @@ def thumbClassifier(results):
 
 
 def detectHand(hands, img, ASLModel):
-    
+    #comment this in if meidapipe doesnt work
+    #return "thumbs up", img
     gestureName=""
-    
-    #cv2.putText(img, "looking for ASL gestures", (int(img.shape[1]/2),20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
-    if img is None:
-        print("empty camera frame!!!!!")
-        
+    if img is None: print("empty camera frame!!!!!")
+       
     results = hands.process(img)
     if results.multi_hand_landmarks:
-        #get the dimensions for the cropped image
+        
         minX,minY,maxX,maxY=createSquare(results,img)
-        # Draw the square bounding box
         cv2.rectangle(img, (minX, minY), (maxX, maxY), (155, 155, 155), 2)
-        if minX < maxX and minY < maxY:
-            handRegion = img[minY:maxY, minX:maxX]
-            #Preprocess the hand region for the ASL model
-            preprocessedHand = preprocessHandRegion(handRegion) 
-            #Predict the ASL gesture given by user
-            #asl_prediction = ASLModel.predict(preprocessedHand) 
-            asl_prediction = 1
-            #turning the gesture from clas number to real name and adding to video feed
-            #gestureName = "Detected Gesture: " + IdentifyGesture(np.argmax(asl_prediction)) 
-            gestureName = thumbClassifier(results)
-    
-    
-    #adding all the text before displaying the image
-    #cv2.putText(img, gestureName, (10, 130), cv2.FONT_HERSHEY_PLAIN, 2, (colors, colors, colors), 2)
-    #cv2.putText(img,str(int(fps)), (10,70), cv2.FONT_HERSHEY_PLAIN, 3, (colors,50,colors), 3)
-    #cv2.imshow("Image", img)
-    
-    global latest_gesture  # Declare it as global inside the function if you're updating it
-    # Update this line accordingly in your detectHand function
+        gestureName = thumbClassifier(results)
+    else:
+        gestureName ='No gesture detected'
+    global latest_gesture 
     latest_gesture = gestureName  # gestureName is the detected gesture
     return gestureName,img
 
-app = Flask(__name__)
-mpHands = mp.solutions.hands
-hands = mpHands.Hands(static_image_mode=False,
-                    max_num_hands=1,
-                    min_detection_confidence=0.5,
-                    min_tracking_confidence=0.5)
-latest_gesture = 'No gesture detected yet'
-firstGesture, secondGesture = 'No gesture detected yet','No gesture detected yet'
-firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
+
+
 
 def detect_motion(last_frame, current_frame, threshold=50):
     # Convert frames to grayscale
@@ -95,10 +70,27 @@ def detect_motion(last_frame, current_frame, threshold=50):
     # Return True if contours are found
     return len(contours) > 0
 
+def detection(cap,queue):
+    while True:
+        success, img = cap.read()
+        if not success:
+            return False, None
+        detected, frame = detectHand(hands,img, '')
+        print(detected)
+        if detected: queue.append(detected)
+        if len(queue) ==30 and len(set(queue))==1:
+            global firstGesture
+            firstGesture = set(queue).pop()
+            queue.clear()
+            return firstGesture
+        
+        
+
 def gen_frames(cap): 
     inMotion = False
     last_frame = None
     while True:
+        
         success, img = cap.read()
         if not success:
             break
@@ -120,17 +112,18 @@ def gen_frames(cap):
                     else:
                         detected, frame = detectHand(hands,img, '')
                     if detected: secondQueue.append(detected)
-                    ret, buffer = cv2.imencode('.jpg', img)
-                    img = buffer.tobytes()
+                    
                     if len(secondQueue)== 30 and len(set(secondQueue))==1:
                         global secondGesture
                         secondGesture = set(secondQueue).pop()
                         print('both gestures are',firstGesture,secondGesture)
-                        time.sleep(3)
-                        firstGesture,secondGesture = 'No gesture detected yet','No gesture detected yet'
+                        time.sleep(2)
+                        firstGesture,secondGesture = 'No gesture detected','No gesture detected'
                         secondQueue.clear()
                         
                         break
+                    ret, buffer = cv2.imencode('.jpg', img)
+                    img = buffer.tobytes()
                     yield (b'--frame\r\n'
                         b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
             #cv2.putText(img,'put text on the frame', (10,130), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
@@ -139,6 +132,22 @@ def gen_frames(cap):
             
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+
+
+app = Flask(__name__)
+#comment this out if mediapipe doesnt work
+mpHands = mp.solutions.hands
+hands = mpHands.Hands(static_image_mode=False,
+                    max_num_hands=1,
+                    min_detection_confidence=0.5,
+                    min_tracking_confidence=0.5)
+#until here
+#comment the next line in if mediapipe doesn't work
+#hands = ""
+latest_gesture = 'No gesture detected'
+firstGesture, secondGesture = 'No gesture detected yet','No gesture detected'
+firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
+
 
 @app.route('/video_feed')
 def video_feed():
@@ -156,4 +165,6 @@ def current_gesture():
     return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture)
 
 if __name__ == "__main__":
+    
+    
     app.run(debug=True) 
