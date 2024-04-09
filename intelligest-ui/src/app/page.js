@@ -1,13 +1,13 @@
 import React from "react";
 import Image from "next/image";
-import tv from "./TV.png";
-import light from "./lights.png";
-import alarm from "./alarm.png";
-import locks from "./locks.png";
-import reminders from "./reminders.png"
-import thermostat from "./thermostat.png"
-import weather from "./weather.png"
-import toDo from "./to-dolist.png"
+import tv from "./gesture-imgs/TV.png";
+import light from "./gesture-imgs/lights.png";
+import alarm from "./gesture-imgs/alarm.png";
+import locks from "./gesture-imgs/locks.png";
+import reminders from "./gesture-imgs/reminders.png"
+import thermostat from "./gesture-imgs/thermostat.png"
+import weather from "./gesture-imgs/weather.png"
+import toDo from "./gesture-imgs/to-dolist.png"
 
 export default function Home() {
     const handleClick = (buttonName) => {
