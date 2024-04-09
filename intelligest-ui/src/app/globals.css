@@ -32,18 +32,6 @@ body {
   }
 }
 
-.custom-button {
-  background: url('./tv.png') no-repeat; /* Set background image */
-  background-size: cover; /* Scale the background image to cover the entire button */
-  color: white; /* Text color */
-  font-weight: bold;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
 .button-image {
   width: 50px; /* Set width of the image */
   height: 50px; /* Set height of the image */
