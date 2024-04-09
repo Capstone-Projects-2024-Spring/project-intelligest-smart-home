@@ -13,7 +13,8 @@ from methods import *
 #so you will need to install it with pip install python_weather
 #queue to find the right gesture
 from collections import deque
-
+deviceChoice = None
+deviceStatus = None
 
 #https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/gesture_recognizer/python/gesture_recognizer.ipynb#scrollTo=TUfAcER1oUS6
 #https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer/python#video
