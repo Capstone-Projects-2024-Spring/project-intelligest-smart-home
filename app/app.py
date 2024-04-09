@@ -84,8 +84,17 @@ def detection(cap,queue):
             firstGesture = set(queue).pop()
             queue.clear()
             return firstGesture
-        
-        
+
+def toggle_light(light_id, state):
+    url = f"http://localhost:8123/api/services/light/turn_on"
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
+        "Content-Type": "application/json",
+    }
+    data = {"entity_id": "switch.living_room_light_1"}
+    
+    response = requests.post(url, json=data, headers=headers)
+    return response.status_code == 200        
 
 def gen_frames(cap): 
     inMotion = False
@@ -139,18 +148,6 @@ def gen_frames(cap):
             
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
-
-def toggle_light(light_id, state):
-    url = f"http://your-homeassistant-domain:8123/api/services/light/{'turn_on' if state else 'turn_off'}"
-    headers = {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
-        "Content-Type": "application/json",
-    }
-    data = {"entity_id": "switch.living_room_light_1"}
-    
-    response = requests.post(url, json=data, headers=headers)
-    return response.status_code == 200
-
 
 app = Flask(__name__)
 #comment this out if mediapipe doesnt work
