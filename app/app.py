@@ -12,6 +12,7 @@ from methods import *
 #so you will need to install it with pip install python_weather
 #queue to find the right gesture
 from collections import deque
+import requests
 
 
 def thumbClassifier(results):
@@ -104,6 +105,12 @@ def gen_frames(cap):
                 global firstGesture
                 firstGesture = set(firstQueue).pop()
                 firstQueue.clear()
+
+                if firstGesture == "Turn Light On":  
+                    toggle_light("switch.living_room_light_1", True)  
+                elif firstGesture == "Turn Light Off":  
+                    toggle_light("switch.living_room_light_1", False)
+
                 while True:
                     print('made it into second loop')
                     success, img = cap.read()
@@ -132,6 +139,17 @@ def gen_frames(cap):
             
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+
+def toggle_light(light_id, state):
+    url = f"http://your-homeassistant-domain:8123/api/services/light/{'turn_on' if state else 'turn_off'}"
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
+        "Content-Type": "application/json",
+    }
+    data = {"entity_id": "switch.living_room_light_1"}
+    
+    response = requests.post(url, json=data, headers=headers)
+    return response.status_code == 200
 
 
 app = Flask(__name__)
