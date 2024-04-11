@@ -11,14 +11,18 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: ""
-
-ota:
-  password: ""
+  port: 6053
 
 wifi:
   ssid: "showthesign"
   password: "3aF1Vd1ft2eD"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Bryans_Hotspot"
+    password: "R0OF7ZllNiAf"
+    # showthesign
+    # f334p8ofpehgb
 
 captive_portal:
 
@@ -26,4 +30,3 @@ switch:
   - platform: gpio
     name: "Kitchen Light 1"
     pin: 5
-    
