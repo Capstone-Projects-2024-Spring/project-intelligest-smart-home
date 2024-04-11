@@ -1,0 +1,29 @@
+esphome:
+  name: kitchen
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  password: ""
+
+wifi:
+  ssid: "showthesign"
+  password: "3aF1Vd1ft2eD"
+
+captive_portal:
+
+switch:
+  - platform: gpio
+    name: "Kitchen Light 1"
+    pin: 5
+    
