@@ -92,11 +92,11 @@ def get_all_devices(device_type):
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         devices = response.json()
-        filtered_devices = [devices for devices in devices if device_type in devices['entity_id']]
+        filtered_devices = [device for device in devices if device_type in device['entity_id']]
         return filtered_devices
     else:
         return None
-    
+
 
 def black_image(img):
     black_screen = np.zeros_like(img)
