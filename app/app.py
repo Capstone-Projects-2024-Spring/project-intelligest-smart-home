@@ -40,8 +40,6 @@ def detectHand(hands, img, ASLModel):
     return gestureName,img
 
 
-
-
 def detect_motion(last_frame, current_frame, threshold=20):
     # Convert frames to grayscale
     if last_frame is None:
@@ -66,6 +64,7 @@ def detect_motion(last_frame, current_frame, threshold=20):
     print('checking for motion', len(contours))
     return len(contours) > 0, current_frame
 
+
 def toggle_light():
     #action = "turn_on" if state else "turn_off"
     url = f"http://localhost:8123/api/services/switch/toggle"
@@ -82,6 +81,22 @@ def toggle_light():
         light_state = requests.get(f"http://localhost:8123/api/states/{data['entity_id']}", headers=headers).json()
         return light_state['state'] == 'on' 
     return None
+
+
+def get_all_devices(device_type):
+    url = "http://localhost:8123/api/states"
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
+        "Content-Type": "application/json"
+    }
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        devices = response.json()
+        filtered_devices = [devices for devices in devices if device_type in devices['entity_id']]
+        return filtered_devices
+    else:
+        return None
+    
 
 def black_image(img):
     black_screen = np.zeros_like(img)
@@ -172,6 +187,7 @@ def gen_frames(cap):
         img = buffer.tobytes()
         yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+
 
 app = Flask(__name__)
 #comment this out if mediapipe doesnt work
