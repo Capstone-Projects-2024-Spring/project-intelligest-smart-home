@@ -15,7 +15,7 @@ api:
 
 wifi:
   ssid: "showthesign"
-  password: "3aF1Vd1ft2eD"
+  password: "f334p8ofpehgb"
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
