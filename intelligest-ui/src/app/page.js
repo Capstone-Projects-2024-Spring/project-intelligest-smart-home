@@ -17,6 +17,7 @@ export default function Home() {
   return (
       <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
+      <img src="http://localhost:5000/video_feed" alt="Video Feed" style={{width: "100%", maxWidth: "640px", height: "auto"}} />
         <div className="grid grid-cols-4 gap-4">
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={tv} alt="TV" width={140} height={50} />
