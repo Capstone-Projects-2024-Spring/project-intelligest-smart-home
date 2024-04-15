@@ -16,12 +16,11 @@ export default function Home() {
     console.log(buttonName);
   };
 
-
   //Loads the video on page load
   useEffect(() => {
     const img = document.querySelector("#videoElement");
     img.src = "http://127.0.0.1:5000/video_feed";
-    img.style.width = '640px';  // Set the width of the video feed
+    img.style.width = "640px";
   }, []);
 
   //sets up event stream on page load
@@ -42,20 +41,26 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
-        <img id="videoElement" />
-        <div className="text-black">
-          Latest Gesture: {data.lastestGesture} <br />
-          First Gesture: {data.firstGesture} <br />
-          Latest Gesture: {data.secondGesture} <br />
-          Device Choice: {data.deviceChoice} <br />
-          Device Status: {data.deviceStatus} <br />
+        <div>
+          <img id="videoElement" />
+          <div className="text-black">
+            Latest Gesture: {data.lastestGesture} <br />
+            First Gesture: {data.firstGesture} <br />
+            Latest Gesture: {data.secondGesture} <br />
+            Device Choice: {data.deviceChoice} <br />
+            Device Status: {data.deviceStatus} <br />
+          </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={tv} alt="TV" width={140} height={50} />
             TV
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
+          <button
+            className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "light" ? "bg-blue-300" : ""
+            }`}
+          >
             <Image src={light} alt="TV" width={140} height={50} />
             Lights
           </button>
