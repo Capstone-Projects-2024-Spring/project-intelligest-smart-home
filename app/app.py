@@ -206,5 +206,21 @@ def current_gesture():
     
     return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus)
 
+@app.route('/current_gesture_sse')
+def current_gesture_sse():
+    def generate():
+        while True:
+            data = {
+                'latestGesture': latest_gesture,
+                'firstGesture': firstGesture,
+                'secondGesture': secondGesture,
+                'deviceChoice': deviceChoice,
+                'deviceStatus': deviceStatus
+            }
+            yield f"data:{json.dumps(data)}\n\n"
+            time.sleep(1) 
+
+    return Response(generate(), mimetype='text/event-stream')
+
 if __name__ == "__main__":
     app.run(debug=True) 
