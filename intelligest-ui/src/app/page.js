@@ -1,23 +1,36 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import tv from "./gesture-imgs/TV.png";
 import light from "./gesture-imgs/lights.png";
 import alarm from "./gesture-imgs/alarm.png";
 import locks from "./gesture-imgs/locks.png";
-import reminders from "./gesture-imgs/reminders.png"
-import thermostat from "./gesture-imgs/thermostat.png"
-import weather from "./gesture-imgs/weather.png"
-import toDo from "./gesture-imgs/to-dolist.png"
+import reminders from "./gesture-imgs/reminders.png";
+import thermostat from "./gesture-imgs/thermostat.png";
+import weather from "./gesture-imgs/weather.png";
+import toDo from "./gesture-imgs/to-dolist.png";
 
 export default function Home() {
-    const handleClick = (buttonName) => {
+  const handleClick = (buttonName) => {
     console.log(buttonName);
   };
 
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then(function (stream) {
+        let video = document.querySelector("#videoElement");
+        video.srcObject = stream;
+      })
+      .catch(function (err) {
+        console.log("Something went wrong!", err);
+      });
+  }, []);
+
   return (
-      <main className="flex min-h-screen flex-col">
+    <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
-      <img src="http://localhost:5000/video_feed" alt="Video Feed" style={{width: "100%", maxWidth: "640px", height: "auto"}} />
+        <video autoPlay={true} id="videoElement" />
         <div className="grid grid-cols-4 gap-4">
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={tv} alt="TV" width={140} height={50} />
@@ -56,6 +69,3 @@ export default function Home() {
     </main>
   );
 }
-
-
-
