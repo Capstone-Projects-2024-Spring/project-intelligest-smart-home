@@ -16,26 +16,22 @@ export default function Home() {
     console.log(buttonName);
   };
 
+
+  //Loads the video on page load
   useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then(function (stream) {
-        let video = document.querySelector("#videoElement");
-        video.srcObject = stream;
-      })
-      .catch(function (err) {
-        console.log("Something went wrong!", err);
-      });
+    const img = document.querySelector("#videoElement");
+    img.src = "http://127.0.0.1:5000/video_feed";
+    img.style.width = '640px';  // Set the width of the video feed
   }, []);
 
+  //sets up event stream on page load
   useEffect(() => {
     const eventSource = new EventSource(
-      "http://localhost:5000/current_gesture_sse"
+      "http://127.0.0.1:5000/current_gesture_sse"
     );
 
     eventSource.onmessage = function (event) {
       setData(JSON.parse(event.data));
-      console.log(data);
     };
 
     return () => {
@@ -46,7 +42,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
-        <video autoPlay={true} id="videoElement" />
+        <img id="videoElement" />
         <div className="text-black">
           Latest Gesture: {data.lastestGesture} <br />
           First Gesture: {data.firstGesture} <br />
