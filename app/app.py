@@ -68,6 +68,25 @@ def detect_motion(last_frame, current_frame, threshold=20):
     print('checking for motion', len(contours))
     return len(contours) > 0, current_frame
 
+def get_recent_news():
+    api_key = 'f39bbfdee666491fbde90584b53cd919'  
+    news_url = f'https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}&pageSize=5'
+    response = requests.get(news_url)
+    if response.status_code == 200:
+        news_data = response.json()
+        articles = []
+        for article in news_data['articles']:
+            article_info = {
+                'title': article['title'],
+                'content': article['description'],
+                'url': article['url']
+            }
+            articles.append(article_info)
+        return articles
+    else:
+        return None
+
+
 def toggle_light():
     #action = "turn_on" if state else "turn_off"
     url = f"http://localhost:8123/api/services/switch/toggle"
