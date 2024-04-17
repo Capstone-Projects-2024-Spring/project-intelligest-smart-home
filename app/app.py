@@ -1,4 +1,5 @@
 from flask import Flask, render_template, Response, jsonify
+from flask_cors import CORS
 import cv2
 import requests
 import time
@@ -8,6 +9,7 @@ import mediapipe as mp
 import time, math
 import numpy as np
 from methods import *
+import json
 #from tensorflow.keras.models import load_model
 #this requires python_weather, which is not included in requirements.txt, 
 #so you will need to install it with pip install python_weather
@@ -170,7 +172,7 @@ def gen_frames(cap):
                             print('Device Status is', deviceStatus)
                         except:
                             print('toggle light didnt work')
-                    time.sleep(5)
+                    time.sleep(3)
                     deviceChoice, deviceStatus = 'N/A','N/A'
                     firstGesture,secondGesture = 'No gesture detected','No gesture detected'
                     secondQueue.clear()
@@ -190,6 +192,7 @@ def gen_frames(cap):
 
 
 app = Flask(__name__)
+CORS(app)
 #comment this out if mediapipe doesnt work
 mpHands = mp.solutions.hands
 hands = mpHands.Hands(static_image_mode=False,
@@ -203,14 +206,10 @@ hands = mpHands.Hands(static_image_mode=False,
 latest_gesture, firstGesture, secondGesture = 'No gesture detected yet','No gesture detected','No gesture detected'
 firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
 
-
 @app.route('/video_feed')
 def video_feed():
-    # Assuming 'cap' is your cv2.VideoCapture object
     return Response(gen_frames(cv2.VideoCapture(0)),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
-    
-
     
 @app.route('/')
 def index():
@@ -221,6 +220,22 @@ def index():
 def current_gesture():
     
     return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus)
+
+@app.route('/current_gesture_sse')
+def current_gesture_sse():
+    def generate():
+        while True:
+            data = {
+                'latestGesture': latest_gesture,
+                'firstGesture': firstGesture,
+                'secondGesture': secondGesture,
+                'deviceChoice': deviceChoice,
+                'deviceStatus': deviceStatus
+            }
+            yield f"data:{json.dumps(data)}\n\n"
+            time.sleep(1) 
+
+    return Response(generate(), mimetype='text/event-stream')
 
 if __name__ == "__main__":
     app.run(debug=True) 
