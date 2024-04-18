@@ -3,7 +3,6 @@ from flask_cors import CORS
 import cv2
 import requests
 import time
-import cv2
 import  asyncio, os
 import mediapipe as mp
 import time, math
@@ -25,7 +24,7 @@ deviceStatus = None
 
 def detectHand(hands, img, ASLModel):
     #comment this in if meidapipe doesnt work
-    #return "thumbs up", img
+    return "thumbs up", img
     gestureName=""
     if img is None: print("empty camera frame!!!!!")
        
@@ -70,7 +69,7 @@ def detect_motion(last_frame, current_frame, threshold=20):
 
 def toggle_light():
     #action = "turn_on" if state else "turn_off"
-    url = f"http://localhost:8123/api/services/switch/toggle"
+    #url = f"http://localhost:8123/api/services/switch/toggle"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
         "Content-Type": "application/json",
@@ -180,12 +179,12 @@ CORS(app)
 #comment this out if mediapipe doesnt work
 mpHands = mp.solutions.hands
 hands = mpHands.Hands(static_image_mode=False,
-                    max_num_hands=1,
-                    min_detection_confidence=0.5,
-                    min_tracking_confidence=0.5)
+                      max_num_hands=1,
+                      min_detection_confidence=0.5,
+                      min_tracking_confidence=0.5)
 #until here
 #comment the next line in if mediapipe doesn't work
-#hands = ""
+hands = ""
 
 latest_gesture, firstGesture, secondGesture = 'No gesture detected yet','No gesture detected','No gesture detected'
 firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
