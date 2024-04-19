@@ -17,6 +17,15 @@ import json
 from collections import deque
 deviceChoice = None
 deviceStatus = None
+entityChoice = None
+entityChoices = []
+
+gesture_to_entity = {
+    'one finger up': 0,
+    'two fingers up': 1,
+    'three fingers up': 2,
+    'four fingers up': 3,
+}
 
 #https://colab.research.google.com/github/googlesamples/mediapipe/blob/main/examples/gesture_recognizer/python/gesture_recognizer.ipynb#scrollTo=TUfAcER1oUS6
 #https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer/python#video
@@ -165,8 +174,19 @@ def gen_frames(cap):
                         deviceChoice = 'light'
                         print('device choice is', deviceChoice)
                         try:   
-
-                            lightState = toggle_light()
+                            # Returns a list of all devices related to the device type
+                            entityChoices = get_all_devices(deviceChoice)
+                            while True:
+                                success, img = cap.read()
+                                if not success:
+                                    break
+                                else:
+                                    detected, frame = detectHand(hands, img, '')
+                                if detected and detected in gesture_to_entity:
+                                    # Get the entity id of the device they gestured for
+                                    entityChoice = entityChoices[gesture_to_entity[detected]]
+                                    break
+                            lightState = toggle_light(entityChoice)
                             if lightState is True:
                                 deviceStatus = 'on'
                             elif lightState is False:
@@ -175,7 +195,8 @@ def gen_frames(cap):
                         except:
                             print('toggle light didnt work')
                     time.sleep(3)
-                    deviceChoice, deviceStatus = 'N/A','N/A'
+                    deviceChoice, deviceStatus, entityChoice = 'N/A','N/A', 'N/A'
+                    entityChoices.clear()
                     firstGesture,secondGesture = 'No gesture detected','No gesture detected'
                     secondQueue.clear()
                     break
@@ -232,7 +253,9 @@ def current_gesture_sse():
                 'firstGesture': firstGesture,
                 'secondGesture': secondGesture,
                 'deviceChoice': deviceChoice,
-                'deviceStatus': deviceStatus
+                'deviceStatus': deviceStatus,
+                'entityChoices': entityChoices,
+                'entityChoice': deviceChoice,
             }
             yield f"data:{json.dumps(data)}\n\n"
             time.sleep(1) 
