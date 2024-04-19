@@ -186,7 +186,9 @@ def gen_frames(cap):
                                     break
                                 else:
                                     detected, frame = detectHand(hands, img, '')
-                                if detected and detected in gesture_to_entity:
+                                if detected: thirdQueue.append(detected)
+
+                                if len(thirdQueue)== 30 and len(set(thirdQueue))==1 and set(thirdQueue).pop() != 'No gesture detected':
                                     # Get the entity id of the device they gestured for
                                     entityChoice = entityChoices[gesture_to_entity[detected]]
                                     break
@@ -231,7 +233,7 @@ hands = mpHands.Hands(static_image_mode=False,
 #hands = ""
 
 latest_gesture, firstGesture, secondGesture = 'No gesture detected yet','No gesture detected','No gesture detected'
-firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
+firstQueue,secondQueue,thirdQueue = deque(maxlen=30),deque(maxlen=30),deque(maxlen=30)
 
 @app.route('/video_feed')
 def video_feed():
