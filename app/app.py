@@ -126,6 +126,8 @@ def gen_frames(cap):
     last_motion = None
     global deviceStatus
     global deviceChoice
+    global entityChoices
+    global entityChoice
     #loop to keep the iterations of the model going 
     while True:
         success, img = cap.read()
