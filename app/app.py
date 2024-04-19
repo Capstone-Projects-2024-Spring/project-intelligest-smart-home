@@ -67,14 +67,15 @@ def detect_motion(last_frame, current_frame, threshold=20):
     return len(contours) > 0, current_frame
 
 
-def toggle_light():
+def toggle_light(device_id):
     #action = "turn_on" if state else "turn_off"
     url = f"http://localhost:8123/api/services/switch/toggle"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
         "Content-Type": "application/json",
     }
-    data = {"entity_id": "switch.living_room_light_1"}
+    # data = {"entity_id": "switch.living_room_light_1"}
+    data = {"entity_id": device_id}
     print('toggling light',data)
     response = requests.post(url, json=data, headers=headers)
     if response.status_code == 200:
@@ -164,6 +165,7 @@ def gen_frames(cap):
                         deviceChoice = 'light'
                         print('device choice is', deviceChoice)
                         try:   
+
                             lightState = toggle_light()
                             if lightState is True:
                                 deviceStatus = 'on'
