@@ -49,6 +49,8 @@ export default function Home() {
             Latest Gesture: {data.secondGesture} <br />
             Device Choice: {data.deviceChoice} <br />
             Device Status: {data.deviceStatus} <br />
+            Entity Choices: {data.entityChoices} <br />
+            Entity Choice: {data.entityChoice} <br />
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
