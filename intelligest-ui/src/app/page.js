@@ -25,9 +25,7 @@ export default function Home() {
 
   //sets up event stream on page load
   useEffect(() => {
-    const eventSource = new EventSource(
-      "http://127.0.0.1:5000/current_gesture_sse"
-    );
+    const eventSource = new EventSource("http://127.0.0.1:5000/current_gesture_sse");
 
     eventSource.onmessage = function (event) {
       setData(JSON.parse(event.data));
@@ -44,48 +42,57 @@ export default function Home() {
         <div>
           <img id="videoElement" />
           <div className="text-black">
-            Latest Gesture: {data.lastestGesture} <br />
+            Latest Gesture: {data.latestGesture} <br />
             First Gesture: {data.firstGesture} <br />
-            Latest Gesture: {data.secondGesture} <br />
+            Second Gesture: {data.secondGesture} <br />
             Device Choice: {data.deviceChoice} <br />
             Device Status: {data.deviceStatus} <br />
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={tv} alt="TV" width={140} height={50} />
-            TV
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "News" ? "bg-blue-300" : ""
+            }`}
+          >
+            <Image src={tv} alt="News gesture" width={140} height={50} />
+            News
           </button>
           <button
             className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
-              data.deviceChoice === "light" ? "bg-blue-300" : ""
+              data.deviceChoice === "Light" ? "bg-blue-300" : ""
             }`}
           >
-            <Image src={light} alt="TV" width={140} height={50} />
+            <Image src={light} alt="Lights gesture" width={140} height={50} />
             Lights
           </button>
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={alarm} alt="TV" width={140} height={50} />
+            <Image src={alarm} alt="Alarm gesture" width={140} height={50} />
             Alarm
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={locks} alt="TV" width={140} height={50} />
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "Weather" ? "bg-blue-300" : ""
+            }`}
+          >
+            <Image src={locks} alt="Weather gesture" width={140} height={50} />
             Weather
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={reminders} alt="TV" width={140} height={50} />
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "Thermostat" ? "bg-blue-300" : ""
+            }`}
+          >
+            <Image src={reminders} alt="Thermostat gesture" width={140} height={50} />
             Thermostat
           </button>
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={thermostat} alt="TV" width={140} height={50} />
+            <Image src={thermostat} alt="Locks gesture" width={140} height={50} />
             Locks
           </button>
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={weather} alt="TV" width={140} height={50} />
+            <Image src={weather} alt="Reminders gesture" width={140} height={50} />
             Reminders
           </button>
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={toDo} alt="TV" width={140} height={80} />
+            <Image src={toDo} alt="To-do List gesture" width={140} height={80} />
             To-do List
           </button>
         </div>
@@ -93,3 +100,4 @@ export default function Home() {
     </main>
   );
 }
+
