@@ -105,6 +105,7 @@ def get_all_devices(device_type):
     if response.status_code == 200:
         devices = response.json()
         filtered_devices = [device for device in devices if device_type in device['entity_id']]
+        print('filtered devices',filtered_devices)
         return filtered_devices
     else:
         return None

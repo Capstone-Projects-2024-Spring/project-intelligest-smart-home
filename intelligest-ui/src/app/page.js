@@ -50,7 +50,7 @@ export default function Home() {
             Device Choice: {data.deviceChoice} <br />
             Device Status: {data.deviceStatus} <br />
             Entity Choices: {data.entityChoices} <br />
-            Entity Choice: {data.entityChoice} <br />
+            Entity Choice: {data.entityChoice.entity_id} <br />
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
