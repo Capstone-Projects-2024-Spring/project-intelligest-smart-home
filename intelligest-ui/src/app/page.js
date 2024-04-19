@@ -44,7 +44,7 @@ export default function Home() {
         <div>
           <img id="videoElement" />
           <div className="text-black">
-            Latest Gesture: {data.lastestGesture} <br />
+            Latest Gesture: {data.latestGesture} <br />
             First Gesture: {data.firstGesture} <br />
             Latest Gesture: {data.secondGesture} <br />
             Device Choice: {data.deviceChoice} <br />
