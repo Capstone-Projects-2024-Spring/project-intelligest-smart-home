@@ -10,7 +10,7 @@ import thermostat from "./gesture-imgs/thermostat.png";
 import weather from "./gesture-imgs/weather.png";
 import toDo from "./gesture-imgs/to-dolist.png";
 import Icon from '@mdi/react';
-import { mdiHomeAssistant } from '@mdi/js';
+import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
 
 
 export default function Home() {
@@ -37,16 +37,18 @@ export default function Home() {
     };
 
     return () => {
-      eventSource.close();
+      eventSource.close();      
     };
   }, []);
  
   return (
     <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
-      <button aria-label="User Profile" className="absolute top-0 right-0 m-4">
-        <Icon path={mdiHomeAssistant} />
-      </button>
+          <button aria-label="User Profile" className="self-end mr-4 mt-4">
+            <Icon path={mdiAccountMultiple} title="User Profile" size={3} />
+            <Icon path={mdiAccount} title="User Profile" size={3} />
+            <Icon path={mdiHomeAssistant} title="User Profile" size={3} />
+          </button>
         <div>
           <img id="videoElement" />
           <div className="text-black">
