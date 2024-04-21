@@ -1,6 +1,35 @@
-"use client";
+import logo from './logo.svg';
+import './App.css';
+
+export default function App() {
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
+}
+
+
+
+
+/*
+//"use client";
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 // import tv from "./gesture-imgs/TV.png";
 // import light from "./gesture-imgs/lights.png";
 // import alarm from "./gesture-imgs/alarm.png";
@@ -9,8 +38,8 @@ import Image from "next/image";
 // import thermostat from "./gesture-imgs/thermostat.png";
 // import weather from "./gesture-imgs/weather.png";
 // import toDo from "./gesture-imgs/to-dolist.png";
-import Icon from '@mdi/react';
-import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
+//import Icon from '@mdi/react';
+//import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
 
 
 function sum(a, b) {
@@ -52,7 +81,7 @@ export default function Home() {
       <div >
 
       </div>
-      <div className="bg-gray-200 min-h-screen flex justify-center items-center">
+      <div data-testid="button-test" className="bg-gray-200 min-h-screen flex justify-center items-center">
         <div className="Icon">
           <button aria-label="User Profile" className="self-end mr-4 mt-4">
             <Icon path={mdiHomeAssistant} title="User Profile" size={3} />
@@ -68,7 +97,7 @@ export default function Home() {
             Device Status: {data.deviceStatus} <br />
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-4">
+        <div  className="grid grid-cols-4 gap-4">
           <button onClick={() => handleClick("TV Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={tv} alt="TV" width={140} height={50} />
             TV
@@ -110,3 +139,5 @@ export default function Home() {
     </main>
   );
 }
+
+*/
