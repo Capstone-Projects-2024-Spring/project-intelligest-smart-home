@@ -62,7 +62,7 @@ export default function Home() {
             Device Status: {data.deviceStatus} <br />
           </div>
         </div>
-        <div data-testid="button-test" className="grid grid-cols-4 gap-4">
+        <div data-testid="button-test-1" className="grid grid-cols-4 gap-4">
           <button onClick={() => handleClick("TV Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={tv} alt="TV" width={140} height={50} />
             TV
@@ -71,32 +71,32 @@ export default function Home() {
             className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
               data.deviceChoice === "light" ? "bg-blue-300" : ""
             }`}>
-            <Image src={light} alt="TV" width={140} height={50} />
+            <Image src={light} alt="Light" width={140} height={50} />
             Lights
           </button>
           <button onClick={() => handleClick("Alarm Button Pressed")} 
           className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={alarm} alt="TV" width={140} height={50} />
+            <Image src={alarm} alt="Alarm" width={140} height={50} />
             Alarm
           </button>
           <button onClick={() => handleClick("Weather Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={locks} alt="TV" width={140} height={50} />
+            <Image src={locks} alt="Weather" width={140} height={50} />
             Weather
           </button>
           <button onClick={() => handleClick("Thermostat Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={reminders} alt="TV" width={140} height={50} />
+            <Image src={reminders} alt="Thermostat" width={140} height={50} />
             Thermostat
           </button>
           <button onClick={() => handleClick("Locks Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={thermostat} alt="TV" width={140} height={50} />
+            <Image src={thermostat} alt="Locks" width={140} height={50} />
             Locks
           </button>
           <button onClick={() => handleClick("Reminders Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={weather} alt="TV" width={140} height={50} />
+            <Image src={weather} alt="Reminders" width={140} height={50} />
             Reminders
           </button>
           <button onClick={() => handleClick("To-do Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={toDo} alt="TV" width={140} height={80} />
+            <Image src={toDo} alt="To-do List" width={140} height={80} />
             To-do List
           </button>
         </div>
