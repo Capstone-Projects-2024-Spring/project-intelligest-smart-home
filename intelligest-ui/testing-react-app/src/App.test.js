@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import App from './App';
-import sum from './App';
-
-//const sum = require('./sum');
+import Home from '.../src/page';
+import React from 'react';
+import { render, screen, within, fireEvent} from '@testing-library/react'
+import Home from './page';
+import handleClick from './page';
 
 test('renders learn react link', () => {
   render(<App />);

@@ -11,10 +11,34 @@ import handleClick from './page';
  * @jest-environment-options {"url": "https://jestjs.io/"}
  */
 
+test('Test for Video Feed', () => {
+  render(<Home/>);
+  const homeElement = screen.getByTestId('video-feed');
+  expect(homeElement).toBeInDocument();
+  expect(homeElement).toHaveTextContent("videoElement");
+});
+
+test('Test for Home Assistant Icon', () => {
+  render(<Home/>);
+  const homeElement = screen.getByTestId('HA-icon');
+  expect(homeElement).toBeInDocument();
+  expect(homeElement).toHaveTextContent("User Profile");
+});
+
+
+
 
 test('Test for TV button', () => {
-  render(<Home/>);
-  const homeElement = screen.getByTestId('button-test-1');
+  render(<Home handleClick={handleClick}/>);
+  const homeElement = screen.getByTestId('button-test');
+  expect(homeElement).toBeInDocument();
+  expect(homeElement).toHaveTextContent("TV");
+});
+
+
+test('Test for TV button', () => {
+  render(<Home handleClick={handleClick}/>);
+  const homeElement = screen.getByTestId('button-test');
   expect(homeElement).toBeInDocument();
   expect(homeElement).toHaveTextContent("TV");
 });
