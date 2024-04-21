@@ -39,7 +39,7 @@ def toggle_light():
     response = requests.post(url, json=data, headers=headers)
     if response.status_code == 200:
         # Get the new state of the light
-        time.sleep(1)
+        #time.sleep(1)
         light_state = requests.get(f"http://localhost:8123/api/states/{data['entity_id']}", headers=headers).json()
         return light_state['state'] == 'on' 
     return None
@@ -53,13 +53,26 @@ async def getweather():
     
     
     # get the weather forecast for a few days
-    forecast = []
+    #forecast = [weather.humidity,weather.precipitation, weather.pressure]
+    forecast = {}
     for daily in weather.daily_forecasts:
-      forecast.append({daily.date: [daily.temperature,daily.hourly_forecasts,
-                                    daily.sunlight,daily.sunrise,daily.sunset]})
-    
-    forecast.append({'current':[weather.humidity,weather.precipitation, weather.pressure]})
+        hourlyForecast = {}
+        for hourly in daily.hourly_forecasts:
+            
+            hourlyForecast[str(hourly.time.strftime("%H:%M"))] = hourly.temperature
+        forecast[str(daily.date)] = {'temperature':daily.temperature,
+                                     'sunlight':daily.sunlight,
+                                     'sunrise': daily.sunrise.strftime("%H:%M"),
+                                     'sunset':daily.sunset.strftime("%H:%M"),
+                                     'hourly_forecasts':hourlyForecast}
+        
+        forecast['current'] = {'humidity':weather.humidity,
+                               'precipitation':weather.precipitation, 
+                               'pressure':weather.pressure}
+        
     return forecast
+
+global_weather = asyncio.run(getweather())
 
 def processGesture(firstGesture, secondGesture):
     global deviceChoice
@@ -79,22 +92,21 @@ def processGesture(firstGesture, secondGesture):
                 print('Device Status is', deviceStatus)
             except:
                 print('toggle light didnt work')
-            time.sleep(3)
-        case "one finger up", 'thumbs up':
-            weather = asyncio.run(getweather())
+            time.sleep(1)
+        case "thumbs up", 'thumbs up':
+            print('weather',global_weather)
+            #weather = asyncio.run(getweather())
             deviceChoice = 'Weather'
-            print(weather)
+            #print(weather)
         case "one finger up", 'thumbs down':
-            weather = asyncio.run(getweather())
             deviceChoice = 'News'
             
         case "two fingers up", 'thumbs down':
-            weather = asyncio.run(getweather())
             deviceChoice = 'Thermostat'
             
         case _:
             print(".")
-    return
+    return deviceChoice
 
 class VideoProcessor:
     def __init__(self):
@@ -115,8 +127,8 @@ class VideoProcessor:
         self.latest_gesture = 'No gesture detected yet'
         self.firstGesture = 'No gesture detected'
         self.secondGesture = 'No gesture detected'
-        self.deviceChoice = 'N/A'
-        self.deviceStatus = 'N/A'
+        #self.deviceChoice = 'N/A'
+        #self.deviceStatus = 'N/A'
         self.firstQueue = deque(maxlen=30)
         self.secondQueue = deque(maxlen=30)
     
@@ -143,6 +155,7 @@ class VideoProcessor:
             detected, img = self.get_img()
 
             #Motion detection part
+            
             inMotion, last_frame = detect_motion(last_frame, img)
             
             if not inMotion: 
@@ -168,9 +181,13 @@ class VideoProcessor:
 
                     if len(self.secondQueue) == 30 and len(set(self.secondQueue)) == 1 and set(self.secondQueue).pop() != 'No gesture detected':
                         self.secondGesture = set(self.secondQueue).pop()
+                        if self.secondGesture=='thumb flat':
+                            self.clear()
+                            continue
+                        
                         print('first and second gesture:',self.firstGesture,self.secondGesture)
-                        processGesture(self.firstGesture,self.secondGesture)
-                        time.sleep(1)
+                        self.deviceChoice = processGesture(self.firstGesture,self.secondGesture)
+                        #time.sleep(1)
                         self.clear()
                         break
                     frame = self.format_image(img)
@@ -282,21 +299,23 @@ def index():
 @app.route('/current_gesture')
 def current_gesture():
     
-    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus)
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather)
 
 @app.route('/current_gesture_sse')
 def current_gesture_sse():
     def generate():
         while True:
+            
             data = {
                 'latestGesture': processor.latest_gesture,
                 'firstGesture': processor.firstGesture,
                 'secondGesture': processor.secondGesture,
                 'deviceChoice': processor.deviceChoice,
-                'deviceStatus': processor.deviceStatus
+                'deviceStatus': processor.deviceStatus,
+                'weatherData': global_weather
             }
             yield f"data:{json.dumps(data)}\n\n"
-            time.sleep(1) 
+            #time.sleep(1) 
 
     return Response(generate(), mimetype='text/event-stream')
 

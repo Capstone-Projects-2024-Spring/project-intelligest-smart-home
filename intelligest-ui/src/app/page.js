@@ -11,30 +11,36 @@ import weather from "./gesture-imgs/weather.png";
 import toDo from "./gesture-imgs/to-dolist.png";
 
 export default function Home() {
-  const [data, setData] = useState({}); // Declare 'data' in your component's state
-  const handleClick = (buttonName) => {
-    console.log(buttonName);
-  };
+  const [data, setData] = useState({});
+  const [showWeatherPopup, setShowWeatherPopup] = useState(false);
 
-  //Loads the video on page load
   useEffect(() => {
     const img = document.querySelector("#videoElement");
     img.src = "http://127.0.0.1:5000/video_feed";
     img.style.width = "640px";
   }, []);
 
-  //sets up event stream on page load
   useEffect(() => {
     const eventSource = new EventSource("http://127.0.0.1:5000/current_gesture_sse");
-
     eventSource.onmessage = function (event) {
       setData(JSON.parse(event.data));
     };
-
-    return () => {
-      eventSource.close();
-    };
+    return () => eventSource.close();
   }, []);
+  useEffect(() => {
+    if (data.deviceChoice === "Weather") {
+      setShowWeatherPopup(true);
+    } else {
+      setShowWeatherPopup(false);
+    }
+  }, [data.deviceChoice]); 
+  const handleWeatherButtonClick = () => {
+    setShowWeatherPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowWeatherPopup(false);
+  };
 
   return (
     <main className="flex min-h-screen flex-col">
@@ -47,6 +53,7 @@ export default function Home() {
             Second Gesture: {data.secondGesture} <br />
             Device Choice: {data.deviceChoice} <br />
             Device Status: {data.deviceStatus} <br />
+            
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
@@ -69,11 +76,9 @@ export default function Home() {
             <Image src={alarm} alt="Alarm gesture" width={140} height={50} />
             Alarm
           </button>
-          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
-              data.deviceChoice === "Weather" ? "bg-blue-300" : ""
-            }`}
-          >
-            <Image src={locks} alt="Weather gesture" width={140} height={50} />
+          <button onClick={handleWeatherButtonClick} className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+            data.deviceChoice === "Weather" ? "bg-blue-300" : ""}`}>
+            <Image src={weather} alt="Weather gesture" width={140} height={50} />
             Weather
           </button>
           <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
@@ -88,7 +93,7 @@ export default function Home() {
             Locks
           </button>
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={weather} alt="Reminders gesture" width={140} height={50} />
+            <Image src={locks} alt="Reminders gesture" width={140} height={50} />
             Reminders
           </button>
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
@@ -97,7 +102,42 @@ export default function Home() {
           </button>
         </div>
       </div>
+      {showWeatherPopup && (
+        <div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto">
+          <button onClick={closePopup} className="absolute top-0 right-0 p-2">X</button>
+          <div className="p-4 text-black">
+            <h2>Current Weather:</h2>
+            <p>Humidity: {data.weatherData?.current?.humidity}%</p>
+            <p>Precipitation: {data.weatherData?.current?.precipitation} inches</p>
+            <p>Pressure: {data.weatherData?.current?.pressure} inHg</p>
+            
+            {Object.keys(data.weatherData).filter(date => date !== 'current').map((date) => (
+              <div key={date}>
+                <h3>{date}</h3>
+                <p>Sunrise: {data.weatherData[date].sunrise}</p>
+                <p>Sunset: {data.weatherData[date].sunset}</p>
+                <p>Daylight: {data.weatherData[date].sunlight} hours</p>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Temperature (°F)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(data.weatherData[date].hourly_forecasts).map(([time, temp]) => (
+                      <tr key={time}>
+                        <td>{time}</td>
+                        <td>{temp}°F</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
-
