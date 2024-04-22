@@ -5,7 +5,7 @@ import requests
 import time
 import cv2
 import  asyncio, os
-#import mediapipe as mp
+import mediapipe as mp
 import time, math
 import numpy as np
 from methods import *
@@ -25,7 +25,7 @@ deviceStatus = None
 
 def detectHand(hands, img, ASLModel):
     #comment this in if meidapipe doesnt work
-    return "thumbs up", img
+    #return "thumbs up", img
     gestureName=""
     if img is None: print("empty camera frame!!!!!")
        
@@ -194,11 +194,11 @@ def gen_frames(cap):
 app = Flask(__name__)
 CORS(app)
 #comment this out if mediapipe doesnt work
-# mpHands = mp.solutions.hands
-# hands = mpHands.Hands(static_image_mode=False,
-#                     max_num_hands=1,
-#                     min_detection_confidence=0.5,
-#                     min_tracking_confidence=0.5)
+mpHands = mp.solutions.hands
+hands = mpHands.Hands(static_image_mode=False,
+                    max_num_hands=1,
+                    min_detection_confidence=0.5,
+                    min_tracking_confidence=0.5)
 #until here
 #comment the next line in if mediapipe doesn't work
 #hands = ""
