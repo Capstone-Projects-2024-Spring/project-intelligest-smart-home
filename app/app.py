@@ -95,31 +95,43 @@ async def getweather():
 
 global_weather = asyncio.run(getweather())
 
-def processGesture(firstGesture, secondGesture):
-    global deviceChoice
+def determineDeviceChoice(firstGesture, secondGesture):
     #using a switch statement to match up the gestures with their respective actions
     match firstGesture, secondGesture:
         case "one finger up", "one finger up":
             #lights
+            return 'Light'
+        # Add more cases here for other gestures
+        # ...
+        case _, _:
+            return None
+        case "thumbs up", 'thumbs up':
+            print('weather',global_weather)
+            #weather = asyncio.run(getweather())
+            return 'Weather'
+            #print(weather)
+        case "one finger up", 'thumbs down':
+            return 'News'
             
-            deviceChoice = 'Light'
+        case "two fingers up", 'thumbs down':
+            return 'Thermostat'
             
-            try:   
-                # Returns a list of all devices related to the device type
-                entityChoices = get_all_devices(deviceChoice)
-                while True:
-                    success, img = cap.read()
-                    if not success:
-                        break
-                    else:
-                        detected, frame = detectHand(hands, img, '')
-                        if detected: thirdQueue.append(detected)
+        case _:
+            return None
 
-                        if len(thirdQueue)== 30 and len(set(thirdQueue))==1 and set(thirdQueue).pop() != 'No gesture detected':
-                            # Get the entity id of the device they gestured for
-                            entityChoice = entityChoices[gesture_to_entity[detected]]
-                            break
-                lightState = toggle_light()
+def processGesture(firstGesture, secondGesture, thirdGesture=None, entityChoice=None):
+    global deviceChoice
+    deviceChoice = determineDeviceChoice(firstGesture, secondGesture)
+    if deviceChoice is None:
+        print("Invalid gesture combination")
+        return None
+    match firstGesture, secondGesture:
+        case "one finger up", "one finger up":
+            #lights
+            deviceChoice = 'Light'
+            try:   
+                # entityChoice controls the correct device the user wants.
+                lightState = toggle_light(entityChoice)
                 if lightState is True:
                     deviceStatus = 'on'
                 elif lightState is False:
@@ -153,19 +165,27 @@ class VideoProcessor:
         self.latest_gesture = 'No gesture detected yet'
         self.firstGesture = 'No gesture detected'
         self.secondGesture = 'No gesture detected'
+        self.thirdGesture = 'No gesture detected'
         self.deviceChoice = 'N/A'
         self.deviceStatus = 'N/A'
         self.firstQueue = deque(maxlen=30)
         self.secondQueue = deque(maxlen=30)
+        self.thirdQueue = deque(maxlen=30)
+        self.entityChoice = None
+        self.entityChoices = []
         
     def clear(self):
         self.latest_gesture = 'No gesture detected yet'
         self.firstGesture = 'No gesture detected'
         self.secondGesture = 'No gesture detected'
-        #self.deviceChoice = 'N/A'
-        #self.deviceStatus = 'N/A'
+        self.thirdGesture = 'No gesture detected'
+        self.deviceChoice = 'N/A'
+        self.deviceStatus = 'N/A'
         self.firstQueue = deque(maxlen=30)
         self.secondQueue = deque(maxlen=30)
+        self.thirdQueue = deque(maxlen=30)
+        self.entityChoice = None
+        self.entityChoices = []
     
     def format_image(self,img):
         ret, buffer = cv2.imencode('.jpg', img)
@@ -186,6 +206,8 @@ class VideoProcessor:
         last_frame = None
         last_motion = None
         inMotion = False
+        # List of devices that require a third gesture
+        requires_third_gesture = ['Light']
         while True:
             detected, img = self.get_img()
 
@@ -221,6 +243,36 @@ class VideoProcessor:
                             continue
                         
                         print('first and second gesture:',self.firstGesture,self.secondGesture)
+
+                        # Just determines the device choice, DOESN"T ACTUALLY DO ANYTHING in terms of performing actions.
+                        # This is in the case that the device requires a third gesture action for entity choice.
+                        self.deviceChoice = determineDeviceChoice(self.firstGesture, self.secondGesture)
+
+                        if self.deviceChoice in requires_third_gesture:
+                            # get devices immediately after the second gesture is detected and we know if it requires a third gesture
+                            self.entityChoices = get_all_devices(self.deviceChoice)
+                            while True:
+                                detected, img = self.get_img()
+                                self.thirdQueue.append(detected)
+
+                                if len(self.thirdQueue) == 30 and len(set(self.thirdQueue)) == 1 and set(self.thirdQueue).pop() != 'No gesture detected':
+                                    self.thirdGesture = set(self.thirdQueue).pop()
+                                    print('third gesture:', self.thirdGesture)
+                                    # Process the third gesture here, stored in ENTITYCHOICE
+                                    self.entityChoice = self.entityChoices[gesture_to_entity[self.thirdGesture]]
+                                    # Then send it off to process it.
+                                    self.deviceChoice = processGesture(self.firstGesture,self.secondGesture, self.thirdGesture, self.entityChoice)
+                                    self.clear()
+                                    break
+                        elif detected == 'thumb flat':
+                            # If the "back" signal is detected, clear the queues and continue to the next iteration
+                            self.clear()
+                            continue
+                        else:
+                            print("Waiting for third gesture")
+                            continue
+                    else:
+                        # If the device doesn't require gesture 3, should use None for thirdGesture by default.
                         self.deviceChoice = processGesture(self.firstGesture,self.secondGesture)
                         #time.sleep(1)
                         self.clear()
@@ -319,7 +371,7 @@ hands = mpHands.Hands(static_image_mode=False,
 #comment the next line in if mediapipe doesn't work
 #hands = ""
 #weather = asyncio.run(getweather())
-latest_gesture, firstGesture, secondGesture = 'No gesture detected yet','No gesture detected','No gesture detected'
+latest_gesture, firstGesture, secondGesture, thirdGesture = 'No gesture detected yet','No gesture detected','No gesture detected', 'No gesture detected'
 firstQueue,secondQueue,thirdQueue = deque(maxlen=30),deque(maxlen=30),deque(maxlen=30)
 processor=VideoProcessor()
 @app.route('/video_feed')
@@ -335,7 +387,7 @@ def index():
 @app.route('/current_gesture')
 def current_gesture():
     
-    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather)
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, thirdGesture = thirdGesture deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
 
 @app.route('/current_gesture_sse')
 def current_gesture_sse():
@@ -350,7 +402,10 @@ def current_gesture_sse():
                 'deviceStatus': deviceStatus,
                 'entityChoices': entityChoices,
                 'entityChoice': deviceChoice,
-                'weatherData': global_weather
+                'weatherData': global_weather,
+                'thirdGesture': thirdGesture,
+                'entityChoice': entityChoice,
+                'entityChoices': entityChoices
             }
             yield f"data:{json.dumps(data)}\n\n"
             #time.sleep(1) 
