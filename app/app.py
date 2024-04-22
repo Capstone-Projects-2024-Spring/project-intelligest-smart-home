@@ -246,6 +246,7 @@ class VideoProcessor:
 
                         # Just determines the device choice, DOESN"T ACTUALLY DO ANYTHING in terms of performing actions.
                         # This is in the case that the device requires a third gesture action for entity choice.
+                        print('first and second gesture:',self.firstGesture,self.secondGesture)
                         self.deviceChoice = determineDeviceChoice(self.firstGesture, self.secondGesture)
 
                         if self.deviceChoice in requires_third_gesture:
