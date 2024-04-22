@@ -392,17 +392,17 @@ def current_gesture_sse():
         while True:
             
             data = {
-                'latestGesture': latest_gesture,
-                'firstGesture': firstGesture,
-                'secondGesture': secondGesture,
-                'deviceChoice': deviceChoice,
-                'deviceStatus': deviceStatus,
-                'entityChoices': entityChoices,
-                'entityChoice': deviceChoice,
+                'latestGesture': processor.latest_gesture,
+                'firstGesture': processor.firstGesture,
+                'secondGesture': processor.secondGesture,
+                'deviceChoice': processor.deviceChoice,
+                'deviceStatus': processor.deviceStatus,
+                'entityChoices': processor.entityChoices,
+                'entityChoice': processor.deviceChoice,
                 'weatherData': global_weather,
-                'thirdGesture': thirdGesture,
-                'entityChoice': entityChoice,
-                'entityChoices': entityChoices
+                'thirdGesture': processor.thirdGesture,
+                'entityChoice': processor.entityChoice,
+                'entityChoices': processor.entityChoices
             }
             yield f"data:{json.dumps(data)}\n\n"
             #time.sleep(1) 
