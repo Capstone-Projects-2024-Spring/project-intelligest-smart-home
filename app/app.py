@@ -387,7 +387,7 @@ def index():
 @app.route('/current_gesture')
 def current_gesture():
     
-    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, thirdGesture = thirdGesture deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, thirdGesture = thirdGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
 
 @app.route('/current_gesture_sse')
 def current_gesture_sse():
