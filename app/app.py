@@ -224,6 +224,7 @@ class VideoProcessor:
                 self.firstQueue.append(detected)
             if len(self.firstQueue) == 30 and len(set(self.firstQueue)) == 1 and set(self.firstQueue).pop() != 'No gesture detected':
                 self.firstGesture = set(self.firstQueue).pop()
+                print('first gesture set to:', self.firstGesture)
                 self.firstQueue.clear()
 
                 while True:
@@ -232,6 +233,7 @@ class VideoProcessor:
 
                     if len(self.secondQueue) == 30 and len(set(self.secondQueue)) == 1 and set(self.secondQueue).pop() != 'No gesture detected':
                         self.secondGesture = set(self.secondQueue).pop()
+                        print('second gesture set to:', self.secondGesture)
                         if self.secondGesture=='thumb flat':
                             self.clear()
                             continue
