@@ -12,8 +12,27 @@ import toDo from "./gesture-imgs/to-dolist.png";
 
 export default function Home() {
   const [data, setData] = useState({}); // Declare 'data' in your component's state
-  const handleClick = (buttonName) => {
-    console.log(buttonName);
+  
+  const handleClick = async (deviceType) => {
+    console.log(deviceType);
+
+    if (deviceType === "light") {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/toggle_light", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.ok) {
+          console.log("Light toggled successfully");
+          const newData = await response.json();
+          setData(newData);
+        }
+      } catch (error) {
+        console.error("Failed to toggle light:", error);
+      }
+    }
   };
 
   //Loads the video on page load
@@ -60,6 +79,7 @@ export default function Home() {
             className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
               data.deviceChoice === "light" ? "bg-blue-300" : ""
             }`}
+            onClick={() => handleClick("light")}
           >
             <Image src={light} alt="TV" width={140} height={50} />
             Lights
