@@ -51,6 +51,7 @@ export default function Home() {
             Latest Gesture: {data.latestGesture} <br />
             First Gesture: {data.firstGesture} <br />
             Second Gesture: {data.secondGesture} <br />
+            Third Gesture: {data.thirdGesture} <br />
             Device Choice: {data.deviceChoice} <br />
             Device Status: {data.deviceStatus} <br />
             Entity Choices: {data.entityChoices} <br />
