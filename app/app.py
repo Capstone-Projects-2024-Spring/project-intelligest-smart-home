@@ -113,7 +113,7 @@ def determineDeviceChoice(firstGesture, secondGesture):
             return 'Thermostat'
             
         case _:
-            return None
+            print(".")
 
 def processGesture(firstGesture, secondGesture, thirdGesture=None, entityChoice=None):
     global deviceChoice
