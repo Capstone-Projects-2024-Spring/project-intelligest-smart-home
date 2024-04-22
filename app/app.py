@@ -118,9 +118,7 @@ def determineDeviceChoice(firstGesture, secondGesture):
 def processGesture(firstGesture, secondGesture, thirdGesture=None, entityChoice=None):
     global deviceChoice
     deviceChoice = determineDeviceChoice(firstGesture, secondGesture)
-    if deviceChoice is None:
-        print("Invalid gesture combination")
-        return None
+    print('device choice is',deviceChoice)
     match firstGesture, secondGesture:
         case "one finger up", "one finger up":
             #lights
