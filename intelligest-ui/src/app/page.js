@@ -52,7 +52,11 @@ export default function Home() {
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
+        <button 
+            className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+            data.deviceChoice === "tv" ? "bg-orange-300" : ""
+            }`}
+          >
             <Image src={tv} alt="TV" width={140} height={50} />
             TV
           </button>
@@ -61,31 +65,49 @@ export default function Home() {
               data.deviceChoice === "light" ? "bg-blue-300" : ""
             }`}
           >
-            <Image src={light} alt="TV" width={140} height={50} />
+            <Image src={light} alt="Lights" width={140} height={50} />
             Lights
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={alarm} alt="TV" width={140} height={50} />
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "alarm" ? "bg-green-300" : ""
+            }`}
+          >
+            <Image src={alarm} alt="Alarm" width={140} height={50} />
             Alarm
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={locks} alt="TV" width={140} height={50} />
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "weather" ? "bg-green-300" : ""
+            }`}
+          >
+            <Image src={weather} alt="Weather" width={140} height={50} />
             Weather
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={reminders} alt="TV" width={140} height={50} />
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "thermostat" ? "bg-green-300" : ""
+            }`}
+          >
+            <Image src={thermostat} alt="Thermostat" width={140} height={50} />
             Thermostat
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={thermostat} alt="TV" width={140} height={50} />
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "locks" ? "bg-green-300" : ""
+            }`}
+          >
+            <Image src={locks} alt="Locks" width={140} height={50} />
             Locks
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={weather} alt="TV" width={140} height={50} />
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "reminders" ? "bg-green-300" : ""
+            }`}
+          >
+            <Image src={reminders} alt="Reminders" width={140} height={50} />
             Reminders
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={toDo} alt="TV" width={140} height={80} />
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+              data.deviceChoice === "to-do list" ? "bg-green-300" : ""
+            }`}
+          >
+            <Image src={toDo} alt="To-do List" width={140} height={80} />
             To-do List
           </button>
         </div>
