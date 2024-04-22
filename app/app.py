@@ -231,6 +231,10 @@ class VideoProcessor:
                     detected, img = self.get_img()
                     self.secondQueue.append(detected)
 
+                    print('secondQueue:', self.secondQueue)
+                    print('set(secondQueue):', set(self.secondQueue))
+                    print('set(secondQueue).pop():', set(self.secondQueue).pop())
+
                     if len(self.secondQueue) == 30 and len(set(self.secondQueue)) == 1 and set(self.secondQueue).pop() != 'No gesture detected':
                         self.secondGesture = set(self.secondQueue).pop()
                         print('second gesture set to:', self.secondGesture)
