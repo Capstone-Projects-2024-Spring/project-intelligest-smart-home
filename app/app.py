@@ -9,7 +9,9 @@ import mediapipe as mp
 import time, math
 import numpy as np
 from methods import *
+from method.VideoFeedMethods import *
 import json
+import python_weather, asyncio, os
 #from tensorflow.keras.models import load_model
 #this requires python_weather, which is not included in requirements.txt, 
 #so you will need to install it with pip install python_weather
@@ -32,50 +34,6 @@ gesture_to_entity = {
 
 
 
-def detectHand(hands, img, ASLModel):
-    #comment this in if meidapipe doesnt work
-    #return "thumbs up", img
-    gestureName=""
-    if img is None: print("empty camera frame!!!!!")
-       
-    results = hands.process(img)
-    if results.multi_hand_landmarks:
-        
-        minX,minY,maxX,maxY=createSquare(results,img)
-        cv2.rectangle(img, (minX, minY), (maxX, maxY), (155, 155, 155), 2)
-        gestureName = thumbClassifier(results)
-    else:
-        gestureName ='No gesture detected'
-    global latest_gesture 
-    latest_gesture = gestureName  # gestureName is the detected gesture
-    return gestureName,img
-
-
-def detect_motion(last_frame, current_frame, threshold=20):
-    # Convert frames to grayscale
-    if last_frame is None:
-        last_frame = current_frame
-    gray_last = cv2.cvtColor(last_frame, cv2.COLOR_BGR2GRAY)
-    gray_current = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
-    
-    # Apply Gaussian Blur to reduce noise and detail
-    gray_last = cv2.GaussianBlur(gray_last, (21, 21), 0)
-    gray_current = cv2.GaussianBlur(gray_current, (21, 21), 0)
-    
-    # Compute the absolute difference between the current frame and reference frame
-    frame_diff = cv2.absdiff(gray_last, gray_current)
-    
-    # Threshold the difference
-    _, thresh = cv2.threshold(frame_diff, threshold, 255, cv2.THRESH_BINARY)
-    
-    # Find contours to see if there are significant changes
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # Return True if contours are found
-    print('checking for motion', len(contours))
-    return len(contours) > 0, current_frame
-
-
 def toggle_light(device_id):
     #action = "turn_on" if state else "turn_off"
     url = f"http://localhost:8123/api/services/switch/toggle"
@@ -89,11 +47,10 @@ def toggle_light(device_id):
     response = requests.post(url, json=data, headers=headers)
     if response.status_code == 200:
         # Get the new state of the light
-        time.sleep(1)
+        #time.sleep(1)
         light_state = requests.get(f"http://localhost:8123/api/states/{data['entity_id']}", headers=headers).json()
         return light_state['state'] == 'on' 
     return None
-
 
 def get_all_devices(device_type):
     url = "http://localhost:8123/api/states"
@@ -111,113 +68,242 @@ def get_all_devices(device_type):
     else:
         return None
 
+async def getweather():
+  # declare the client. the measuring unit used defaults to the metric system (celcius, km/h, etc.)
+  async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
+    # fetch a weather forecast from a city
+    weather = await client.get('Philadelphia') 
+    # get the weather forecast for a few days
+    #forecast = [weather.humidity,weather.precipitation, weather.pressure]
+    forecast = {}
+    for daily in weather.daily_forecasts:
+        hourlyForecast = {}
+        for hourly in daily.hourly_forecasts:
+            
+            hourlyForecast[str(hourly.time.strftime("%H:%M"))] = hourly.temperature
+        forecast[str(daily.date)] = {'temperature':daily.temperature,
+                                     'sunlight':daily.sunlight,
+                                     'sunrise': daily.sunrise.strftime("%H:%M"),
+                                     'sunset':daily.sunset.strftime("%H:%M"),
+                                     'hourly_forecasts':hourlyForecast}
+        
+        forecast['current'] = {'humidity':weather.humidity,
+                               'precipitation':weather.precipitation, 
+                               'pressure':weather.pressure}
+        
+    return forecast
 
-def black_image(img):
-    black_screen = np.zeros_like(img)
-    img = black_screen 
-    print('no motion')
-    ret, buffer = cv2.imencode('.jpg', img)
-    img = buffer.tobytes()
-    
-    yield (b'--frame\r\n'
-        b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+global_weather = asyncio.run(getweather())
 
-def gen_frames(cap): 
-    inMotion = False
-    last_frame = None
-    last_motion = None
-    global deviceStatus
+def processGesture(firstGesture, secondGesture):
     global deviceChoice
-    global entityChoices
-    global entityChoice
-    #loop to keep the iterations of the model going 
-    while True:
-        success, img = cap.read()
-        if not success:
-            print('failed to read frame')
-            break
-        
-        inMotion,last_frame = detect_motion(last_frame, img)
-        
-        if not inMotion: 
-            if last_motion and time.time()-last_motion > 2:
-                print('no motion detected, black screen being shown.')
-                img = np.zeros_like(img)
-                ret, buffer = cv2.imencode('.jpg', img)
-                img = buffer.tobytes()
-                yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
-                continue
-        else:
-            last_motion = time.time()
-        
-        detected, frame = detectHand(hands,img, '')
-        print(detected)
-        if detected: firstQueue.append(detected)
-        if len(firstQueue) ==30 and len(set(firstQueue))==1 and set(firstQueue).pop() != 'No gesture detected':
-            print("first gesture detected")
-            global firstGesture
-            firstGesture = set(firstQueue).pop()
-            firstQueue.clear()
+    #using a switch statement to match up the gestures with their respective actions
+    match firstGesture, secondGesture:
+        case "one finger up", "one finger up":
+            #lights
+            
+            deviceChoice = 'Light'
+            
+            try:   
+                # Returns a list of all devices related to the device type
+                entityChoices = get_all_devices(deviceChoice)
+                while True:
+                    success, img = cap.read()
+                    if not success:
+                        break
+                    else:
+                        detected, frame = detectHand(hands, img, '')
+                        if detected: thirdQueue.append(detected)
 
-            while True:
-                print('made it into second loop')
-                success, img = cap.read()
-                if not success:
-                    break
-                else:
-                    detected, frame = detectHand(hands,img, '')
-                if detected: secondQueue.append(detected)
-                
-                if len(secondQueue)== 30 and len(set(secondQueue))==1 and set(secondQueue).pop() != 'No gesture detected':
-                    global secondGesture
-                    secondGesture = set(secondQueue).pop()
-                    print('both gestures are',firstGesture,secondGesture)
-                    if firstGesture == 'thumbs up' and secondGesture == 'thumbs up':
-                        print('both thumbs up detected')
-                        deviceChoice = 'light'
-                        print('device choice is', deviceChoice)
-                        try:   
-                            # Returns a list of all devices related to the device type
-                            entityChoices = get_all_devices(deviceChoice)
-                            while True:
-                                success, img = cap.read()
-                                if not success:
-                                    break
-                                else:
-                                    detected, frame = detectHand(hands, img, '')
-                                if detected: thirdQueue.append(detected)
+                        if len(thirdQueue)== 30 and len(set(thirdQueue))==1 and set(thirdQueue).pop() != 'No gesture detected':
+                            # Get the entity id of the device they gestured for
+                            entityChoice = entityChoices[gesture_to_entity[detected]]
+                            break
+                lightState = toggle_light()
+                if lightState is True:
+                    deviceStatus = 'on'
+                elif lightState is False:
+                    deviceStatus = 'off'
+                print('Device Status is', deviceStatus)
+            except:
+                print('toggle light didnt work')
+            time.sleep(1)
+        case "thumbs up", 'thumbs up':
+            print('weather',global_weather)
+            #weather = asyncio.run(getweather())
+            deviceChoice = 'Weather'
+            #print(weather)
+        case "one finger up", 'thumbs down':
+            deviceChoice = 'News'
+            
+        case "two fingers up", 'thumbs down':
+            deviceChoice = 'Thermostat'
+            
+        case _:
+            print(".")
+    return deviceChoice
 
-                                if len(thirdQueue)== 30 and len(set(thirdQueue))==1 and set(thirdQueue).pop() != 'No gesture detected':
-                                    # Get the entity id of the device they gestured for
-                                    entityChoice = entityChoices[gesture_to_entity[detected]]
-                                    break
-                            lightState = toggle_light(entityChoice)
-                            if lightState is True:
-                                deviceStatus = 'on'
-                            elif lightState is False:
-                                deviceStatus = 'off'
-                            print('Device Status is', deviceStatus)
-                        except:
-                            print('toggle light didnt work')
-                    time.sleep(3)
-                    deviceChoice, deviceStatus, entityChoice = 'N/A','N/A', 'N/A'
-                    entityChoices.clear()
-                    firstGesture,secondGesture = 'No gesture detected','No gesture detected'
-                    secondQueue.clear()
-                    break
-                
-                #writing the image in the second gesture loop, shouldn't be changed
-                ret, buffer = cv2.imencode('.jpg', img)
-                img = buffer.tobytes()
-                yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+class VideoProcessor:
+    def __init__(self):
+        self.cap = cv2.VideoCapture(0)
+        self.hands = mp.solutions.hands.Hands(static_image_mode=False,
+                                              max_num_hands=1,
+                                              min_detection_confidence=0.5,
+                                              min_tracking_confidence=0.5)
+        self.latest_gesture = 'No gesture detected yet'
+        self.firstGesture = 'No gesture detected'
+        self.secondGesture = 'No gesture detected'
+        self.deviceChoice = 'N/A'
+        self.deviceStatus = 'N/A'
+        self.firstQueue = deque(maxlen=30)
+        self.secondQueue = deque(maxlen=30)
         
-        #writing the image in the first gesture loop, shouldn't be changed
+    def clear(self):
+        self.latest_gesture = 'No gesture detected yet'
+        self.firstGesture = 'No gesture detected'
+        self.secondGesture = 'No gesture detected'
+        #self.deviceChoice = 'N/A'
+        #self.deviceStatus = 'N/A'
+        self.firstQueue = deque(maxlen=30)
+        self.secondQueue = deque(maxlen=30)
+    
+    def format_image(self,img):
         ret, buffer = cv2.imencode('.jpg', img)
-        img = buffer.tobytes()
-        yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+        frame = buffer.tobytes()
+        return frame
+    
+    def get_img(self):
+        success, img = self.cap.read()
+        if not success:
+            print('Failed to read frame')
+            return None
+        detected, img = detectHand(self.hands,img,"")
+        self.latest_gesture = detected
+        
+        return detected, img
+    
+    def gen_frames(self):
+        last_frame = None
+        last_motion = None
+        inMotion = False
+        while True:
+            detected, img = self.get_img()
+
+            #Motion detection part
+            
+            inMotion, last_frame = detect_motion(last_frame, img)
+            
+            if not inMotion: 
+                if last_motion and time.time() - last_motion > 2:
+                    print('No motion detected, showing black screen.')
+                    img = np.zeros_like(img)
+                else:
+                    continue
+            else:
+                last_motion = time.time()
+
+            #self.latest_gesture = detected
+
+            if detected:
+                self.firstQueue.append(detected)
+            if len(self.firstQueue) == 30 and len(set(self.firstQueue)) == 1 and set(self.firstQueue).pop() != 'No gesture detected':
+                self.firstGesture = set(self.firstQueue).pop()
+                self.firstQueue.clear()
+
+                while True:
+                    detected, img = self.get_img()
+                    self.secondQueue.append(detected)
+
+                    if len(self.secondQueue) == 30 and len(set(self.secondQueue)) == 1 and set(self.secondQueue).pop() != 'No gesture detected':
+                        self.secondGesture = set(self.secondQueue).pop()
+                        if self.secondGesture=='thumb flat':
+                            self.clear()
+                            continue
+                        
+                        print('first and second gesture:',self.firstGesture,self.secondGesture)
+                        self.deviceChoice = processGesture(self.firstGesture,self.secondGesture)
+                        #time.sleep(1)
+                        self.clear()
+                        break
+                    frame = self.format_image(img)
+                    yield (b'--frame\r\n'
+                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            frame = self.format_image(img)
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+# def gen_frames(cap): 
+#     inMotion = False
+#     last_frame = None
+#     last_motion = None
+#     global deviceStatus
+#     global deviceChoice
+#     #loop to keep the iterations of the model going 
+#     while True:
+#         success, img = cap.read()
+#         if not success:
+#             print('failed to read frame')
+#             break
+#         inMotion,last_frame = detect_motion(last_frame, img)
+
+#         if not inMotion: 
+#             if last_motion and time.time()-last_motion > 2:
+#                 print('no motion detected, black screen being shown.')
+#                 img = np.zeros_like(img)
+#                 ret, buffer = cv2.imencode('.jpg', img)
+#                 img = buffer.tobytes()
+#                 yield (b'--frame\r\n'
+#                     b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+#                 continue
+#         else:
+#             last_motion = time.time()
+        
+#         detected, frame = detectHand(hands,img, '')
+#         global latest_gesture
+#         latest_gesture = detected
+#         print('latest gesture is',latest_gesture)
+        
+#         if detected: firstQueue.append(detected)
+#         if len(firstQueue) ==30 and len(set(firstQueue))==1 and set(firstQueue).pop() != 'No gesture detected':
+#             print("first gesture detected")
+#             global firstGesture
+#             firstGesture = set(firstQueue).pop()
+#             firstQueue.clear()
+
+#             while True:
+                
+#                 success, img = cap.read()
+#                 if not success:
+#                     break
+#                 else:
+#                     detected, frame = detectHand(hands,img, '')
+#                 if detected: secondQueue.append(detected)
+                
+#                 if len(secondQueue)== 30 and len(set(secondQueue))==1 and set(secondQueue).pop() != 'No gesture detected':
+#                     #restart the loop if the thumb flat gesture is detected
+#                     global secondGesture
+#                     if secondGesture=='thumb flat':
+#                         continue
+#                     secondGesture = set(secondQueue).pop()
+#                     print('both gestures are',firstGesture,secondGesture)
+#                     processGesture(firstGesture,secondGesture)
+                    
+#                     deviceChoice, deviceStatus = 'N/A','N/A'
+#                     firstGesture,secondGesture = 'No gesture detected','No gesture detected'
+#                     secondQueue.clear()
+#                     break
+                
+#                 #writing the image in the second gesture loop, shouldn't be changed
+#                 ret, buffer = cv2.imencode('.jpg', img)
+#                 img = buffer.tobytes()
+#                 yield (b'--frame\r\n'
+#                     b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
+        
+#         #writing the image in the first gesture loop, shouldn't be changed
+#         ret, buffer = cv2.imencode('.jpg', img)
+#         img = buffer.tobytes()
+#         yield (b'--frame\r\n'
+#                 b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
 
 
 app = Flask(__name__)
@@ -228,16 +314,17 @@ hands = mpHands.Hands(static_image_mode=False,
                     max_num_hands=1,
                     min_detection_confidence=0.5,
                     min_tracking_confidence=0.5)
+
 #until here
 #comment the next line in if mediapipe doesn't work
 #hands = ""
-
+#weather = asyncio.run(getweather())
 latest_gesture, firstGesture, secondGesture = 'No gesture detected yet','No gesture detected','No gesture detected'
 firstQueue,secondQueue,thirdQueue = deque(maxlen=30),deque(maxlen=30),deque(maxlen=30)
-
+processor=VideoProcessor()
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen_frames(cv2.VideoCapture(0)),
+    return Response(processor.gen_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
     
 @app.route('/')
@@ -248,12 +335,13 @@ def index():
 @app.route('/current_gesture')
 def current_gesture():
     
-    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus)
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather)
 
 @app.route('/current_gesture_sse')
 def current_gesture_sse():
     def generate():
         while True:
+            
             data = {
                 'latestGesture': latest_gesture,
                 'firstGesture': firstGesture,
@@ -262,9 +350,10 @@ def current_gesture_sse():
                 'deviceStatus': deviceStatus,
                 'entityChoices': entityChoices,
                 'entityChoice': deviceChoice,
+                'weatherData': global_weather
             }
             yield f"data:{json.dumps(data)}\n\n"
-            time.sleep(1) 
+            #time.sleep(1) 
 
     return Response(generate(), mimetype='text/event-stream')
 

@@ -33,7 +33,7 @@ class hand:
         elif self.fingersUp == 2:
             return 'two fingers up'
         elif self.indexFinger.direction == 'up' and self.fingersUp == 1:
-            return 'one finger up - index'
+            return 'one finger up'
         elif self.thumb.direction == 'up':
             return 'thumbs up'
         elif self.thumb.direction == 'down':
@@ -145,20 +145,6 @@ def getHandFromImage(img,hands):
         return handRegion, img
     
 
-def thumbClassifier(results):
-    res=results.multi_hand_landmarks[0].landmark
-    GestureObject = hand(results.multi_hand_landmarks[0])
-    
-    # print('Thumb angle: ', thumb.angle)
-    # print('Ring Finger angle: ', ringFinger.angle)
-    # print('Middle Finger angle: ', middleFinger.angle)
-    # print('Index Finger angle: ', indexFinger.angle)
-    # print('Pinky Finger angle: ', pinkyFinger.angle)
-    # print(wrist.x, wrist.y, wrist.z)
-
-    return GestureObject.gesture
-
-
 def preprocessHandRegion(handRegion):
     #resize the image to the same resolution used in the dataset
     resized_hand = cv2.resize(handRegion, (224,224))
@@ -169,29 +155,3 @@ def preprocessHandRegion(handRegion):
     return batch_hand
 
     
-def InstructionCommand(hands, img, cTime, pTime,firstDetected):
-    result = ""
-    
-    cv2.putText(img, f'''Thumbs for  {firstDetected}''', (int(img.shape[1]/3),20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
-    if img is None:
-        print("empty camera frame!!!!!")
-    
-    results = hands.process(img)
-    if results.multi_hand_landmarks:
-        #get the dimensions for the cropped image
-        minX,minY,maxX,maxY=createSquare(results,img)
-        # Draw the square bounding box
-        cv2.rectangle(img, (minX, minY), (maxX, maxY), (0, 0, 0), 2)
-        if minX < maxX and minY < maxY:
-            result = thumbClassifier(results)
-        
-    cTime = time.time()
-    fps = 1/(cTime-pTime)
-    pTime = cTime
-        
-    cv2.putText(img,result, (10,130), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
-    cv2.putText(img,str(int(fps))+' FPS', (10,70), cv2.FONT_HERSHEY_PLAIN, 3, (100,50,100), 3)
-    cv2.imshow("Image", img)
-    cv2.waitKey(1)
-    return pTime, cTime, result
-
