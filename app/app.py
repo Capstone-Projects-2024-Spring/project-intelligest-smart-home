@@ -79,7 +79,8 @@ def get_recent_news():
             article_info = {
                 'title': article['title'],
                 'content': article['description'],
-                'url': article['url']
+                'url': article['ur'l, 
+                'image_url': article.get('urlToImage', '')
             }
             articles.append(article_info)
         return articles
