@@ -101,10 +101,6 @@ def determineDeviceChoice(firstGesture, secondGesture):
         case "one finger up", "one finger up":
             #lights
             return 'Light'
-        # Add more cases here for other gestures
-        # ...
-        case _, _:
-            return None
         case "thumbs up", 'thumbs up':
             print('weather',global_weather)
             #weather = asyncio.run(getweather())
