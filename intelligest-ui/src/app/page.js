@@ -1,14 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-// import tv from "./gesture-imgs/TV.png";
-// import light from "./gesture-imgs/lights.png";
-// import alarm from "./gesture-imgs/alarm.png";
-// import locks from "./gesture-imgs/locks.png";
-// import reminders from "./gesture-imgs/reminders.png";
-// import thermostat from "./gesture-imgs/thermostat.png";
-// import weather from "./gesture-imgs/weather.png";
-// import toDo from "./gesture-imgs/to-dolist.png";
+import tv from "./gesture-imgs/TV.png";
+import light from "./gesture-imgs/lights.png";
+import alarm from "./gesture-imgs/alarm.png";
+import locks from "./gesture-imgs/locks.png";
+import reminders from "./gesture-imgs/reminders.png";
+import thermostat from "./gesture-imgs/thermostat.png";
+import weather from "./gesture-imgs/weather.png";
+import toDo from "./gesture-imgs/to-dolist.png";
 import Icon from '@mdi/react';
 import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
 
@@ -61,39 +61,39 @@ export default function Home() {
         </div>
         <div data-testid="button-test" className="grid grid-cols-4 gap-4">
           <button onClick={() => handleClick("TV Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            {/* <Image src={tv} alt="TV" width={140} height={50} /> */}
+            <Image src={tv} alt="TV" width={140} height={50} />
             TV
           </button>
           <button onClick={() => handleClick("Light Button Pressed")}
             className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
               data.deviceChoice === "light" ? "bg-blue-300" : ""
             }`}>
-            {/* <Image src={light} alt="TV" width={140} height={50} /> */}
+            <Image src={light} alt="TV" width={140} height={50} />
             Lights
           </button>
           <button onClick={() => handleClick("Alarm Button Pressed")} 
           className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            {/* <Image src={alarm} alt="TV" width={140} height={50} /> */}
+            <Image src={alarm} alt="TV" width={140} height={50} />
             Alarm
           </button>
           <button onClick={() => handleClick("Weather Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            {/* <Image src={locks} alt="TV" width={140} height={50} /> */}
+            <Image src={locks} alt="TV" width={140} height={50} />
             Weather
           </button>
           <button onClick={() => handleClick("Thermostat Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            {/* <Image src={reminders} alt="TV" width={140} height={50} /> */}
+            <Image src={reminders} alt="TV" width={140} height={50} />
             Thermostat
           </button>
           <button onClick={() => handleClick("Locks Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            {/* <Image src={thermostat} alt="TV" width={140} height={50} /> */}
+            <Image src={thermostat} alt="TV" width={140} height={50} />
             Locks
           </button>
           <button onClick={() => handleClick("Reminders Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            {/* <Image src={weather} alt="TV" width={140} height={50} /> */}
+            <Image src={weather} alt="TV" width={140} height={50} />
             Reminders
           </button>
           <button onClick={() => handleClick("To-do Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            {/* <Image src={toDo} alt="TV" width={140} height={80} /> */}
+            <Image src={toDo} alt="TV" width={140} height={80} />
             To-do List
           </button>
         </div>
