@@ -12,6 +12,8 @@ import toDo from "./gesture-imgs/to-dolist.png";
 
 export default function Home() {
   const [data, setData] = useState({}); // Declare 'data' in your component's state
+  const [deviceList, setDeviceList] = useState([]);
+  const [selectedDeviceType, setSelectedDeviceType] = useState('');
   
   const handleClick = async (deviceType) => {
     console.log(deviceType);
