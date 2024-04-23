@@ -15,10 +15,10 @@ import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
 
 export default function Home() {
   const [data, setData] = useState({}); // Declare 'data' in your component's state
-  const [lightState, setLightState] = useState(false);
-  const [lockState, setLockState] = useState(false);
-  const [thermostatState, setThermostatState] = useState(false);
-  const [tvState, setTvState] = useState(false);
+  const [lightState, setLightState] = useState("Inactive");
+  const [lockState, setLockState] = useState("Inactive");
+  const [thermostatState, setThermostatState] = useState("Inactive");
+  const [tvState, setTvState] = useState("Inactive");
   const handleClick = (buttonName) => {
     console.log(buttonName);
   };
@@ -39,24 +39,27 @@ export default function Home() {
     eventSource.onmessage = function (event) {
       setData(JSON.parse(event.data));
     };
-    //Capture the change of states in devices.
-    switch(data.deviceChoice){
-      case 'Light':
-        (data.deviceStatus == 'on') && (setLightState(true));
-      case 'Lock':
-        (data.deviceStatus == 'on') && (setLockState(true));
-      case 'Thermostat':
-        (data.deviceStatus == 'on') && (setThermostatState(true));
-      case 'TV':
-        (data.deviceStatus == 'on') && (setTvState(true));
-      default:
-        console.log("Eroor");
-    }
 
     return () => {
       eventSource.close();      
     };
   }, []);
+
+  //Capture the change of states in devices.
+  useEffect(() => {
+    switch(data.deviceChoice){
+      case 'Light':
+        (data.deviceStatus == 'on') && (setLightState("Active"));
+      case 'Lock':
+        (data.deviceStatus == 'on') && (setLockState("Active"));
+      case 'Thermostat':
+        (data.deviceStatus == 'on') && (setThermostatState("Active"));
+      case 'TV':
+        (data.deviceStatus == 'on') && (setTvState("Active"));
+      default:
+        console.log("Error");
+    }
+  },[data.lastestGesture]);
  
   return (
     <main className="flex min-h-screen flex-col">
@@ -77,10 +80,10 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{position:"absolute", top:"5px", right:"5px"}}> Devices
-          <select>
+        <div style={{ color:"gray",position:"absolute", top:"5px", right:"5px"}}>Devices 
+          <select style={{border:"black"}}>
             <option label=" "> </option>
-            <option>Light : {lightState}</option>
+            <option>Light : {lightState} </option>
             <option>Lock : {lockState}</option>
             <option>Thermostat : {thermostatState}</option>
             <option>TV : {tvState}</option>
