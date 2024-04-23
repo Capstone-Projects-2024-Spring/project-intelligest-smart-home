@@ -77,7 +77,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div> Devices
+        <div style={{position:"absolute", top:"5px", right:"5px"}}> Devices
           <select>
             <option label=" "> </option>
             <option>Light : {lightState}</option>
