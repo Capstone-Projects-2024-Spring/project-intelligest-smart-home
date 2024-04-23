@@ -8,7 +8,10 @@ import locks from "./gesture-imgs/locks.png";
 import reminders from "./gesture-imgs/reminders.png";
 import thermostat from "./gesture-imgs/thermostat.png";
 import weather from "./gesture-imgs/weather.png";
-import toDo from "./gesture-imgs/to-dolist.png";
+import livetranscription from "./gesture-imgs/to-dolist.png";
+import thumbsup from "./gesture-imgs/thumbsup.png";
+import sidewaysthumb from "./gesture-imgs/sidewaysthumb.png";
+
 
 export default function Home() {
   const [data, setData] = useState({});
@@ -34,6 +37,13 @@ export default function Home() {
       setShowWeatherPopup(false);
     }
   }, [data.deviceChoice]); 
+
+  useEffect(() => {
+    if (data.firstGesture === "thumb flat" || data.secondGesture === "thumb flat") {
+      setShowWeatherPopup(false);
+    }
+  }, [data.firstGesture, data.secondGesture]);
+
   const handleWeatherButtonClick = () => {
     setShowWeatherPopup(true);
   };
@@ -99,14 +109,26 @@ export default function Home() {
             Reminders
           </button>
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
-            <Image src={toDo} alt="To-do List gesture" width={140} height={80} />
-            To-do List
+            <Image src={livetranscription} alt="Live Transcription gesture" width={140} height={80} />
+            Live Transcription
           </button>
         </div>
       </div>
       {showWeatherPopup && (
         <div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto">
           <button onClick={closePopup} className="absolute top-0 right-0 p-2">X</button>
+          <div className="flex flex-col items-center justify-center absolute top-20 right-10">
+            <Image 
+              src={sidewaysthumb}
+              alt="Close"
+              width={80}  // Original size times four (assuming original was 20x20)
+              height={80}
+              className="block"
+            />
+            <span className="text-sm mt-1">Exit</span>
+          </div>
+        <span className="text-s mt-1" >Exit
+        </span>
           <div className="p-4 text-black">
             <h2>Current Weather:</h2>
             <p>Humidity: {data.weatherData?.current?.humidity}%</p>
