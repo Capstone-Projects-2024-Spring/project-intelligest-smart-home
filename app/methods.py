@@ -38,6 +38,8 @@ class hand:
             return 'thumbs up'
         elif self.thumb.direction == 'down':
             return 'thumbs down'
+        elif self.indexFinger.direction == 'up' and self.thumb.direction == 'flat' and 45 < self.thumb.angle < 135:
+            return 'L shape'
         elif self.thumb.direction == 'flat':
             return 'thumb flat'
         else:
