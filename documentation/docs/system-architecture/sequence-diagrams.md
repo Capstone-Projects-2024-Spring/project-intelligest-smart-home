@@ -72,7 +72,7 @@ Objective: As a new user, I want to set up and control a smart lock with Intelli
 4.	The smart lock should appear on the dashboard as either locked or unlocked.
 5.	The user can now perform the actions mapped to unlocking and locking.
 
-## Use Case 5: Adding Reminders through Gestures
+## Use Case 5: Getting the top news
 
 <Figure caption={"Use Case 5. Adding Reminders through Gestures"}>
 
