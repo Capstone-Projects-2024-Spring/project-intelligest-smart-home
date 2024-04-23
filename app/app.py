@@ -98,6 +98,29 @@ def get_all_devices(device_type):
     else:
         return None
 
+def get_recent_news():
+    api_key = 'f39bbfdee666491fbde90584b53cd919'
+    news_url = f'https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}&pageSize=5'
+
+    response = requests.get(news_url)
+
+    if response.status_code == 200:
+        news_data = response.json()
+        articles = []
+
+        for article in news_data['articles']:
+            article_info = {
+                'title': article['title'],
+                'content': article['description'],
+                'url': article['url'],
+                'image_url': article.get('urlToImage', '') 
+            }
+            articles.append(article_info)
+
+        return articles
+    else:
+        return None
+
 
 def black_image(img):
     black_screen = np.zeros_like(img)
