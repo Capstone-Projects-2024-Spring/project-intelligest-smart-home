@@ -15,6 +15,10 @@ import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
 
 export default function Home() {
   const [data, setData] = useState({}); // Declare 'data' in your component's state
+  const [lightState, setLightState] = useState(false);
+  const [lockState, setLockState] = useState(false);
+  const [thermostatState, setThermostatState] = useState(false);
+  const [tvState, setTvState] = useState(false);
   const handleClick = (buttonName) => {
     console.log(buttonName);
   };
@@ -35,6 +39,19 @@ export default function Home() {
     eventSource.onmessage = function (event) {
       setData(JSON.parse(event.data));
     };
+    //Capture the change of states in devices.
+    switch(data.deviceChoice){
+      case 'Light':
+        (data.deviceStatus == 'on') && (setLightState(true));
+      case 'Lock':
+        (data.deviceStatus == 'on') && (setLockState(true));
+      case 'Thermostat':
+        (data.deviceStatus == 'on') && (setThermostatState(true));
+      case 'TV':
+        (data.deviceStatus == 'on') && (setTvState(true));
+      default:
+        console.log("Eroor");
+    }
 
     return () => {
       eventSource.close();      
@@ -59,6 +76,17 @@ export default function Home() {
             Device Status: {data.deviceStatus} <br />
           </div>
         </div>
+
+        <div> Devices
+          <select>
+            <option label=" "> </option>
+            <option>Light : {lightState}</option>
+            <option>Lock : {lockState}</option>
+            <option>Thermostat : {thermostatState}</option>
+            <option>TV : {tvState}</option>
+          </select>
+        </div>
+
         <div data-testid="button-test" className="grid grid-cols-4 gap-4">
           <button onClick={() => handleClick("TV Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={tv} alt="TV" width={140} height={50} />
