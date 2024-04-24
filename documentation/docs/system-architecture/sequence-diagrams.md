@@ -76,7 +76,7 @@ Objective: As a new user, I want to set up and control a smart lock with Intelli
 
 <Figure caption={"Use Case 5. Adding Reminders through Gestures"}>
 
-![Temperature Adjustment with ASL](../../static/img/UseCase5.png)
+![Temperature Adjustment with ASL](../../static/img/news.png)
 
 </Figure>
 
