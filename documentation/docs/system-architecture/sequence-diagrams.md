@@ -10,7 +10,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 1. Light Control through ASL Gestures"}>
 
-![Light Managment System](../../static/img/UseCase1.png)
+![Light Managment System](../../static/img/light.png)
 
 </Figure>
 
@@ -27,7 +27,7 @@ Objective: As a user, I want to swtich lights on or off in different rooms using
 
 <Figure caption={"Use Case 2. Weather Seeking through Gestures"}>
 
-![Weather Seeking through Gestures](../../static/img/UseCase2.png)
+![Weather Seeking through Gestures](../../static/img/weather.png)
 
 </Figure>
 
@@ -43,7 +43,7 @@ Objective: As a Deaf user, I want to use gestures to seek information about the 
 
 <Figure caption={"Use Case 3. Changing Kitchen Light Color"}>
 
-![Changing the Kitchen Light Color](../../static/img/UseCase3.png)
+![Changing the Kitchen Light Color](../../static/img/kitchen-light.png)
 
 </Figure>
 
@@ -59,7 +59,7 @@ Objective: As a user, I want to change the color of my kitchen lights with gestu
 
 <Figure caption={"Use Case 4. Smart Lock Setup and Control"}>
 
-![Smart Lock Setup and Control](../../static/img/UseCase4.png)
+![Smart Lock Setup and Control](../../static/img/Lock.png)
 
 </Figure>
 
@@ -93,7 +93,7 @@ The top news is displayed on the dashboard
 
 <Figure caption={"Use Case 6. Temperature Adjustments with ASL"}>
 
-![Temperature Adjustment with ASL](../../static/img/UseCase6.png)
+![Temperature Adjustment with ASL](../../static/img/temp-adjust.png)
 
 </Figure>
 
@@ -110,7 +110,7 @@ Objective: As a user, I want to adjust my home's temperature using ASL, so I can
 
 <Figure caption={"Use Case 7. Changing TV Channels"}>
 
-![Changing Channels](../../static/img/UseCase7.png)
+![Changing Channels](../../static/img/tv.png)
 
 </Figure>
 
