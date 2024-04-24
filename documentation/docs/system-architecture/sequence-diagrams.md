@@ -10,7 +10,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Use Case 1. Light Control through ASL Gestures"}>
 
-![Light Managment System](../../static/img/UseCase1.png)
+![Light Managment System](../../static/img/light.png)
 
 </Figure>
 
@@ -27,7 +27,7 @@ Objective: As a user, I want to swtich lights on or off in different rooms using
 
 <Figure caption={"Use Case 2. Weather Seeking through Gestures"}>
 
-![Weather Seeking through Gestures](../../static/img/UseCase2.png)
+![Weather Seeking through Gestures](../../static/img/weather.png)
 
 </Figure>
 
@@ -43,7 +43,7 @@ Objective: As a Deaf user, I want to use gestures to seek information about the 
 
 <Figure caption={"Use Case 3. Changing Kitchen Light Color"}>
 
-![Changing the Kitchen Light Color](../../static/img/UseCase3.png)
+![Changing the Kitchen Light Color](../../static/img/kitchen-light.png)
 
 </Figure>
 
@@ -59,7 +59,7 @@ Objective: As a user, I want to change the color of my kitchen lights with gestu
 
 <Figure caption={"Use Case 4. Smart Lock Setup and Control"}>
 
-![Smart Lock Setup and Control](../../static/img/UseCase4.png)
+![Smart Lock Setup and Control](../../static/img/Lock.png)
 
 </Figure>
 
@@ -72,31 +72,28 @@ Objective: As a new user, I want to set up and control a smart lock with Intelli
 4.	The smart lock should appear on the dashboard as either locked or unlocked.
 5.	The user can now perform the actions mapped to unlocking and locking.
 
-## Use Case 5: Adding Reminders through Gestures
+## Use Case 5: Getting the top news
 
 <Figure caption={"Use Case 5. Adding Reminders through Gestures"}>
 
-![Temperature Adjustment with ASL](../../static/img/UseCase5.png)
+![Temperature Adjustment with ASL](../../static/img/news.png)
 
 </Figure>
 
-Scenario: A Deaf person, wants to add ‘Buy a couple of Milk Gallons’ in his Reminders.
-Objective: As a user, I want to add reminders using gestures, so it would be easier to manage tasks.
+Scenario: A user wants to see the top news in the morning from their IntelliGest Smart Home. 
+Objective: As a user, I want to easily view the top news.
 
-1.	The user does certain gestures in front of IntelliGest.
-2.	The user sees certain lights and knows IntelliGest caught that request.
-3.	The user sees certain lights and knows his request is processing.
-4.	The user then signs their reminder to add using finger spelling.
-5.	The user sees IntelliGest is asking for confirmation to make sure it correctly recognizes the Gesture.
-6.	The User confirms it.
-7.	The user sees on the Display screen that ‘Buy a couple of Milk Gallons’ is added to his Mobile’s Reminders.
-8.	Whenever he opens his Mobile Device, he will see ‘Buy a couple of Milk Gallons’ in his Reminders.
+The user does the required gesture in front of the IntelliGest Camera.
+The user sees a certain light strip color and knows the IntelliGest caught the gesture.
+The system gets the top news and returns it to the device.
+The top news is displayed on the dashboard
+
 
 ## Use Case 6: Temperature Adjustments with ASL
 
 <Figure caption={"Use Case 6. Temperature Adjustments with ASL"}>
 
-![Temperature Adjustment with ASL](../../static/img/UseCase6.png)
+![Temperature Adjustment with ASL](../../static/img/temp-adjust.png)
 
 </Figure>
 
@@ -113,7 +110,7 @@ Objective: As a user, I want to adjust my home's temperature using ASL, so I can
 
 <Figure caption={"Use Case 7. Changing TV Channels"}>
 
-![Changing Channels](../../static/img/UseCase7.png)
+![Changing Channels](../../static/img/tv.png)
 
 </Figure>
 
