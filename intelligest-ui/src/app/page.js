@@ -24,8 +24,12 @@ export default function Home() {
   const [tvState, setTvState] = useState("Inactive");
 
   const [viewToDoList, setViewToDoList] = useState(false);
+  const [viewAlarm, setViewAlarm] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
+  const [getTime, setGetTime] = useState(new Date().toLocaleTimeString());
+  const [userAlarmDate, setUserAlarmDate] = useState(new Date());
+  const [userAlarmTime, setUserAlarmTime] = useState("");
 
   const handleClick = (buttonName) => {
     console.log(buttonName);
@@ -40,15 +44,12 @@ export default function Home() {
 
   //sets up event stream on page load
   useEffect(() => {
-    const eventSource = new EventSource(
-      "http://127.0.0.1:5000/current_gesture_sse"
-    );
-
-    eventSource.onmessage = function (event) {
+    const eventSource = new EventSource("http://127.0.0.1:5000/current_gesture_sse");
+    eventSource.onmessage = function(event){
       setData(JSON.parse(event.data));
     };
 
-    return () => {
+    return ()=>{
       eventSource.close();      
     };
   }, []);
@@ -69,14 +70,21 @@ export default function Home() {
     }
   },[data.lastestGesture]);
 
-  const getToDoList=()=>{
-    console.log("Enetered");
-    setViewToDoList(true);
-  }
+  useEffect(()=>{
+    let isTimer = setInterval(()=>{
+      setGetTime(new Date().toLocaleTimeString())
+    },1000)
+    return()=>clearInterval(isTimer);
+  }, []);
 
-  const closeToDoList=()=>{
-    setViewToDoList(false);
-  }
+  useEffect(()=>{
+    (viewAlarm) && (document.getElementById('alarmDate').valueAsDate = new Date());
+  },[viewAlarm]);
+
+  const getToDoList=()=>{ setViewToDoList(true); }
+  const getAlarm=()=>{ setViewAlarm(true); }
+  const closeToDoList=()=>{ setViewToDoList(false); }
+  const closeAlarm=()=>{ setViewAlarm(false); }
   
   function handleInputChange(event){
     setNewTask(event.target.value);
@@ -90,12 +98,18 @@ export default function Home() {
         setNewTask("");
     }
     console.log("Task Added");
-}
-
-function deleteTask(index){
+  }
+  
+  function deleteTask(index){
     const updatedTasks = tasks.filter((_, i) => i !== index);
     setTasks(updatedTasks);
-}
+  }
+
+  function setNewAlarm(){
+    console.log("Set Alarm");
+    console.log(userAlarmDate);
+    console.log(userAlarmTime);
+  }
  
   return (
     <main className="flex min-h-screen flex-col">
@@ -138,8 +152,7 @@ function deleteTask(index){
             <Image src={light} alt="TV" width={140} height={50} />
             Lights
           </button>
-          <button onClick={() => handleClick("Alarm Button Pressed")} 
-          className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
+          <button onClick={()=>getAlarm()} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={alarm} alt="TV" width={140} height={50} />
             Alarm
           </button>
@@ -184,6 +197,32 @@ function deleteTask(index){
             )}
           </ul>
         </Modal.Body>
+      </Modal>
+
+      <Modal show={viewAlarm} onHide={closeAlarm}>
+      <Modal.Header closeButton>
+        <Modal.Title>Alarm</Modal.Title>
+      </Modal.Header>
+        <div style={{textAlign:"center", padding:"10px"}}>
+          <div style={{fontSize:"2rem", margin:"20px"}}>
+            {getTime}
+          </div>
+          <div style={{display:"flex", flexDirection:"column", alignItems:"center", gap:"10px"}}>
+            <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <label for="alarmDate" style={{paddingRight:"10px"}}>Select Date: </label>
+              <input type="date" id="alarmDate" min="" style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmDate(new Date(e.target.value))}}/>
+            </div>
+            <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <label for="alarmTime" style={{paddingRight:"10px"}}>Select Time: </label>
+              <input type="time" id="alarmTime" value={new Date().toTimeString().split(" ")[0]} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmTime((e.target.value))}}/>
+            </div>
+            <br/>
+            <button id="setAlarm" onClick={setNewAlarm} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Set Alarm</button>
+          </div>
+          <div class="alarms" id="alarms">
+
+          </div>
+        </div>
       </Modal>
     </main>
   );
