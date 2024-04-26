@@ -29,7 +29,15 @@ export default function Home() {
   const [newTask, setNewTask] = useState("");
   const [getTime, setGetTime] = useState(new Date().toLocaleTimeString());
   const [userAlarmDate, setUserAlarmDate] = useState(new Date());
-  const [userAlarmTime, setUserAlarmTime] = useState("");
+  const [userAlarmTime, setUserAlarmTime] = useState(new Date().toTimeString().split(" ")[0]);
+  const [newAlarm, setNewAlarm] = useState([]);
+
+  const [getDOM, setGetDOM] = useState("");
+  const [getError, setGetError] = useState(false);
+  const [getErrorMsg, setGetErrorMsg] = useState("");
+  const newAlarmRef = useRef();
+  const alarmsRef = useRef();
+  const queryRef = useRef();
 
   const handleClick = (buttonName) => {
     console.log(buttonName);
@@ -85,6 +93,7 @@ export default function Home() {
   const getAlarm=()=>{ setViewAlarm(true); }
   const closeToDoList=()=>{ setViewToDoList(false); }
   const closeAlarm=()=>{ setViewAlarm(false); }
+  const resetError=()=>{ setGetError(false); setGetErrorMsg(""); }
   
   function handleInputChange(event){
     setNewTask(event.target.value);
@@ -94,10 +103,9 @@ export default function Home() {
   function addTask(){
     console.log("Adding Task");
     if(newTask.trim() !== ""){
-        setTasks(t => [...t, newTask]);
-        setNewTask("");
+      setTasks(getTasks => [...getTasks, newTask]);
+      setNewTask("");
     }
-    console.log("Task Added");
   }
   
   function deleteTask(index){
@@ -105,10 +113,21 @@ export default function Home() {
     setTasks(updatedTasks);
   }
 
-  function setNewAlarm(){
-    console.log("Set Alarm");
-    console.log(userAlarmDate);
-    console.log(userAlarmTime);
+  function getNewAlarm(){
+    console.log("Setting Alarm...");
+    var currentDate = new Date();
+    if(userAlarmDate < currentDate){
+      setGetError(true);
+      setGetErrorMsg("Invalid Date");
+      return;
+    }
+    if(userAlarmDate == currentDate && userAlarmTime < currentDate.toTimeString().split(" ")[0]){
+      setGetError(true);
+      setGetErrorMsg("Invalid Time");
+      return;
+    }
+    const isNewAlarm = userAlarmDate + userAlarmTime;
+    setNewAlarm(getAlarms => [...getAlarms, isNewAlarm]);
   }
  
   return (
@@ -189,12 +208,13 @@ export default function Home() {
             <button onclick={addTask}>Add</button>
           </div>
           <ul>
-            {tasks.map((task, index)=> 
-            <li key={index}>
-              {task}
-              <button onClick={() => deleteTask(index)}> Delete</button>                
-            </li>
-            )}
+            {tasks.map((task, index)=>{
+              return(
+              <li key={index}>
+                <span>{task}</span>
+                <button onClick={() => deleteTask(index)}> Delete</button>
+              </li>)
+            })}
           </ul>
         </Modal.Body>
       </Modal>
@@ -214,16 +234,32 @@ export default function Home() {
             </div>
             <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
               <label for="alarmTime" style={{paddingRight:"10px"}}>Select Time: </label>
-              <input type="time" id="alarmTime" value={new Date().toTimeString().split(" ")[0]} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmTime((e.target.value))}}/>
+              <input type="time" id="alarmTime" value={userAlarmTime} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmTime((e.target.value))}}/>
             </div>
             <br/>
-            <button id="setAlarm" onClick={setNewAlarm} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Set Alarm</button>
+            <button id="setAlarm" onClick={getNewAlarm} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Set Alarm</button>
           </div>
-          <div class="alarms" id="alarms">
-
+          <div class="alarms" id="alarms" ref={alarmsRef}>
+            {newAlarm.map((item, index) => {
+              return(
+              <div ref={newAlarmRef}>
+                <span>{item}</span>
+                <button class="deleteAlarm" ref={queryRef}>Delete</button>
+              </div>);
+            })}
           </div>
         </div>
       </Modal>
+
+      <Modal show={getError} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Error</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{getErrorMsg}</Modal.Body>
+      <Modal.Footer>
+        <Button onClick={resetError}>Close</Button>
+      </Modal.Footer>
+    </Modal>
     </main>
   );
 }
