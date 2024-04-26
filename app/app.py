@@ -95,56 +95,50 @@ async def getweather():
 
 global_weather = asyncio.run(getweather())
 
-def determineDeviceChoice(firstGesture, secondGesture):
+def determineDeviceChoice(firstGesture):
     #using a switch statement to match up the gestures with their respective actions
     match firstGesture, secondGesture:
-        case "one finger up", "one finger up":
+        case "one finger up":
             #lights
             return 'Light'
-        case "thumbs up", 'thumbs up':
+        case "thumbs up": # update with real gesture
             print('weather',global_weather)
             #weather = asyncio.run(getweather())
             return 'Weather'
             #print(weather)
-        case "one finger up", 'thumbs down':
+        case "two fingers up": # update with real gesture
             return 'News'
             
-        case "two fingers up", 'thumbs down':
+        case "three fingers up": # update with real gesture
             return 'Thermostat'
             
         case _:
             print(".")
 
-def processGesture(firstGesture, secondGesture, thirdGesture=None, entityChoice=None):
+def processGesture(firstGesture, secondGesture=None):
     global deviceChoice
-    deviceChoice = determineDeviceChoice(firstGesture, secondGesture)
+    deviceChoice = determineDeviceChoice(firstGesture)
     print('device choice is',deviceChoice)
-    match firstGesture, secondGesture:
-        case "one finger up", "one finger up":
-            #lights
-            deviceChoice = 'Light'
-            try:   
-                # entityChoice controls the correct device the user wants.
+    match deviceChoice:
+        case "Light":
+            if secondGesture is not None:
+                entityChoice = entityChoices[gesture_to_entity[secondGesture]]
                 lightState = toggle_light(entityChoice)
                 if lightState is True:
                     deviceStatus = 'on'
                 elif lightState is False:
                     deviceStatus = 'off'
                 print('Device Status is', deviceStatus)
-            except:
-                print('toggle light didnt work')
+            else:
+                print("Second gesture required for Light device")
             time.sleep(1)
-        case "thumbs up", 'thumbs up':
-            print('weather',global_weather)
-            #weather = asyncio.run(getweather())
-            deviceChoice = 'Weather'
-            #print(weather)
-        case "one finger up", 'thumbs down':
-            deviceChoice = 'News'
-            
-        case "two fingers up", 'thumbs down':
-            deviceChoice = 'Thermostat'
-            
+        case "Weather" | "News":
+            # These are services, so no need for a second gesture
+            pass
+        case "Thermostat":
+            # Thermostat is a device, so we need the second gesture to select the entity instance
+            # Add your logic here
+            pass
         case _:
             print(".")
     return deviceChoice
@@ -201,7 +195,7 @@ class VideoProcessor:
         last_motion = None
         inMotion = False
         # List of devices that require a third gesture
-        requires_third_gesture = ['Light']
+        devices_requiring_second_gesture = ['Light', 'Thermostat']
         while True:
             detected, img = self.get_img()
 
@@ -227,63 +221,35 @@ class VideoProcessor:
                 print('first gesture set to:', self.firstGesture)
                 self.firstQueue.clear()
 
-                while True:
-                    detected, img = self.get_img()
-                    self.secondQueue.append(detected)
+                if self.firstGesture == 'thumb flat':
+                    self.clear()
+                    continue
 
-                    print('secondQueue:', self.secondQueue)
-                    print('set(secondQueue):', set(self.secondQueue))
-                    print('set(secondQueue).pop():', set(self.secondQueue).pop())
+                self.deviceChoice = determineDeviceChoice(self.firstGesture)
 
-                    if len(self.secondQueue) == 30 and len(set(self.secondQueue)) == 1 and set(self.secondQueue).pop() != 'No gesture detected':
-                        self.secondGesture = set(self.secondQueue).pop()
-                        print('second gesture set to:', self.secondGesture)
-                        if self.secondGesture=='thumb flat':
-                            self.clear()
-                            continue
-                        
-                        print('first and second gesture:',self.firstGesture,self.secondGesture)
+                if self.deviceChoice in devices_requiring_second_gesture:
+                    self.entityChoices = get_all_devices(self.deviceChoice)
+                    print(f"Available {self.deviceChoice} options:", self.entityChoices)
 
-                        # Just determines the device choice, DOESN"T ACTUALLY DO ANYTHING in terms of performing actions.
-                        # This is in the case that the device requires a third gesture action for entity choice.
-                        print('first and second gesture:',self.firstGesture,self.secondGesture)
-                        self.deviceChoice = determineDeviceChoice(self.firstGesture, self.secondGesture)
+                    while True:
+                        detected, img = self.get_img()
+                        self.secondQueue.append(detected)
 
-                        if self.deviceChoice in requires_third_gesture:
-                            # get devices immediately after the second gesture is detected and we know if it requires a third gesture
-                            self.entityChoices = get_all_devices(self.deviceChoice)
-                            while True:
-                                detected, img = self.get_img()
-                                self.thirdQueue.append(detected)
+                        if len(self.secondQueue) == 30 and len(set(self.secondQueue)) == 1 and set(self.secondQueue).pop() != 'No gesture detected':
+                            self.secondGesture = set(self.secondQueue).pop()
+                            print('second gesture set to:', self.secondGesture)
+                            self.deviceChoice = processGesture(self.firstGesture, self.secondGesture)
+                            if self.secondGesture=='thumb flat':
+                                self.clear()
+                                continue
 
-                                if len(self.thirdQueue) == 30 and len(set(self.thirdQueue)) == 1 and set(self.thirdQueue).pop() != 'No gesture detected':
-                                    self.thirdGesture = set(self.thirdQueue).pop()
-                                    print('third gesture:', self.thirdGesture)
-                                    # Process the third gesture here, stored in ENTITYCHOICE
-                                    self.entityChoice = self.entityChoices[gesture_to_entity[self.thirdGesture]]
-                                    # Then send it off to process it.
-                                    self.deviceChoice = processGesture(self.firstGesture,self.secondGesture, self.thirdGesture, self.entityChoice)
-                                    self.clear()
-                                    break
-                        elif detected == 'thumb flat':
-                            # If the "back" signal is detected, clear the queues and continue to the next iteration
-                            self.clear()
-                            continue
-                        else:
-                            print("Waiting for third gesture")
-                            continue
-                    else:
-                        # If the device doesn't require gesture 3, should use None for thirdGesture by default.
-                        self.deviceChoice = processGesture(self.firstGesture,self.secondGesture)
-                        #time.sleep(1)
+                else:
+                        self.deviceChoice = processGesture(self.firstGesture)
                         self.clear()
-                        break
-                    frame = self.format_image(img)
-                    yield (b'--frame\r\n'
+                
+                frame = self.format_image(img)
+                yield (b'--frame\r\n'
                         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            frame = self.format_image(img)
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 app = Flask(__name__)
 CORS(app)
