@@ -1,11 +1,10 @@
 from flask import Flask, render_template, Response, jsonify
 from flask_cors import CORS
-import cv2
 import requests
 import time
 import cv2
 import  asyncio, os
-import mediapipe as mp
+# import mediapipe as mp
 import time, math
 import numpy as np
 from methods import *
@@ -152,10 +151,10 @@ def processGesture(firstGesture, secondGesture, thirdGesture=None, entityChoice=
 class VideoProcessor:
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
-        self.hands = mp.solutions.hands.Hands(static_image_mode=False,
-                                              max_num_hands=1,
-                                              min_detection_confidence=0.5,
-                                              min_tracking_confidence=0.5)
+        # self.hands = mp.solutions.hands.Hands(static_image_mode=False,
+        #                                       max_num_hands=1,
+        #                                       min_detection_confidence=0.5,
+        #                                       min_tracking_confidence=0.5)
         self.latest_gesture = 'No gesture detected yet'
         self.firstGesture = 'No gesture detected'
         self.secondGesture = 'No gesture detected'
@@ -288,11 +287,11 @@ class VideoProcessor:
 app = Flask(__name__)
 CORS(app)
 #comment this out if mediapipe doesnt work
-mpHands = mp.solutions.hands
-hands = mpHands.Hands(static_image_mode=False,
-                    max_num_hands=1,
-                    min_detection_confidence=0.5,
-                    min_tracking_confidence=0.5)
+# mpHands = mp.solutions.hands
+# hands = mpHands.Hands(static_image_mode=False,
+#                     max_num_hands=1,
+#                     min_detection_confidence=0.5,
+#                     min_tracking_confidence=0.5)
 
 #until here
 #comment the next line in if mediapipe doesn't work
