@@ -11,7 +11,8 @@ import weather from "./gesture-imgs/weather.png";
 import livetranscription from "./gesture-imgs/to-dolist.png";
 import thumbsup from "./gesture-imgs/thumbsup.png";
 import sidewaysthumb from "./gesture-imgs/sidewaysthumb.png";
-
+import TimeAndLocation from "./components/TimeAndLocation";
+import Temperature from "./components/Temperature";
 
 export default function Home() {
   const [data, setData] = useState({});
@@ -115,20 +116,28 @@ export default function Home() {
         </div>
       </div>
       {showWeatherPopup && (
-        <div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto">
-          <button onClick={closePopup} className="absolute top-0 right-0 p-2">X</button>
+        <div className="fixed inset-0 flex justify-center items-center ">
+          <div className="w-1/2 h-4/5-screen bg-gradient-to-br from-cyan-700 to-blue-700 p-4 overflow-auto">
+            <TimeAndLocation />
+            <Temperature />
+          </div>
+        </div>
+        /*<div className="fixed inset-0 flex justify-center items-center w-1/2 h-screen bg-white">
+          <div className="mx-auto max-w-screen-md mt-4 py-5 px-32 bg-gradient-to-br from-cyan-700
+          to-blue-700 h-fit shadow-xl">
+              <TimeAndLocation />
+          </div>
+        </div>*/
+      )}
+
+        {/*<div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto">
+            <button onClick={closePopup} className="absolute top-0 right-0 p-2">X</button>
           <div className="flex flex-col items-center justify-center absolute top-20 right-10">
-            <Image 
-              src={sidewaysthumb}
-              alt="Close"
-              width={80}  // Original size times four (assuming original was 20x20)
-              height={80}
-              className="block"
-            />
             <span className="text-sm mt-1">Exit</span>
           </div>
         <span className="text-s mt-1" >Exit
         </span>
+        
           <div className="p-4 text-black">
             <p class="text-2xl font-bold">Weather</p>
             <p>Humidity: {data.weatherData?.current?.humidity}%</p>
@@ -165,11 +174,9 @@ export default function Home() {
                 </table>
               <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
               </div>
-            ))}
+            ))} 
           </div>
-        </div>
-      
-      )}
+          */}
     </main>
   );
 }
