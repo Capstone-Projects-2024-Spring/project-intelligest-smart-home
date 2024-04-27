@@ -13,6 +13,8 @@ import thumbsup from "./gesture-imgs/thumbsup.png";
 import sidewaysthumb from "./gesture-imgs/sidewaysthumb.png";
 import TimeAndLocation from "./components/TimeAndLocation";
 import Temperature from "./components/Temperature";
+import Forecast  from "./components/Forecast";
+import getFormattedWeatherData from "@component/services/weatherService";
 
 export default function Home() {
   const [data, setData] = useState({});
@@ -48,6 +50,11 @@ export default function Home() {
   const handleWeatherButtonClick = () => {
     setShowWeatherPopup(true);
   };
+
+  const fetchWeather = async () => {
+    const data = await getFormattedWeatherData({ q: "Philadelphia"});
+    console.log(data);
+  }
 
   const closePopup = () => {
     setShowWeatherPopup(false);
@@ -120,6 +127,8 @@ export default function Home() {
           <div className="w-1/2 h-4/5-screen bg-gradient-to-br from-cyan-700 to-blue-700 p-4 overflow-auto">
             <TimeAndLocation />
             <Temperature />
+            <Forecast title="Hourly forecast"/>
+            <Forecast title="Daily forecast"/>
           </div>
         </div>
         /*<div className="fixed inset-0 flex justify-center items-center w-1/2 h-screen bg-white">
