@@ -130,7 +130,7 @@ export default function Home() {
         <span className="text-s mt-1" >Exit
         </span>
           <div className="p-4 text-black">
-            <h2>Current Weather:</h2>
+            <p class="text-2xl font-bold">Weather</p>
             <p>Humidity: {data.weatherData?.current?.humidity}%</p>
             <p>Precipitation: {data.weatherData?.current?.precipitation} inches</p>
             <p>Pressure: {data.weatherData?.current?.pressure} inHg</p>
@@ -155,12 +155,20 @@ export default function Home() {
                         <td>{temp}°F</td>
                       </tr>
                     ))}
+                    <div id="area-chart">
+                      <svg class="w-3 h-3 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13V1m0 0L1 5m4-4 4 4"/>
+                      </svg>
+                    </div>
                   </tbody>
+
                 </table>
+              <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
               </div>
             ))}
           </div>
         </div>
+      
       )}
     </main>
   );
