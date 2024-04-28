@@ -336,5 +336,16 @@ def perform_action():
 
     return jsonify(success=True)
 
+@app.route('/get_entities', methods=['POST'])
+def get_entities():
+    data = request.get_json()
+    device_choice = data['deviceChoice']
+
+    if device_choice == 'Light':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    else:
+        return jsonify(entityChoices=[])
+
 if __name__ == "__main__":
     app.run(debug=True) 

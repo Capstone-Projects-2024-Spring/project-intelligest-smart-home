@@ -187,6 +187,35 @@ function Home() {
     }
   };
 
+  const handleLightButtonClick = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/get_entities', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          deviceChoice: 'Light',
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Update the state with the received entity choices
+        setData((prevData) => ({
+          ...prevData,
+          entityChoices: data.entityChoices,
+        }));
+        setShowEntityChoices(true);
+      } else {
+        // Handle error case
+        console.error('Failed to fetch entities');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
@@ -212,13 +241,14 @@ function Home() {
             News
           </button>
           <button
-            className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
-              data.deviceChoice === "Light" ? "bg-blue-300" : ""
-            }`}
-          >
-            <Image src={light} alt="Lights gesture" width={140} height={50} />
-            Lights
-          </button>
+          className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+            data.deviceChoice === 'Light' ? 'bg-blue-300' : ''
+          }`}
+          onClick={handleLightButtonClick}
+        >
+          <Image src={light} alt="Lights gesture" width={140} height={50} />
+          Lights
+        </button>
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={alarm} alt="Alarm gesture" width={140} height={50} />
             Alarm
