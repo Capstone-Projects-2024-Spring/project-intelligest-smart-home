@@ -128,6 +128,7 @@ def processGesture(firstGesture, secondGesture=None):
             if secondGesture is not None:
                 print(f"Second gesture: {secondGesture}")
                 gesture_index = gesture_to_entity.get(secondGesture, None)
+                print('gesture index',gesture_index)
                 if gesture_index is not None and 0 <= gesture_index < len(entityChoices):
                     entityChoice = entityChoices[gesture_index]
                     lightState = toggle_light(entityChoice)
