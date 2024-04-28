@@ -15,10 +15,15 @@ import TimeAndLocation from "./components/TimeAndLocation";
 import Temperature from "./components/Temperature";
 import Forecast  from "./components/Forecast";
 import getFormattedWeatherData from "@component/services/weatherService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export default function Home() {
+function Home() {
   const [data, setData] = useState({});
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
+  const [query, setQuery] = useState({ q: "Philadelphia" });
+  const [units, setUnits] = useState("metric");
+  const [weather, setWeather] = useState(null);
 
   useEffect(() => {
     const img = document.querySelector("#videoElement");
@@ -33,6 +38,7 @@ export default function Home() {
     };
     return () => eventSource.close();
   }, []);
+
   useEffect(() => {
     if (data.deviceChoice === "Weather") {
       setShowWeatherPopup(true);
@@ -46,6 +52,33 @@ export default function Home() {
       setShowWeatherPopup(false);
     }
   }, [data.firstGesture, data.secondGesture]);
+
+  // Weather stuff
+  useEffect(() => {
+    const fetchWeather = async () => {
+      const message = query.q ? query.q : "current location.";
+
+      toast.info("Fetching weather for " + message);
+
+      await getFormattedWeatherData({ ...query, units }).then((data) => {
+        toast.success(
+          `Successfully fetched weather for ${data.name}, ${data.country}.`
+        );
+
+        setWeather(data);
+      });
+    };
+
+    fetchWeather();
+  }, [query, units]);
+
+  const formatBackground = () => {
+    if (!weather) return "from-cyan-700 to-blue-700";
+    const threshold = units === "metric" ? 20 : 60;
+    if (weather.temp <= threshold) return "from-cyan-700 to-blue-700";
+
+    return "from-yellow-700 to-orange-700";
+  };
 
   const handleWeatherButtonClick = () => {
     setShowWeatherPopup(true);
@@ -124,20 +157,28 @@ export default function Home() {
       </div>
       {showWeatherPopup && (
         <div className="fixed inset-0 flex justify-center items-center ">
-          <div className="w-1/2 h-4/5-screen bg-gradient-to-br from-cyan-700 to-blue-700 p-4 overflow-auto">
-            <TimeAndLocation />
-            <Temperature />
-            <Forecast title="Hourly forecast"/>
-            <Forecast title="Daily forecast"/>
+          <div className={`w-1/2 h-4/5-screen bg-gradient-to-br from-cyan-700 to-blue-700 p-4 overflow-auto ${formatBackground()}`}>
+            <TopButtons setQuery={setQuery} />
+            <Inputs setQuery={setQuery} units={units} setUnits={setUnits} />
+            {weather && (
+              <div>
+                <TimeAndLocation weather={weather} />
+                <Temperature weather={weather} />
+                <Forecast title="Hourly forecast"/>
+                <Forecast title="Daily forecast"/>
+              </div>
+            )}
+
           </div>
         </div>
-        /*<div className="fixed inset-0 flex justify-center items-center w-1/2 h-screen bg-white">
+      )}
+        {/*<div className="fixed inset-0 flex justify-center items-center w-1/2 h-screen bg-white">
           <div className="mx-auto max-w-screen-md mt-4 py-5 px-32 bg-gradient-to-br from-cyan-700
           to-blue-700 h-fit shadow-xl">
               <TimeAndLocation />
           </div>
-        </div>*/
-      )}
+    </div>*/}
+  
 
         {/*<div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto">
             <button onClick={closePopup} className="absolute top-0 right-0 p-2">X</button>
@@ -189,3 +230,5 @@ export default function Home() {
     </main>
   );
 }
+
+export default Home;
