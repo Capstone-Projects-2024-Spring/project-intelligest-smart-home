@@ -329,6 +329,7 @@ def perform_action():
         elif lightState is False:
             deviceStatus = 'off'
         print('Device Status is', deviceStatus)
+        processor.clear()
     elif device_choice == 'Thermostat':
         # Perform action for thermostat
         pass
