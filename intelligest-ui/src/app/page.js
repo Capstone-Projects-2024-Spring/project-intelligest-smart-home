@@ -37,6 +37,8 @@ export default function Home() {
   const [userAlarmDate, setUserAlarmDate] = useState(new Date());
   const [userAlarmTime, setUserAlarmTime] = useState(new Date().toTimeString().split(" ")[0]);
   const [newAlarm, setNewAlarm] = useState([]);
+  const [alarmNotification, setAlarmNotification] = useState(false);
+
   const [newReminder, setNewReminder] = useState("");
   const [userReminders, setUserReminders] = useState([]);
   const [reminderDate, setReminderDate] = useState(new Date());
@@ -101,7 +103,6 @@ export default function Home() {
 
   const getToDoList=()=>{ setViewToDoList(true); }
   const getUpdateTask=(index)=>{
-    //var currentTasks = [...tasks];
     setUpdateTask([...tasks][index]);
     setGetTaskIndex(index);
     setViewUpdateTask(true);
@@ -113,6 +114,7 @@ export default function Home() {
   const closeUpdateTask=()=>{ setViewUpdateTask(false); }
   const closeReminder=()=>{ setViewReminder(false); }
   const closeAlarm=()=>{ setViewAlarm(false); }
+  const closeAlarmNotification=()=>{ setAlarmNotification(false); }
   const resetError=()=>{ setGetError(false); setGetErrorMsg(""); }
   
   function handleToDoListInputChange(event){ setNewTask(event.target.value); }
@@ -139,7 +141,9 @@ export default function Home() {
 
   function getNewAlarmEvent(){
     var currentDate = new Date();
-    if(userAlarmDate < currentDate){
+    var isUserDate = userAlarmDate.getMonth()+"/"+userAlarmDate.getDate()+"/"+userAlarmDate.getFullYear();
+    var getCurrentDate = currentDate.getMonth()+"/"+currentDate.getDate()+"/"+currentDate.getFullYear();
+    if(isUserDate < getCurrentDate){
       setGetError(true);
       setGetErrorMsg("Invalid Date");
       return;
@@ -149,8 +153,25 @@ export default function Home() {
       setGetErrorMsg("Invalid Time");
       return;
     }
-    const isNewAlarm = userAlarmDate + userAlarmTime;
+    const isNewAlarm = userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime;
+    var timeComponents = userAlarmTime.split(":");
+    userAlarmDate.setHours(timeComponents[0], timeComponents[1], timeComponents[2]);
+    console.log("Current Date: " + currentDate);
+    console.log("Alarm Date: " + userAlarmDate);
+    console.log("Alarm Time: " + userAlarmTime);
     setNewAlarm(getAlarms => [...getAlarms, isNewAlarm]);
+    var alarmTimer = userAlarmDate.getTime() - currentDate.getTime();
+    var timeoutID = setTimeout(()=>{
+      setAlarmNotification(true);
+      var getCurrentAlarms = [...newAlarm];
+      var getIndex = getCurrentAlarms.indexOf(isNewAlarm);
+      deleteAlarmEvent(getIndex);
+    },alarmTimer);
+  }
+
+  function deleteAlarmEvent(index){
+    const updatedEvents = tasks.filter((_, i) => i !== index);
+    setNewAlarm(updatedEvents);
   }
  
   return(
@@ -234,8 +255,8 @@ export default function Home() {
           <ul style={{textAlign:"left", display:"inline"}}>
             {tasks.map((task, index)=>{
               return(
-              <li key={index} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", animation:"ease-in 0.5s", marginTop:"10px", textDecoration: checkTask ? 'line-through' : 'none', }} onClick={getNegatedTask}>
-                <span className="isTask">{task}</span>
+              <li key={index} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", animation:"ease-in 0.5s", marginTop:"10px"}}>
+                <span onClick={getNegatedTask} style={{textDecoration: checkTask ? 'line-through' : 'none'}}>{task}</span>
                 <button onClick={()=> getUpdateTask(index)} style={{padding:"2px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", marginLeft:"4px"}}> Edit</button>
                 <button onClick={() => deleteToDoListTask(index)} style={{padding:"2px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", right:"0"}}> Delete</button>
               </li>)
@@ -276,17 +297,27 @@ export default function Home() {
             <br/>
             <button id="setAlarm" onClick={getNewAlarmEvent} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Set Alarm</button>
           </div>
-          <div ref={alarmsRef} style={{marginTop:"10px", textAlign:"left"}}>
+          <ul ref={alarmsRef} style={{marginTop:"10px", textAlign:"left"}}>
             {newAlarm.map((item, index) => {
               return(
-              <div ref={newAlarmRef} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", padding:"10px", display:"flex", alignItems:"center", animation:"ease-in 0.5s"}}>
+              <li key={index} ref={newAlarmRef} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", padding:"10px", display:"flex", alignItems:"center", animation:"ease-in 0.5s"}}>
                 <span>{item}</span>
-                <button class="deleteAlarm" ref={queryRef} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Delete</button>
-              </div>);
+                <button class="deleteAlarm" ref={queryRef} onClick={() => deleteAlarmEvent(index)} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Delete</button>
+              </li>);
             })}
-          </div>
+          </ul>
         </div>
       </Modal>
+
+      <Modal show={alarmNotification} onHide={closeAlarmNotification} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Notification</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>Alarm!!!</Modal.Body>
+      <Modal.Footer>
+        <Button onClick={closeAlarmNotification}>Close</Button>
+      </Modal.Footer>
+    </Modal>
 
       <Modal show={viewReminder} onHide={closeReminder}>
         <Modal.Header closeButton>
@@ -310,7 +341,7 @@ export default function Home() {
         </Modal.Body>
       </Modal>
 
-      <Modal show={getError} centered>
+      <Modal show={getError} onHide={resetError} centered>
       <Modal.Header closeButton>
         <Modal.Title>Error</Modal.Title>
       </Modal.Header>
