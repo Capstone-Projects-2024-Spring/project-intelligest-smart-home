@@ -153,12 +153,10 @@ class VideoProcessor:
         self.latest_gesture = 'No gesture detected yet'
         self.firstGesture = 'No gesture detected'
         self.secondGesture = 'No gesture detected'
-        self.thirdGesture = 'No gesture detected'
         self.deviceChoice = 'N/A'
         self.deviceStatus = 'N/A'
         self.firstQueue = deque(maxlen=30)
         self.secondQueue = deque(maxlen=30)
-        self.thirdQueue = deque(maxlen=30)
         self.entityChoice = None
         self.entityChoices = []
         
@@ -166,12 +164,10 @@ class VideoProcessor:
         self.latest_gesture = 'No gesture detected yet'
         self.firstGesture = 'No gesture detected'
         self.secondGesture = 'No gesture detected'
-        self.thirdGesture = 'No gesture detected'
         self.deviceChoice = 'N/A'
         self.deviceStatus = 'N/A'
         self.firstQueue = deque(maxlen=30)
         self.secondQueue = deque(maxlen=30)
-        self.thirdQueue = deque(maxlen=30)
         self.entityChoice = None
         self.entityChoices = []
     
@@ -194,7 +190,7 @@ class VideoProcessor:
         last_frame = None
         last_motion = None
         inMotion = False
-        # List of devices that require a third gesture
+        # List of devices that require a second gesture
         devices_requiring_second_gesture = ['Light', 'Thermostat']
         while True:
             detected, img = self.get_img()
@@ -264,8 +260,8 @@ hands = mpHands.Hands(static_image_mode=False,
 #comment the next line in if mediapipe doesn't work
 #hands = ""
 #weather = asyncio.run(getweather())
-latest_gesture, firstGesture, secondGesture, thirdGesture = 'No gesture detected yet','No gesture detected','No gesture detected', 'No gesture detected'
-firstQueue,secondQueue,thirdQueue = deque(maxlen=30),deque(maxlen=30),deque(maxlen=30)
+latest_gesture, firstGesture, secondGesture = 'No gesture detected yet','No gesture detected','No gesture detected'
+firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
 processor=VideoProcessor()
 @app.route('/video_feed')
 def video_feed():
@@ -280,7 +276,7 @@ def index():
 @app.route('/current_gesture')
 def current_gesture():
     
-    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, thirdGesture = thirdGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
 
 @app.route('/current_gesture_sse')
 def current_gesture_sse():
@@ -296,7 +292,6 @@ def current_gesture_sse():
                 'entityChoices': processor.entityChoices,
                 'entityChoice': processor.deviceChoice,
                 'weatherData': global_weather,
-                'thirdGesture': processor.thirdGesture,
                 'entityChoice': processor.entityChoice,
                 'entityChoices': processor.entityChoices
             }
