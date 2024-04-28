@@ -24,13 +24,23 @@ export default function Home() {
   const [tvState, setTvState] = useState("Inactive");
 
   const [viewToDoList, setViewToDoList] = useState(false);
-  const [viewAlarm, setViewAlarm] = useState(false);
-  const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [viewUpdateTask, setViewUpdateTask] = useState(false);
+  const [getTaskIndex, setGetTaskIndex] = useState();
+  const [updateTask, setUpdateTask] = useState("");
+  const [checkTask, setCheckTask] = useState(false);
+
+  const [viewAlarm, setViewAlarm] = useState(false);
+  const [viewReminder, setViewReminder] = useState(false);
   const [getTime, setGetTime] = useState(new Date().toLocaleTimeString());
   const [userAlarmDate, setUserAlarmDate] = useState(new Date());
   const [userAlarmTime, setUserAlarmTime] = useState(new Date().toTimeString().split(" ")[0]);
   const [newAlarm, setNewAlarm] = useState([]);
+  const [newReminder, setNewReminder] = useState("");
+  const [userReminders, setUserReminders] = useState([]);
+  const [reminderDate, setReminderDate] = useState(new Date());
+  const [reminderTime, setReminderTime] = useState(new Date().toTimeString().split(" ")[0]);
 
   const [getDOM, setGetDOM] = useState("");
   const [getError, setGetError] = useState(false);
@@ -90,31 +100,44 @@ export default function Home() {
   },[viewAlarm]);
 
   const getToDoList=()=>{ setViewToDoList(true); }
+  const getUpdateTask=(index)=>{
+    //var currentTasks = [...tasks];
+    setUpdateTask([...tasks][index]);
+    setGetTaskIndex(index);
+    setViewUpdateTask(true);
+  }
+  const getNegatedTask=()=>{ setCheckTask(!checkTask);}
+  const getReminder=()=>{ setViewReminder(true); }
   const getAlarm=()=>{ setViewAlarm(true); }
   const closeToDoList=()=>{ setViewToDoList(false); }
+  const closeUpdateTask=()=>{ setViewUpdateTask(false); }
+  const closeReminder=()=>{ setViewReminder(false); }
   const closeAlarm=()=>{ setViewAlarm(false); }
   const resetError=()=>{ setGetError(false); setGetErrorMsg(""); }
   
-  function handleInputChange(event){
-    setNewTask(event.target.value);
-    console.log("Task Set");
-  }
+  function handleToDoListInputChange(event){ setNewTask(event.target.value); }
+  function handleReminderInputChange(event){ setNewReminder(event.target.value); }
 
-  function addTask(){
-    console.log("Adding Task");
+  function getNewToDoListTask(){
     if(newTask.trim() !== ""){
       setTasks(getTasks => [...getTasks, newTask]);
       setNewTask("");
     }
   }
-  
-  function deleteTask(index){
+
+  function editToDoListTask(){
+    var newTasks = [...tasks];
+    newTasks[getTaskIndex] = updateTask;
+    setTasks(newTasks);
+    setViewUpdateTask(false);
+  }
+
+  function deleteToDoListTask(index){
     const updatedTasks = tasks.filter((_, i) => i !== index);
     setTasks(updatedTasks);
   }
 
-  function getNewAlarm(){
-    console.log("Setting Alarm...");
+  function getNewAlarmEvent(){
     var currentDate = new Date();
     if(userAlarmDate < currentDate){
       setGetError(true);
@@ -130,7 +153,7 @@ export default function Home() {
     setNewAlarm(getAlarms => [...getAlarms, isNewAlarm]);
   }
  
-  return (
+  return(
     <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
         <div data-testid="HA-icon" className="Icon">
@@ -138,6 +161,7 @@ export default function Home() {
             <Icon path={mdiHomeAssistant} title="User Profile" size={3} />
           </button>
         </div>
+
         <div data-testid="video-feed" >
           <img id="videoElement" />
           <div className="text-black">
@@ -187,7 +211,7 @@ export default function Home() {
             <Image src={thermostat} alt="TV" width={140} height={50} />
             Locks
           </button>
-          <button onClick={() => handleClick("Reminders Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
+          <button onClick={() => getReminder()} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={weather} alt="TV" width={140} height={50} />
             Reminders
           </button>
@@ -204,18 +228,31 @@ export default function Home() {
         </Modal.Header>
         <Modal.Body>
           <div>
-            <input type="text" placeholder="Enter an task..." style={{border:"1px solid black", borderRadius: "4px"}} value={newTask} onChange={handleInputChange}/>
-            <button onclick={addTask}>Add</button>
+            <input type="text" placeholder="Enter an task..." style={{border:"1px solid black", borderRadius: "5px"}} value={newTask} onChange={(e)=>{setNewTask(e.target.value)}}/>
+            <button id="setAlarm" onClick={getNewToDoListTask} style={{marginLeft:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", padding:"2px"}}>Add</button>
           </div>
-          <ul>
+          <ul style={{textAlign:"left", display:"inline"}}>
             {tasks.map((task, index)=>{
               return(
-              <li key={index}>
-                <span>{task}</span>
-                <button onClick={() => deleteTask(index)}> Delete</button>
+              <li key={index} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", animation:"ease-in 0.5s", marginTop:"10px", textDecoration: checkTask ? 'line-through' : 'none', }} onClick={getNegatedTask}>
+                <span className="isTask">{task}</span>
+                <button onClick={()=> getUpdateTask(index)} style={{padding:"2px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", marginLeft:"4px"}}> Edit</button>
+                <button onClick={() => deleteToDoListTask(index)} style={{padding:"2px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", right:"0"}}> Delete</button>
               </li>)
             })}
           </ul>
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={viewUpdateTask} onHide={closeUpdateTask} centered>
+        <Modal.Header closeButton>
+        <Modal.Title>Update Task</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <input type="text" style={{border:"1px solid black", borderRadius: "5px"}} value={updateTask} onChange={(e)=>{setUpdateTask(e.target.value)}}/>
+            <button onClick={editToDoListTask} style={{marginLeft:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", padding:"2px"}}>Update Task</button>
+          </div>
         </Modal.Body>
       </Modal>
 
@@ -237,18 +274,40 @@ export default function Home() {
               <input type="time" id="alarmTime" value={userAlarmTime} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmTime((e.target.value))}}/>
             </div>
             <br/>
-            <button id="setAlarm" onClick={getNewAlarm} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Set Alarm</button>
+            <button id="setAlarm" onClick={getNewAlarmEvent} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Set Alarm</button>
           </div>
-          <div class="alarms" id="alarms" ref={alarmsRef}>
+          <div ref={alarmsRef} style={{marginTop:"10px", textAlign:"left"}}>
             {newAlarm.map((item, index) => {
               return(
-              <div ref={newAlarmRef}>
+              <div ref={newAlarmRef} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", padding:"10px", display:"flex", alignItems:"center", animation:"ease-in 0.5s"}}>
                 <span>{item}</span>
-                <button class="deleteAlarm" ref={queryRef}>Delete</button>
+                <button class="deleteAlarm" ref={queryRef} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Delete</button>
               </div>);
             })}
           </div>
         </div>
+      </Modal>
+
+      <Modal show={viewReminder} onHide={closeReminder}>
+        <Modal.Header closeButton>
+        <Modal.Title>Reminder</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <textarea type="text" placeholder="Enter an reminder..." style={{border:"1px solid black", borderRadius: "5px"}} value={newReminder} onChange={(e) =>{setNewReminder(e.target.value)}}/>
+            <div style={{display:"flex", flexDirection:"column", alignItems:"center", gap:"10px"}}>
+              <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+                <label for="alarmDate" style={{paddingRight:"10px"}}>Select Date: </label>
+                <input type="date" id="alarmDate" min="" style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmDate(new Date(e.target.value))}}/>
+              </div>
+              <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+                <label for="alarmTime" style={{paddingRight:"10px"}}>Select Time: </label>
+                <input type="time" id="alarmTime" value={userAlarmTime} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmTime((e.target.value))}}/>
+              </div>
+            </div>
+            <button id="setReminder" onClick={getNewToDoListTask} style={{marginLeft:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", padding:"2px"}}>Set</button>
+          </div>
+        </Modal.Body>
       </Modal>
 
       <Modal show={getError} centered>
