@@ -247,6 +247,7 @@ class VideoProcessor:
                             print('second gesture set to:', self.secondGesture)
                             processGesture(self.firstGesture, self.secondGesture)
                             second_gesture_captured = True
+                            self.clear()
                             if self.secondGesture=='thumb flat':
                                 self.clear()
                                 continue
@@ -254,7 +255,7 @@ class VideoProcessor:
                 else:
                         processGesture(self.firstGesture)
                         self.clear()
-                        
+
             frame = self.format_image(img)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
