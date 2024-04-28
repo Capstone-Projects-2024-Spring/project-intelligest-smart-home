@@ -98,7 +98,7 @@ global_weather = asyncio.run(getweather())
 # Determines the device choice based on the first gesture captured.
 def determineDeviceChoice(firstGesture):
     #using a switch statement to match up the gestures with their respective actions
-    match firstGesture, secondGesture:
+    match firstGesture:
         case "one finger up":
             #lights
             return 'Light'
