@@ -26,7 +26,7 @@ class hand:
         # Refine gesture detection using counts
         if self.fingersUp == 4 and self.thumb.direction == 'up':
             return 'five fingers up'
-        elif self.indexFinger.direction == 'up' and self.thumb.direction == 'flat' and 45 < self.thumb.angle < 135:
+        elif self.indexFinger.direction == 'up' and self.thumb.direction == 'flat':
             return 'L shape'
         elif self.fingersUp == 4:
             return 'four fingers up'
