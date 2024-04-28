@@ -250,6 +250,9 @@ class VideoProcessor:
                 frame = self.format_image(img)
                 yield (b'--frame\r\n'
                         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            frame = self.format_image(img)
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 app = Flask(__name__)
 CORS(app)
