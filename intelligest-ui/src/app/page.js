@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import tv from "./gesture-imgs/TV.png";
 import light from "./gesture-imgs/lights.png";
@@ -16,7 +16,6 @@ import sidewaysthumb from "./gesture-imgs/sidewaysthumb.png";
 export default function Home() {
   const [data, setData] = useState({});
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
-  const videoRef = useRef(null); // Create a ref for the video element
 
   useEffect(() => {
     const img = document.querySelector("#videoElement");
@@ -90,7 +89,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
         <div>
-        <video ref={videoRef} autoPlay muted />
+        <img id="videoElement" />
           <div className="text-black">
             Latest Gesture: {data.latestGesture} <br />
             First Gesture: {data.firstGesture} <br />
