@@ -126,6 +126,7 @@ def processGesture(firstGesture, secondGesture=None):
     match deviceChoice:
         case "Light":
             if secondGesture is not None:
+                print(f"Second gesture: {secondGesture}")
                 gesture_index = gesture_to_entity.get(secondGesture, None)
                 if gesture_index is not None and 0 <= gesture_index < len(entityChoices):
                     entityChoice = entityChoices[gesture_index]
