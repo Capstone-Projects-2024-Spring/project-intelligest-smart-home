@@ -161,6 +161,32 @@ function Home() {
     }
   };
 
+  const handleEntityChoice = async (index) => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/perform_action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          deviceChoice: data.deviceChoice,
+          entityChoice: data.entityChoices[index],
+        }),
+      });
+
+      if (response.ok) {
+        // Action performed successfully
+        console.log('Action performed successfully');
+      } else {
+        // Handle error case
+        console.error('Failed to perform action');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+
   return (
     <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
@@ -277,7 +303,12 @@ function Home() {
           <ul>
             {data.entityChoices.map((entity, index) => (
               <li key={entity}>
-                <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded flex items-center">
+                <button
+                  className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded flex items-center ${
+                    data.entityChoice === entity ? 'bg-blue-300' : ''
+                  }`}
+                  onClick={() => handleEntityChoice(index)}
+                >
                   {getEntityIcon(data.deviceChoice) && (
                     <FontAwesomeIcon
                       icon={getEntityIcon(data.deviceChoice)}

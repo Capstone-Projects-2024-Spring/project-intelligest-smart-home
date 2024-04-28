@@ -314,5 +314,26 @@ def current_gesture_sse():
 
     return Response(generate(), mimetype='text/event-stream')
 
+@app.route('/perform_action', methods=['POST'])
+def perform_action():
+    data = requests.get_json()
+    device_choice = data['deviceChoice']
+    entity_choice = data['entityChoice']
+
+    # Perform the desired action based on the device and entity choice
+    if device_choice == 'Light':
+        # Toggle the light
+        lightState = toggle_light(entity_choice)
+        if lightState is True:
+            deviceStatus = 'on'
+        elif lightState is False:
+            deviceStatus = 'off'
+        print('Device Status is', deviceStatus)
+    elif device_choice == 'Thermostat':
+        # Perform action for thermostat
+        pass
+
+    return jsonify(success=True)
+
 if __name__ == "__main__":
     app.run(debug=True) 
