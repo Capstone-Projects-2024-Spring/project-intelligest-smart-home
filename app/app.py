@@ -237,7 +237,8 @@ class VideoProcessor:
                     self.entityChoices = get_all_devices(self.deviceChoice)
                     print(f"Available {self.deviceChoice} options:", self.entityChoices)
 
-                    while True:
+                    second_gesture_captured = False
+                    while not second_gesture_captured:
                         detected, img = self.get_img()
                         self.secondQueue.append(detected)
 
@@ -245,6 +246,7 @@ class VideoProcessor:
                             self.secondGesture = set(self.secondQueue).pop()
                             print('second gesture set to:', self.secondGesture)
                             processGesture(self.firstGesture, self.secondGesture)
+                            second_gesture_captured = True
                             if self.secondGesture=='thumb flat':
                                 self.clear()
                                 continue
@@ -252,10 +254,7 @@ class VideoProcessor:
                 else:
                         processGesture(self.firstGesture)
                         self.clear()
-                
-                frame = self.format_image(img)
-                yield (b'--frame\r\n'
-                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                        
             frame = self.format_image(img)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
