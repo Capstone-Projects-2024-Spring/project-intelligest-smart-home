@@ -18,44 +18,44 @@ export default function Home() {
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
   const videoRef = useRef(null); // Create a ref for the video element
 
-  // useEffect(() => {
-  //   const img = document.querySelector("#videoElement");
-  //   img.src = "http://127.0.0.1:5000/video_feed";
-  //   img.style.width = "640px";
-  // }, []);
-
   useEffect(() => {
-    const videoPlayer = videoRef.current; // Get the current value of the ref
-  
-    const loadVideo = () => {
-      fetch('/video_feed')
-        .then((response) => response.body)
-        .then((body) => {
-          const reader = body.getReader();
-          const stream = new ReadableStream({
-            start(controller) {
-              function push() {
-                reader.read().then(({ done, value }) => {
-                  if (done) {
-                    controller.close();
-                    return;
-                  }
-                  controller.enqueue(new Uint8Array(value));
-                  push();
-                });
-              }
-              push();
-            },
-          });
-          videoPlayer.srcObject = new MediaSource(stream);
-        })
-        .catch((error) => {
-          console.error('Error fetching video feed:', error);
-        });
-    };
-  
-    loadVideo();
+    const img = document.querySelector("#videoElement");
+    img.src = "http://127.0.0.1:5000/video_feed";
+    img.style.width = "640px";
   }, []);
+
+  // useEffect(() => {
+  //   const videoPlayer = videoRef.current; // Get the current value of the ref
+  
+  //   const loadVideo = () => {
+  //     fetch('/video_feed')
+  //       .then((response) => response.body)
+  //       .then((body) => {
+  //         const reader = body.getReader();
+  //         const stream = new ReadableStream({
+  //           start(controller) {
+  //             function push() {
+  //               reader.read().then(({ done, value }) => {
+  //                 if (done) {
+  //                   controller.close();
+  //                   return;
+  //                 }
+  //                 controller.enqueue(new Uint8Array(value));
+  //                 push();
+  //               });
+  //             }
+  //             push();
+  //           },
+  //         });
+  //         videoPlayer.srcObject = new MediaSource(stream);
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching video feed:', error);
+  //       });
+  //   };
+  
+  //   loadVideo();
+  // }, []);
 
   useEffect(() => {
     const eventSource = new EventSource("http://127.0.0.1:5000/current_gesture_sse");
