@@ -95,6 +95,7 @@ async def getweather():
 
 global_weather = asyncio.run(getweather())
 
+# Determines the device choice based on the first gesture captured.
 def determineDeviceChoice(firstGesture):
     #using a switch statement to match up the gestures with their respective actions
     match firstGesture, secondGesture:
@@ -115,6 +116,9 @@ def determineDeviceChoice(firstGesture):
         case _:
             print(".")
 
+# Handles logic based on the device/service choice
+# For devices like "Light" and "Lock", it waits for the second gesture to select the entity instance.
+# For services like "Weather" and "News", it does not require a second gesture.
 def processGesture(firstGesture, secondGesture=None):
     global deviceChoice
     deviceChoice = determineDeviceChoice(firstGesture)
