@@ -140,6 +140,12 @@ export default function Home() {
   }
 
   function getNewAlarmEvent(){
+    var checkCurrentAlarms = [...newAlarm];
+    if(checkCurrentAlarms.includes(userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime)){
+      setGetError(true);
+      setGetErrorMsg("That time is already set");
+      return;
+    }
     var currentDate = new Date();
     var isUserDate = userAlarmDate.getMonth()+"/"+userAlarmDate.getDate()+"/"+userAlarmDate.getFullYear();
     var getCurrentDate = currentDate.getMonth()+"/"+currentDate.getDate()+"/"+currentDate.getFullYear();
@@ -308,16 +314,16 @@ export default function Home() {
           </ul>
         </div>
       </Modal>
-
+      
       <Modal show={alarmNotification} onHide={closeAlarmNotification} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Notification</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>Alarm!!!</Modal.Body>
-      <Modal.Footer>
-        <Button onClick={closeAlarmNotification}>Close</Button>
-      </Modal.Footer>
-    </Modal>
+        <Modal.Header closeButton>
+          <Modal.Title>Notification</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Alarm!!!</Modal.Body>
+        <Modal.Footer>
+          <Button onClick={closeAlarmNotification}>Close</Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal show={viewReminder} onHide={closeReminder}>
         <Modal.Header closeButton>
