@@ -6,7 +6,7 @@ import {
   UilSun,
   UilSunset,
 } from "@iconscout/react-unicons";
-import { formatToLocalTime, iconUrlFromCode } from "@component/services/weatherService";
+import { formatToLocalTime, iconUrlFromCode } from "@component/app/services/weatherService";
 
 function TemperatureAndDetails({
   weather: {
@@ -31,22 +31,22 @@ function TemperatureAndDetails({
 
       <div className="flex flex-row items-center justify-between text-white py-3">
         {/* <img src={iconUrlFromCode(icon)} alt="" className="w-20" /> */}
-        <p className="text-5xl">{`${temp.toFixed()}°`}</p>
+        <p className="text-5xl">55°</p>
         <div className="flex flex-col space-y-2">
           <div className="flex font-light text-sm items-center justify-center">
             <UilTemperature size={18} className="mr-1" />
             Real fell:
-            <span className="font-medium ml-1">{`${feels_like.toFixed()}°`}</span>
+            <span className="font-medium ml-1">45</span>
           </div>
           <div className="flex font-light text-sm items-center justify-center">
             <UilTear size={18} className="mr-1" />
             Humidity:
-            <span className="font-medium ml-1">{`${humidity.toFixed()}%`}</span>
+            <span className="font-medium ml-1">55%</span>
           </div>
           <div className="flex font-light text-sm items-center justify-center">
             <UilWind size={18} className="mr-1" />
             Wind:
-            <span className="font-medium ml-1">{`${speed.toFixed()} km/h`}</span>
+            <span className="font-medium ml-1">55 km/h</span>
           </div>
         </div>
       </div>

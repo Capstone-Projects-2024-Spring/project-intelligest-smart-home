@@ -1,12 +1,12 @@
 import React from 'react';
-import { iconUrlFromCode } from "@component/services/weatherService";
+import { iconUrlFromCode } from "@component/app/services/weatherService";
 
 function Forecast({ title, items }) {
     console.log(items);
     return (
       <div>
         <div className="flex items-center justify-start mt-6">
-          <p className="text-white font-medium uppercase">{title}</p>
+          <p className="text-white font-medium uppercase">title</p>
         </div>
         <hr className="my-2" />
   
@@ -22,7 +22,7 @@ function Forecast({ title, items }) {
                 className="w-12 my-1"
                 alt=""
               /> */}
-              <p className="font-medium">{`${item.temp.toFixed()}°`}</p>
+              <p className="font-medium">45</p>
             </div>
           ))}
         </div>

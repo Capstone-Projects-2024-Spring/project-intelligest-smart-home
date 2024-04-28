@@ -14,7 +14,7 @@ import sidewaysthumb from "./gesture-imgs/sidewaysthumb.png";
 import TimeAndLocation from "./components/TimeAndLocation";
 import Temperature from "./components/Temperature";
 import Forecast  from "./components/Forecast";
-import getFormattedWeatherData from "@component/services/weatherService";
+import getFormattedWeatherData from "@component/app/services/weatherService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -23,7 +23,7 @@ function Home() {
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
   const [query, setQuery] = useState({ q: "Philadelphia" });
   const [units, setUnits] = useState("metric");
-  const [weather, setWeather] = useState(null);
+  //const [weather, setWeather] = useState(null);
 
   useEffect(() => {
     const img = document.querySelector("#videoElement");
@@ -158,12 +158,12 @@ function Home() {
       {showWeatherPopup && (
         <div className="fixed inset-0 flex justify-center items-center ">
           <div className={`w-1/2 h-4/5-screen bg-gradient-to-br from-cyan-700 to-blue-700 p-4 overflow-auto ${formatBackground()}`}>
-            <TopButtons setQuery={setQuery} />
-            <Inputs setQuery={setQuery} units={units} setUnits={setUnits} />
+            {/* <TopButtons setQuery={setQuery} />
+            <Inputs setQuery={setQuery} units={units} setUnits={setUnits} /> */}
             {weather && (
               <div>
-                <TimeAndLocation weather={weather} />
-                <Temperature weather={weather} />
+                <TimeAndLocation />
+                <Temperature  />
                 <Forecast title="Hourly forecast"/>
                 <Forecast title="Daily forecast"/>
               </div>

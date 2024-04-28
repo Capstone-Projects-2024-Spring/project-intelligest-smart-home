@@ -1,5 +1,5 @@
 import React from "react";
-
+{/*
 function TopButtons({ setQuery }) {
   const cities = [
     {
@@ -39,4 +39,4 @@ function TopButtons({ setQuery }) {
   );
 }
 
-export default TopButtons;
+export default TopButtons;*/}
