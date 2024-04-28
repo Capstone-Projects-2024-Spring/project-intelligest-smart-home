@@ -119,7 +119,7 @@ def determineDeviceChoice(firstGesture):
 # Handles logic based on the device/service choice
 # For devices like "Light" and "Lock", it waits for the second gesture to select the entity instance.
 # For services like "Weather" and "News", it does not require a second gesture.
-def processGesture(firstGesture, secondGesture=None):
+def processGesture(self, firstGesture, secondGesture=None):
     global deviceChoice
     deviceChoice = determineDeviceChoice(firstGesture)
     print('device choice is',deviceChoice)
@@ -130,13 +130,13 @@ def processGesture(firstGesture, secondGesture=None):
                 gesture_index = gesture_to_entity.get(secondGesture, None)
                 print('gesture index',gesture_index)
                 if gesture_index is not None and entityChoices and 0 <= gesture_index < len(entityChoices):
-                    entityChoice = entityChoices[gesture_index]
+                    self.entityChoice = self.entityChoices[gesture_index]
                     lightState = toggle_light(entityChoice)
                     if lightState is True:
-                        deviceStatus = 'on'
+                        self.deviceStatus = 'on'
                     elif lightState is False:
-                        deviceStatus = 'off'
-                    print('Device Status is', deviceStatus)
+                        self.deviceStatus = 'off'
+                    print('Device Status is', self.deviceStatus)
                 else:
                     print("Invalid gesture or no devices found.")
             else:
