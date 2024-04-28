@@ -119,24 +119,24 @@ def determineDeviceChoice(firstGesture):
 # Handles logic based on the device/service choice
 # For devices like "Light" and "Lock", it waits for the second gesture to select the entity instance.
 # For services like "Weather" and "News", it does not require a second gesture.
-def processGesture(self, firstGesture, secondGesture=None):
+def processGesture(firstGesture, secondGesture=None):
     global deviceChoice
     deviceChoice = determineDeviceChoice(firstGesture)
-    print('device choice is',deviceChoice)
+    print('device choice is', deviceChoice)
     match deviceChoice:
         case "Light":
             if secondGesture is not None:
                 print(f"Second gesture: {secondGesture}")
                 gesture_index = gesture_to_entity.get(secondGesture, None)
-                print('gesture index',gesture_index)
-                if gesture_index is not None and entityChoices and 0 <= gesture_index < len(entityChoices):
-                    self.entityChoice = self.entityChoices[gesture_index]
-                    lightState = toggle_light(entityChoice)
+                print('gesture index', gesture_index)
+                if gesture_index is not None and processor.entityChoices and 0 <= gesture_index < len(processor.entityChoices):
+                    processor.entityChoice = processor.entityChoices[gesture_index]
+                    lightState = toggle_light(processor.entityChoice)
                     if lightState is True:
-                        self.deviceStatus = 'on'
+                        deviceStatus = 'on'
                     elif lightState is False:
-                        self.deviceStatus = 'off'
-                    print('Device Status is', self.deviceStatus)
+                        deviceStatus = 'off'
+                    print('Device Status is', deviceStatus)
                 else:
                     print("Invalid gesture or no devices found.")
             else:
@@ -244,13 +244,13 @@ class VideoProcessor:
                         if len(self.secondQueue) == 30 and len(set(self.secondQueue)) == 1 and set(self.secondQueue).pop() != 'No gesture detected':
                             self.secondGesture = set(self.secondQueue).pop()
                             print('second gesture set to:', self.secondGesture)
-                            self.deviceChoice = processGesture(self.firstGesture, self.secondGesture)
+                            processGesture(self.firstGesture, self.secondGesture)
                             if self.secondGesture=='thumb flat':
                                 self.clear()
                                 continue
 
                 else:
-                        self.deviceChoice = processGesture(self.firstGesture)
+                        processGesture(self.firstGesture)
                         self.clear()
                 
                 frame = self.format_image(img)
