@@ -126,13 +126,17 @@ def processGesture(firstGesture, secondGesture=None):
     match deviceChoice:
         case "Light":
             if secondGesture is not None:
-                entityChoice = entityChoices[gesture_to_entity[secondGesture]]
-                lightState = toggle_light(entityChoice)
-                if lightState is True:
-                    deviceStatus = 'on'
-                elif lightState is False:
-                    deviceStatus = 'off'
-                print('Device Status is', deviceStatus)
+                gesture_index = gesture_to_entity.get(secondGesture, None)
+                if gesture_index is not None and 0 <= gesture_index < len(entityChoices):
+                    entityChoice = entityChoices[gesture_index]
+                    lightState = toggle_light(entityChoice)
+                    if lightState is True:
+                        deviceStatus = 'on'
+                    elif lightState is False:
+                        deviceStatus = 'off'
+                    print('Device Status is', deviceStatus)
+                else:
+                    print("Invalid gesture or no devices found.")
             else:
                 print("Second gesture required for Light device")
             time.sleep(1)
