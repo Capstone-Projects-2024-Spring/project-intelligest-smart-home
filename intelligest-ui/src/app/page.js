@@ -17,10 +17,43 @@ export default function Home() {
   const [data, setData] = useState({});
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
 
+  // useEffect(() => {
+  //   const img = document.querySelector("#videoElement");
+  //   img.src = "http://127.0.0.1:5000/video_feed";
+  //   img.style.width = "640px";
+  // }, []);
+
   useEffect(() => {
-    const img = document.querySelector("#videoElement");
-    img.src = "http://127.0.0.1:5000/video_feed";
-    img.style.width = "640px";
+    const videoPlayer = videoRef.current;
+  
+    const loadVideo = () => {
+      fetch('/video_feed')
+        .then((response) => response.body)
+        .then((body) => {
+          const reader = body.getReader();
+          const stream = new ReadableStream({
+            start(controller) {
+              function push() {
+                reader.read().then(({ done, value }) => {
+                  if (done) {
+                    controller.close();
+                    return;
+                  }
+                  controller.enqueue(new Uint8Array(value));
+                  push();
+                });
+              }
+              push();
+            },
+          });
+          videoPlayer.srcObject = new MediaSource(stream);
+        })
+        .catch((error) => {
+          console.error('Error fetching video feed:', error);
+        });
+    };
+  
+    loadVideo();
   }, []);
 
   useEffect(() => {
