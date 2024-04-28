@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, jsonify
+from flask import Flask, render_template, Response, jsonify, request
 from flask_cors import CORS
 import requests
 import time
@@ -316,7 +316,7 @@ def current_gesture_sse():
 
 @app.route('/perform_action', methods=['POST'])
 def perform_action():
-    data = requests.get_json()
+    data = request.get_json()
     device_choice = data['deviceChoice']
     entity_choice = data['entityChoice']
 
