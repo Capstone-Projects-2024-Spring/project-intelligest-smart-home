@@ -15,6 +15,7 @@ import python_weather, asyncio, os
 #so you will need to install it with pip install python_weather
 #queue to find the right gesture
 from collections import deque
+
 deviceChoice = None
 deviceStatus = None
 entityChoice = None
@@ -417,6 +418,17 @@ def get_entities():
         return jsonify(entityChoices=entity_choices)
     else:
         return jsonify(entityChoices=[])
+
+@app.route('/get_news')
+def get_news():
+    try:
+        news_data = get_recent_news()
+        if news_data:
+            return jsonify(news_data)
+        else:
+            return jsonify({'error': 'No news data available'}), 404
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch news'}), 500
 
 if __name__ == "__main__":
     app.run(debug=True) 

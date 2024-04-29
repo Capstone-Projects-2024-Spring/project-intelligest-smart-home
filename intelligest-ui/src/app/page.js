@@ -21,8 +21,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLightbulb, faLock } from "@fortawesome/free-solid-svg-icons";
 import toDo from "./gesture-imgs/to-dolist.png";
-import Icon from "@mdi/react";
-import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from "@mdi/js";
+import Icon from '@mdi/react';
+import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
+import "react-toastify/dist/ReactToastify.css";
 
 function Home() {
   const [data, setData] = useState({});
@@ -32,7 +33,8 @@ function Home() {
   const [showEntityChoices, setShowEntityChoices] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   //const [weather, setWeather] = useState(null);
-
+  const [showNewsPopup, setShowNewsPopup] = useState(false);
+  const [newsData, setNewsData] = useState([]);
   const handleClick = (buttonName) => {
     console.log(buttonName);
   };
@@ -89,8 +91,11 @@ function Home() {
   useEffect(() => {
     if (data.deviceChoice === "Weather") {
       setShowWeatherPopup(true);
+    } else if (data.deviceChoice === "News") {
+      setShowWeatherPopup(false);
     } else {
       setShowWeatherPopup(false);
+      setShowNewsPopup(false);
     }
   }, [data.deviceChoice]);
 
@@ -139,6 +144,27 @@ function Home() {
     }
   }, [data.deviceStatus]);
 
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/get_news');
+        if (response.ok) {
+          const data = await response.json();
+          setNewsData(data);
+          setShowNewsPopup(true);
+        } else {
+          console.error('Failed to fetch news');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    if (data.deviceChoice === "News") {
+      fetchNews();
+    }
+  }, [data.deviceChoice]);
+
   const formatBackground = () => {
     if (!weather) return "from-cyan-700 to-blue-700";
     const threshold = units === "metric" ? 20 : 60;
@@ -149,6 +175,21 @@ function Home() {
 
   const handleWeatherButtonClick = () => {
     setShowWeatherPopup(true);
+  };
+
+  const handleNewsButtonClick = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/get_news');
+      if (response.ok) {
+        const data = await response.json();
+        setNewsData(data);
+        setShowNewsPopup(true);
+      } else {
+        console.error('Failed to fetch news');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const fetchWeather = async () => {
@@ -283,6 +324,7 @@ function Home() {
         </div>
         <div className="grid grid-cols-4 gap-4">
           <button
+            onClick={handleNewsButtonClick}
             className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
               data.deviceChoice === "News" ? "bg-blue-300" : ""
             }`}
@@ -439,6 +481,28 @@ function Home() {
           </ul>
         </div>
       )}
+      {showNewsPopup && (
+          <div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto shadow-lg">
+            <button onClick={() => setShowNewsPopup(false)} 
+                    className="absolute top-0 right-0 p-2 text-gray-600 hover:text-gray-900 transition-colors">
+              <svg className="w-6 h-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+            <div className="p-4 text-black">
+              <h2 className="text-xl font-semibold mb-4">Latest News:</h2>
+              {newsData.map((article, index) => (
+                <div key={index} className="mb-4 border-b pb-4">
+                  <h3 className="text-lg font-bold">{article.title}</h3>
+                  <p className="text-gray-700 mb-2">{article.content}</p>
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 transition-colors">
+                    Read more
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       {showConfirmation && (
         <div className="absolute right-0 bottom-0 w-1/2 h-screen bg-white p-4 overflow-auto">
           <h2>Operation Complete</h2>
