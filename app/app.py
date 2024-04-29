@@ -50,6 +50,24 @@ def toggle_light(device_id):
         return light_state['state'] == 'on' 
     return None
 
+def toggle_lock(device_id):
+    #action = "turn_on" if state else "turn_off"
+    url = f"http://localhost:8123/api/services/switch/toggle"
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
+        "Content-Type": "application/json",
+    }
+
+    data = {"entity_id": device_id}
+    print('toggling lock',data)
+    response = requests.post(url, json=data, headers=headers)
+    if response.status_code == 200:
+        # Get the new state of the light
+        #time.sleep(1)
+        lock_state = requests.get(f"http://localhost:8123/api/states/{data['entity_id']}", headers=headers).json()
+        return lock_state['state'] == 'locked' 
+    return None
+
 def get_all_devices(device_type):
     url = "http://localhost:8123/api/states"
     headers = {
@@ -133,7 +151,8 @@ def determineDeviceChoice(firstGesture):
             
         case "three fingers up": # update with real gesture
             return 'Thermostat'
-            
+        case "four fingers up": # update with real gesture
+            return 'Lock'
         case _:
             print(".")
 
@@ -162,6 +181,24 @@ def processGesture(firstGesture, secondGesture=None):
                     print("Invalid gesture or no devices found.")
             else:
                 print("Second gesture required for Light device")
+            time.sleep(1)
+        case "Lock":
+            if secondGesture is not None:
+                print(f"Second gesture: {secondGesture}")
+                gesture_index = gesture_to_entity.get(secondGesture, None)
+                print('gesture index', gesture_index)
+                if gesture_index is not None and processor.entityChoices and 0 <= gesture_index < len(processor.entityChoices):
+                    processor.entityChoice = processor.entityChoices[gesture_index]
+                    lockState = toggle_lock(processor.entityChoice)
+                    if lockState is True:
+                        deviceStatus = 'locked'
+                    elif lockState is False:
+                        deviceStatus = 'unlocked'
+                    print('Device Status is', deviceStatus)
+                else:
+                    print("Invalid gesture or no devices found.")
+            else:
+                print("Second gesture required for Lock device")
             time.sleep(1)
         case "Weather" | "News":
             # These are services, so no need for a second gesture
@@ -353,6 +390,14 @@ def perform_action():
             deviceStatus = 'off'
         print('Device Status is', deviceStatus)
         processor.clear()
+    elif device_choice == 'Lock':
+        lockState = toggle_lock(entity_choice)
+        if lockState is True:
+            deviceStatus = 'locked'
+        elif lockState is False:
+            deviceStatus = 'unlocked'
+        print('Device Status is', deviceStatus)
+        processor.clear()
     elif device_choice == 'Thermostat':
         # Perform action for thermostat
         pass
@@ -365,6 +410,9 @@ def get_entities():
     device_choice = data['deviceChoice']
 
     if device_choice == 'Light':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    elif device_choice == 'Lock':
         entity_choices = get_all_devices(device_choice)
         return jsonify(entityChoices=entity_choices)
     else:
