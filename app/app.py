@@ -3,7 +3,7 @@ from flask_cors import CORS
 import requests
 import time
 import  asyncio, os
-#import mediapipe as mp
+import mediapipe as mp
 import time, math
 import numpy as np
 from methods import *
