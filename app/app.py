@@ -34,7 +34,7 @@ gesture_to_entity = {
 
 def toggle_light(device_id):
     #action = "turn_on" if state else "turn_off"
-    #url = f"http://localhost:8123/api/services/switch/toggle"
+    url = f"http://localhost:8123/api/services/switch/toggle"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
         "Content-Type": "application/json",
