@@ -11,12 +11,6 @@ import weather from "./gesture-imgs/weather.png";
 import livetranscription from "./gesture-imgs/to-dolist.png";
 import thumbsup from "./gesture-imgs/thumbsup.png";
 import sidewaysthumb from "./gesture-imgs/sidewaysthumb.png";
-import TimeAndLocation from "./components/TimeAndLocation";
-import Temperature from "./components/Temperature";
-import Forecast  from "./components/Forecast";
-import getFormattedWeatherData from "@component/app/services/weatherService";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   UilTemperature,
   UilTear,
@@ -26,11 +20,17 @@ import {
 } from "@iconscout/react-unicons";
 
 
-
 export default function Home() {
   const [data, setData] = useState({});
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
+  const [time, setTime] = useState(new Date());
+
+  console.log("Date: ", Date())
+
+  useEffect(()=> {
+    setInterval(()=>setTime(new Date()), 1000)
+  }, [])
 
   useEffect(() => {
     async function fetchWeatherData() {
@@ -102,7 +102,7 @@ export default function Home() {
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          <button className={`hover:bg-yellow-100 text-black font-bold py-2 px-4 rounded ${
+          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
               data.deviceChoice === "News" ? "bg-blue-300" : ""
             }`}
           >
