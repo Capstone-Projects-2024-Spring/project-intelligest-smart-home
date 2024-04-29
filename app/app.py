@@ -67,6 +67,31 @@ def get_all_devices(device_type):
     else:
         return None
 
+# async def getweather():
+#   # declare the client. the measuring unit used defaults to the metric system (celcius, km/h, etc.)
+#   async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
+#     # fetch a weather forecast from a city
+#     weather = await client.get('Philadelphia') 
+#     # get the weather forecast for a few days
+#     #forecast = [weather.humidity, weather.precipitation, weather.pressure]
+#     forecast = {}
+#     for daily in weather.daily_forecasts:
+#         hourlyForecast = {}
+#         for hourly in daily.hourly_forecasts:
+            
+#             hourlyForecast[str(hourly.time.strftime("%H:%M"))] = hourly.temperature
+#         forecast[str(daily.date)] = {'temperature':daily.temperature,
+#                                      'sunlight':daily.sunlight,
+#                                      'sunrise': daily.sunrise.strftime("%H:%M"),
+#                                      'sunset':daily.sunset.strftime("%H:%M"),
+#                                      'hourly_forecasts':hourlyForecast}
+        
+#         forecast['current'] = {'humidity':weather.humidity,
+#                                'precipitation':weather.precipitation, 
+#                                'pressure':weather.pressure}
+        
+#     return forecast
+
 async def getweather():
   # declare the client. the measuring unit used defaults to the metric system (celcius, km/h, etc.)
   async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
@@ -75,22 +100,24 @@ async def getweather():
     # get the weather forecast for a few days
     #forecast = [weather.humidity,weather.precipitation, weather.pressure]
     forecast = {}
-    for daily in weather.daily_forecasts:
+    days =['today','tomorrow','day after']
+    for daily, day in zip(weather.daily_forecasts, days):
         hourlyForecast = {}
         for hourly in daily.hourly_forecasts:
-            
+
             hourlyForecast[str(hourly.time.strftime("%H:%M"))] = hourly.temperature
-        forecast[str(daily.date)] = {'temperature':daily.temperature,
+        forecast[day] = {'temperature':daily.temperature,
                                      'sunlight':daily.sunlight,
                                      'sunrise': daily.sunrise.strftime("%H:%M"),
                                      'sunset':daily.sunset.strftime("%H:%M"),
                                      'hourly_forecasts':hourlyForecast}
-        
+
         forecast['current'] = {'humidity':weather.humidity,
                                'precipitation':weather.precipitation, 
                                'pressure':weather.pressure}
-        
+
     return forecast
+
 
 global_weather = asyncio.run(getweather())
 
@@ -337,6 +364,11 @@ def current_gesture_sse():
             #time.sleep(1) 
 
     return Response(generate(), mimetype='text/event-stream')
+
+@app.route('/weather')
+def weather():
+    weather_data = global_weather
+    return jsonify(weather_data)
 
 if __name__ == "__main__":
     app.run(debug=True) 

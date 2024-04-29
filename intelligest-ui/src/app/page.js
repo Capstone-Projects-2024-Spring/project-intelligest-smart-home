@@ -17,13 +17,47 @@ import Forecast  from "./components/Forecast";
 import getFormattedWeatherData from "@component/app/services/weatherService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  UilTemperature,
+  UilTear,
+  UilWind,
+  UilSun,
+  UilSunset,
+} from "@iconscout/react-unicons";
 
-function Home() {
+
+
+export default function Home() {
   const [data, setData] = useState({});
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
-  const [query, setQuery] = useState({ q: "Philadelphia" });
-  const [units, setUnits] = useState("metric");
-  //const [weather, setWeather] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
+  // const [query, setQuery] = useState({ q: "Philadelphia" });
+  // const [units, setUnits] = useState("metric");
+  // const [weather, setWeather] = useState(null);
+
+  /*const fetchWeather = async () => {
+    const data = await getFormattedWeatherData({q: "weather"})
+    console.log("Weather stuff:", data)
+  }
+
+  fetchWeather(); */
+
+  useEffect(() => {
+    async function fetchWeatherData() {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/weather');
+        if (!response.ok) {
+          throw new Error('Failed to fetch weather data');
+        }
+        const tempData = await response.json();
+        setWeatherData(tempData);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchWeatherData();
+  }, []);
 
   useEffect(() => {
     const img = document.querySelector("#videoElement");
@@ -54,40 +88,35 @@ function Home() {
   }, [data.firstGesture, data.secondGesture]);
 
   // Weather stuff
-  useEffect(() => {
-    const fetchWeather = async () => {
-      const message = query.q ? query.q : "current location.";
+  // useEffect(() => {
+  //   const fetchWeather = async () => {
+  //     const message = query.q ? query.q : "current location.";
 
-      toast.info("Fetching weather for " + message);
+  //     toast.info("Fetching weather for " + message);
 
-      await getFormattedWeatherData({ ...query, units }).then((data) => {
-        toast.success(
-          `Successfully fetched weather for ${data.name}, ${data.country}.`
-        );
+  //     await getFormattedWeatherData({ ...query, units }).then((data) => {
+  //       toast.success(
+  //         `Successfully fetched weather for ${data.name}, ${data.country}.`
+  //       );
 
-        setWeather(data);
-      });
-    };
+  //       setWeather(data);
+  //     });
+  //   };
 
-    fetchWeather();
-  }, [query, units]);
+  //   fetchWeather();
+  // }, [query, units]);
 
-  const formatBackground = () => {
-    if (!weather) return "from-cyan-700 to-blue-700";
-    const threshold = units === "metric" ? 20 : 60;
-    if (weather.temp <= threshold) return "from-cyan-700 to-blue-700";
+  // const formatBackground = () => {
+  //   if (!weather) return "from-cyan-700 to-blue-700";
+  //   const threshold = units === "metric" ? 20 : 60;
+  //   if (weather.temp <= threshold) return "from-cyan-700 to-blue-700";
 
-    return "from-yellow-700 to-orange-700";
-  };
+  //   return "from-yellow-700 to-orange-700";
+  // };
 
   const handleWeatherButtonClick = () => {
     setShowWeatherPopup(true);
   };
-
-  const fetchWeather = async () => {
-    const data = await getFormattedWeatherData({ q: "Philadelphia"});
-    console.log(data);
-  }
 
   const closePopup = () => {
     setShowWeatherPopup(false);
@@ -95,7 +124,7 @@ function Home() {
 
   return (
     <main className="flex min-h-screen flex-col">
-      <div className="bg-gray-200 min-h-screen flex justify-center items-center">
+      <div className="bg-gradient-to-br from-gray-100 to-gray-400 min-h-screen flex justify-center items-center">
         <div>
           <img id="videoElement" />
           <div className="text-black">
@@ -110,7 +139,7 @@ function Home() {
           </div>
         </div>
         <div className="grid grid-cols-4 gap-4">
-          <button className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
+          <button className={`hover:bg-yellow-100 text-black font-bold py-2 px-4 rounded ${
               data.deviceChoice === "News" ? "bg-blue-300" : ""
             }`}
           >
@@ -156,79 +185,46 @@ function Home() {
         </div>
       </div>
       {showWeatherPopup && (
-        <div className="fixed inset-0 flex justify-center items-center ">
-          <div className={`w-1/2 h-4/5-screen bg-gradient-to-br from-cyan-700 to-blue-700 p-4 overflow-auto ${formatBackground()}`}>
-            {/* <TopButtons setQuery={setQuery} />
-            <Inputs setQuery={setQuery} units={units} setUnits={setUnits} /> */}
-            {weather && (
-              <div>
-                <TimeAndLocation />
-                <Temperature  />
-                <Forecast title="Hourly forecast"/>
-                <Forecast title="Daily forecast"/>
-              </div>
-            )}
+        <div className="absolute inset-0 flex justify-center items-center rounded-lg">
+        {/*  <div className="absolute inset-0 flex justify-center items-center w-1/2 h-3/4-screen bg-gradient-to-br from-cyan-700 to-blue-700 p-4 overflow-auto"> */}
+          <div className="w-3/4 h-7/10-screen bg-gradient-to-br from-cyan-700 to-blue-700 p-4 overflow-auto rounded-3xl">
+            <button onClick={closePopup} className="absolute top-50 right-20">x</button>
+            <div className="justify-center text-white">
+              <p className="justify-center text-5xl">{data.weatherData?.today?.temperature}</p>
+              <p>Humidity: {data.weatherData?.current?.humidity}%</p>
+              <p>Precipitation: {data.weatherData?.current?.precipitation} inches</p>
+              <p>Pressure: {data.weatherData?.current?.pressure} inHg</p>
 
+              <div className="flex flex-row items-center justify-between text-white py-3">
+                {Object.keys(data.weatherData).filter(date => date !== 'current').map((date) => (
+                  <div key={date}>
+                    <h3>{date}</h3>
+                    <p>Sunrise: {data.weatherData[date].sunrise}</p>
+                    <p>Sunset: {data.weatherData[date].sunset}</p>
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead>
+                        <tr>
+                          <th>Temperature</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(data.weatherData[date].hourly_forecasts).map(([time, temp]) => (
+                          <tr key={time}>
+                            <td>{time}</td>
+                            <td>{temp}°F</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ))} 
+              </div>
+            </div>
           </div>
         </div>
-      )}
-        {/*<div className="fixed inset-0 flex justify-center items-center w-1/2 h-screen bg-white">
-          <div className="mx-auto max-w-screen-md mt-4 py-5 px-32 bg-gradient-to-br from-cyan-700
-          to-blue-700 h-fit shadow-xl">
-              <TimeAndLocation />
-          </div>
-    </div>*/}
-  
-
-        {/*<div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto">
-            <button onClick={closePopup} className="absolute top-0 right-0 p-2">X</button>
-          <div className="flex flex-col items-center justify-center absolute top-20 right-10">
-            <span className="text-sm mt-1">Exit</span>
-          </div>
-        <span className="text-s mt-1" >Exit
-        </span>
-        
-          <div className="p-4 text-black">
-            <p class="text-2xl font-bold">Weather</p>
-            <p>Humidity: {data.weatherData?.current?.humidity}%</p>
-            <p>Precipitation: {data.weatherData?.current?.precipitation} inches</p>
-            <p>Pressure: {data.weatherData?.current?.pressure} inHg</p>
-            
-            {Object.keys(data.weatherData).filter(date => date !== 'current').map((date) => (
-              <div key={date}>
-                <h3>{date}</h3>
-                <p>Sunrise: {data.weatherData[date].sunrise}</p>
-                <p>Sunset: {data.weatherData[date].sunset}</p>
-                <p>Daylight: {data.weatherData[date].sunlight} hours</p>
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead>
-                    <tr>
-                      <th>Time</th>
-                      <th>Temperature (°F)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(data.weatherData[date].hourly_forecasts).map(([time, temp]) => (
-                      <tr key={time}>
-                        <td>{time}</td>
-                        <td>{temp}°F</td>
-                      </tr>
-                    ))}
-                    <div id="area-chart">
-                      <svg class="w-3 h-3 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13V1m0 0L1 5m4-4 4 4"/>
-                      </svg>
-                    </div>
-                  </tbody>
-
-                </table>
-              <script src="../path/to/flowbite/dist/flowbite.min.js"></script>
-              </div>
-            ))} 
-          </div>
-          */}
+      )} 
     </main>
   );
 }
 
-export default Home;
+  
