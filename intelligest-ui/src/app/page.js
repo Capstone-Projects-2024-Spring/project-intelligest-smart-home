@@ -31,16 +31,6 @@ export default function Home() {
   const [data, setData] = useState({});
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
-  // const [query, setQuery] = useState({ q: "Philadelphia" });
-  // const [units, setUnits] = useState("metric");
-  // const [weather, setWeather] = useState(null);
-
-  /*const fetchWeather = async () => {
-    const data = await getFormattedWeatherData({q: "weather"})
-    console.log("Weather stuff:", data)
-  }
-
-  fetchWeather(); */
 
   useEffect(() => {
     async function fetchWeatherData() {
@@ -86,33 +76,6 @@ export default function Home() {
       setShowWeatherPopup(false);
     }
   }, [data.firstGesture, data.secondGesture]);
-
-  // Weather stuff
-  // useEffect(() => {
-  //   const fetchWeather = async () => {
-  //     const message = query.q ? query.q : "current location.";
-
-  //     toast.info("Fetching weather for " + message);
-
-  //     await getFormattedWeatherData({ ...query, units }).then((data) => {
-  //       toast.success(
-  //         `Successfully fetched weather for ${data.name}, ${data.country}.`
-  //       );
-
-  //       setWeather(data);
-  //     });
-  //   };
-
-  //   fetchWeather();
-  // }, [query, units]);
-
-  // const formatBackground = () => {
-  //   if (!weather) return "from-cyan-700 to-blue-700";
-  //   const threshold = units === "metric" ? 20 : 60;
-  //   if (weather.temp <= threshold) return "from-cyan-700 to-blue-700";
-
-  //   return "from-yellow-700 to-orange-700";
-  // };
 
   const handleWeatherButtonClick = () => {
     setShowWeatherPopup(true);
