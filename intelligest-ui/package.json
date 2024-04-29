@@ -10,11 +10,19 @@
     "test": "jest"
   },
   "dependencies": {
-    "@mdi/js": "^7.4.47",
-    "@mdi/react": "^1.6.1",
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@iconscout/react-unicons": "^2.0.2",
+    "apexcharts": "^3.49.0",
+    "flowbite": "^2.3.0",
+    "luxon": "^3.4.4",
     "next": "^14.1.4",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "^18",
+    "react-dom": "^18",
+    "react-toastify": "^10.0.5",
+    "@mdi/js": "^7.4.47",
+    "@mdi/react": "^1.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",
