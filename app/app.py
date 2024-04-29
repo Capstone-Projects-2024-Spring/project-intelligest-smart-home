@@ -2,9 +2,8 @@ from flask import Flask, render_template, Response, jsonify, request
 from flask_cors import CORS
 import requests
 import time
-import cv2
 import  asyncio, os
-import mediapipe as mp
+#import mediapipe as mp
 import time, math
 import numpy as np
 from methods import *
@@ -35,7 +34,7 @@ gesture_to_entity = {
 
 def toggle_light(device_id):
     #action = "turn_on" if state else "turn_off"
-    url = f"http://localhost:8123/api/services/switch/toggle"
+    #url = f"http://localhost:8123/api/services/switch/toggle"
     headers = {
         "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
         "Content-Type": "application/json",
@@ -67,6 +66,7 @@ def get_all_devices(device_type):
     else:
         return None
 
+
 async def getweather():
   # declare the client. the measuring unit used defaults to the metric system (celcius, km/h, etc.)
   async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
@@ -85,14 +85,36 @@ async def getweather():
                                      'sunrise': daily.sunrise.strftime("%H:%M"),
                                      'sunset':daily.sunset.strftime("%H:%M"),
                                      'hourly_forecasts':hourlyForecast}
-        
         forecast['current'] = {'humidity':weather.humidity,
                                'precipitation':weather.precipitation, 
                                'pressure':weather.pressure}
         
     return forecast
-
+  
 global_weather = asyncio.run(getweather())
+
+def get_recent_news():
+    api_key = 'f39bbfdee666491fbde90584b53cd919'
+    news_url = f'https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}&pageSize=5'
+
+    response = requests.get(news_url)
+
+    if response.status_code == 200:
+        news_data = response.json()
+        articles = []
+
+        for article in news_data['articles']:
+            article_info = {
+                'title': article['title'],
+                'content': article['description'],
+                'url': article['url'],
+                'image_url': article.get('urlToImage', '') 
+            }
+            articles.append(article_info)
+
+        return articles
+    else:
+        return None
 
 # Determines the device choice based on the first gesture captured.
 def determineDeviceChoice(firstGesture):
@@ -274,6 +296,7 @@ hands = mpHands.Hands(static_image_mode=False,
 #comment the next line in if mediapipe doesn't work
 #hands = ""
 #weather = asyncio.run(getweather())
+
 latest_gesture, firstGesture, secondGesture = 'No gesture detected yet','No gesture detected','No gesture detected'
 firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
 processor=VideoProcessor()

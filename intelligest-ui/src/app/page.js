@@ -19,6 +19,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLightbulb } from "@fortawesome/free-solid-svg-icons";
+import toDo from "./gesture-imgs/to-dolist.png";
+import Icon from '@mdi/react';
+import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
 
 function Home() {
   const [data, setData] = useState({});
@@ -28,6 +31,10 @@ function Home() {
   const [showEntityChoices, setShowEntityChoices] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   //const [weather, setWeather] = useState(null);
+  
+  const handleClick = (buttonName) => {
+    console.log(buttonName);
+  };
 
   useEffect(() => {
     const img = document.querySelector("#videoElement");
@@ -85,7 +92,7 @@ function Home() {
       setShowWeatherPopup(false);
     }
   }, [data.deviceChoice]);
-
+  
   useEffect(() => {
     if (
       data.firstGesture === "thumb flat" ||
@@ -215,11 +222,16 @@ function Home() {
       console.error('Error:', error);
     }
   };
-
+  
   return (
     <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
-        <div>
+        <div data-testid="HA-icon" className="Icon">
+          <button aria-label="User Profile" className="self-end mr-4 mt-4">
+            <Icon path={mdiHomeAssistant} title="User Profile" size={3} />
+          </button>
+        </div>
+        <div data-testid="video-feed" >
           <img id="videoElement" />
           <div className="text-black">
             Latest Gesture: {data.latestGesture} <br />
