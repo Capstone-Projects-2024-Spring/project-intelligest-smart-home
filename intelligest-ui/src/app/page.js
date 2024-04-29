@@ -439,20 +439,27 @@ function Home() {
         </div>
       )}
       {showNewsPopup && (
-        <div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto">
-          <button onClick={() => setShowNewsPopup(false)} className="absolute top-0 right-0 p-2">X</button>
-          <div className="p-4 text-black">
-            <h2>Latest News:</h2>
-            {newsData.map((article, index) => (
-              <div key={index} className="mb-4">
-                <h3>{article.title}</h3>
-                <p>{article.content}</p>
-                <a href={article.url} target="_blank" rel="noopener noreferrer">Read more</a>
-              </div>
-            ))}
+          <div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto shadow-lg">
+            <button onClick={() => setShowNewsPopup(false)} 
+                    className="absolute top-0 right-0 p-2 text-gray-600 hover:text-gray-900 transition-colors">
+              <svg className="w-6 h-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+            <div className="p-4 text-black">
+              <h2 className="text-xl font-semibold mb-4">Latest News:</h2>
+              {newsData.map((article, index) => (
+                <div key={index} className="mb-4 border-b pb-4">
+                  <h3 className="text-lg font-bold">{article.title}</h3>
+                  <p className="text-gray-700 mb-2">{article.content}</p>
+                  <a href={article.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700 transition-colors">
+                    Read more
+                  </a>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
       {showConfirmation && (
         <div className="absolute right-0 bottom-0 w-1/2 h-screen bg-white p-4 overflow-auto">
           <h2>Operation Complete</h2>
