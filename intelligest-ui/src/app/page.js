@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import tv from "./gesture-imgs/TV.png";
 import light from "./gesture-imgs/lights.png";
 import alarm from "./gesture-imgs/alarm.png";
@@ -258,9 +259,15 @@ function Home() {
     <main className="flex min-h-screen flex-col">
       <div className="bg-gray-200 min-h-screen flex justify-center items-center">
         <div data-testid="HA-icon" className="Icon">
-          <button aria-label="User Profile" className="self-end mr-4 mt-4">
-            <Icon path={mdiHomeAssistant} title="User Profile" size={3} />
-          </button>
+          <Link
+            href="https://127.0.1.1:8123/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <button aria-label="User Profile" className="self-end mr-4 mt-4">
+              <Icon path={mdiHomeAssistant} title="User Profile" size={3} />
+            </button>
+          </Link>
         </div>
         <div data-testid="video-feed">
           <img id="videoElement" />
