@@ -1,0 +1,34 @@
+esphome:
+  name: frontdoor
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+api:
+  port: 6053
+
+
+wifi:
+  ssid: "showthesign"
+  password: "f334p8ofpehgb"
+  # Bryans_Hotspot
+  # R0OF7ZllNiAf
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Bryans_Hotspot"
+    password: "R0OF7ZllNiAf"
+    # showthesign
+    # f334p8ofpehgb
+
+captive_portal:
+
+switch:
+  - platform: gpio
+    name: "Front Door Lock 1"
+    pin: 5
