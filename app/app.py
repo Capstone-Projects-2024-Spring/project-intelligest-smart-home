@@ -259,7 +259,7 @@ class VideoProcessor:
         last_motion = None
         inMotion = False
         # List of devices that require a second gesture
-        devices_requiring_second_gesture = ['Light', 'Thermostat']
+        devices_requiring_second_gesture = ['Light', 'Thermostat', 'Lock']
         while True:
             detected, img = self.get_img()
 
