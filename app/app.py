@@ -1,10 +1,9 @@
-from flask import Flask, render_template, Response, jsonify
+from flask import Flask, render_template, Response, jsonify, request
 from flask_cors import CORS
 import requests
 import time
-import cv2
 import  asyncio, os
-# import mediapipe as mp
+import mediapipe as mp
 import time, math
 import numpy as np
 from methods import *
@@ -16,6 +15,7 @@ import python_weather, asyncio, os
 #so you will need to install it with pip install python_weather
 #queue to find the right gesture
 from collections import deque
+
 deviceChoice = None
 deviceStatus = None
 entityChoice = None
@@ -51,6 +51,24 @@ def toggle_light(device_id):
         return light_state['state'] == 'on' 
     return None
 
+def toggle_lock(device_id):
+    #action = "turn_on" if state else "turn_off"
+    url = f"http://localhost:8123/api/services/switch/toggle"
+    headers = {
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIyOGU3ZDZmNTg5MjE0MzAxOWQwNTVjZWI5MThmYTcyMCIsImlhdCI6MTcxMjM0NDQ1MywiZXhwIjoyMDI3NzA0NDUzfQ.AXaP5ndD3QFtxhYxfXwT93x6qBh3GacCKmgiTHU6g7A", 
+        "Content-Type": "application/json",
+    }
+
+    data = {"entity_id": device_id}
+    print('toggling lock',data)
+    response = requests.post(url, json=data, headers=headers)
+    if response.status_code == 200:
+        # Get the new state of the light
+        #time.sleep(1)
+        lock_state = requests.get(f"http://localhost:8123/api/states/{data['entity_id']}", headers=headers).json()
+        return lock_state['state'] == 'locked' 
+    return None
+
 def get_all_devices(device_type):
     url = "http://localhost:8123/api/states"
     headers = {
@@ -60,37 +78,13 @@ def get_all_devices(device_type):
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         devices = response.json()
-        filtered_device_ids = [device['entity_id'] for device in devices if device_type in device['entity_id']]
+        filtered_device_ids = [device['entity_id'] for device in devices if device_type.lower() in device['entity_id'].lower()]
         # Filtered Devices is an array of objects. Each object is a entity which includes entity_id, state, attributes, last changed, last updated, context
         print('filtered device ids',filtered_device_ids)
         return filtered_device_ids
     else:
         return None
 
-# async def getweather():
-#   # declare the client. the measuring unit used defaults to the metric system (celcius, km/h, etc.)
-#   async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
-#     # fetch a weather forecast from a city
-#     weather = await client.get('Philadelphia') 
-#     # get the weather forecast for a few days
-#     #forecast = [weather.humidity, weather.precipitation, weather.pressure]
-#     forecast = {}
-#     for daily in weather.daily_forecasts:
-#         hourlyForecast = {}
-#         for hourly in daily.hourly_forecasts:
-            
-#             hourlyForecast[str(hourly.time.strftime("%H:%M"))] = hourly.temperature
-#         forecast[str(daily.date)] = {'temperature':daily.temperature,
-#                                      'sunlight':daily.sunlight,
-#                                      'sunrise': daily.sunrise.strftime("%H:%M"),
-#                                      'sunset':daily.sunset.strftime("%H:%M"),
-#                                      'hourly_forecasts':hourlyForecast}
-        
-#         forecast['current'] = {'humidity':weather.humidity,
-#                                'precipitation':weather.precipitation, 
-#                                'pressure':weather.pressure}
-        
-#     return forecast
 
 async def getweather():
   # declare the client. the measuring unit used defaults to the metric system (celcius, km/h, etc.)
@@ -100,77 +94,120 @@ async def getweather():
     # get the weather forecast for a few days
     #forecast = [weather.humidity,weather.precipitation, weather.pressure]
     forecast = {}
-    days =['today','tomorrow','day after']
-    for daily, day in zip(weather.daily_forecasts, days):
+    for daily in weather.daily_forecasts:
         hourlyForecast = {}
         for hourly in daily.hourly_forecasts:
-
+            
             hourlyForecast[str(hourly.time.strftime("%H:%M"))] = hourly.temperature
-        forecast[day] = {'temperature':daily.temperature,
+        forecast[str(daily.date)] = {'temperature':daily.temperature,
                                      'sunlight':daily.sunlight,
                                      'sunrise': daily.sunrise.strftime("%H:%M"),
                                      'sunset':daily.sunset.strftime("%H:%M"),
                                      'hourly_forecasts':hourlyForecast}
-
         forecast['current'] = {'humidity':weather.humidity,
                                'precipitation':weather.precipitation, 
                                'pressure':weather.pressure}
-
+        
     return forecast
-
-
+  
 global_weather = asyncio.run(getweather())
 
-def determineDeviceChoice(firstGesture, secondGesture):
+def get_recent_news():
+    api_key = 'f39bbfdee666491fbde90584b53cd919'
+    news_url = f'https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}&pageSize=5'
+
+    response = requests.get(news_url)
+
+    if response.status_code == 200:
+        news_data = response.json()
+        articles = []
+
+        for article in news_data['articles']:
+            article_info = {
+                'title': article['title'],
+                'content': article['description'],
+                'url': article['url'],
+                'image_url': article.get('urlToImage', '') 
+            }
+            articles.append(article_info)
+
+        return articles
+    else:
+        return None
+
+# Determines the device choice based on the first gesture captured.
+def determineDeviceChoice(firstGesture):
     #using a switch statement to match up the gestures with their respective actions
-    match firstGesture, secondGesture:
-        case "one finger up", "one finger up":
+    match firstGesture:
+        case "L shape":
             #lights
             return 'Light'
-        case "thumbs up", 'thumbs up':
+        case "thumbs up": # update with real gesture
             print('weather',global_weather)
             #weather = asyncio.run(getweather())
             return 'Weather'
             #print(weather)
-        case "one finger up", 'thumbs down':
+        case "two fingers up": # update with real gesture
             return 'News'
             
-        case "two fingers up", 'thumbs down':
+        case "three fingers up": # update with real gesture
             return 'Thermostat'
-            
+        case "four fingers up": # update with real gesture
+            return 'Lock'
         case _:
             print(".")
 
-def processGesture(firstGesture, secondGesture, thirdGesture=None, entityChoice=None):
+# Handles logic based on the device/service choice
+# For devices like "Light" and "Lock", it waits for the second gesture to select the entity instance.
+# For services like "Weather" and "News", it does not require a second gesture.
+def processGesture(firstGesture, secondGesture=None):
     global deviceChoice
-    deviceChoice = determineDeviceChoice(firstGesture, secondGesture)
-    print('device choice is',deviceChoice)
-    match firstGesture, secondGesture:
-        case "one finger up", "one finger up":
-            #lights
-            deviceChoice = 'Light'
-            try:   
-                # entityChoice controls the correct device the user wants.
-                lightState = toggle_light(entityChoice)
-                if lightState is True:
-                    deviceStatus = 'on'
-                elif lightState is False:
-                    deviceStatus = 'off'
-                print('Device Status is', deviceStatus)
-            except:
-                print('toggle light didnt work')
+    deviceChoice = determineDeviceChoice(firstGesture)
+    print('device choice is', deviceChoice)
+    match deviceChoice:
+        case "Light":
+            if secondGesture is not None:
+                print(f"Second gesture: {secondGesture}")
+                gesture_index = gesture_to_entity.get(secondGesture, None)
+                print('gesture index', gesture_index)
+                if gesture_index is not None and processor.entityChoices and 0 <= gesture_index < len(processor.entityChoices):
+                    processor.entityChoice = processor.entityChoices[gesture_index]
+                    lightState = toggle_light(processor.entityChoice)
+                    if lightState is True:
+                        deviceStatus = 'on'
+                    elif lightState is False:
+                        deviceStatus = 'off'
+                    print('Device Status is', deviceStatus)
+                else:
+                    print("Invalid gesture or no devices found.")
+            else:
+                print("Second gesture required for Light device")
             time.sleep(1)
-        case "thumbs up", 'thumbs up':
-            print('weather',global_weather)
-            #weather = asyncio.run(getweather())
-            deviceChoice = 'Weather'
-            #print(weather)
-        case "one finger up", 'thumbs down':
-            deviceChoice = 'News'
-            
-        case "two fingers up", 'thumbs down':
-            deviceChoice = 'Thermostat'
-            
+        case "Lock":
+            if secondGesture is not None:
+                print(f"Second gesture: {secondGesture}")
+                gesture_index = gesture_to_entity.get(secondGesture, None)
+                print('gesture index', gesture_index)
+                if gesture_index is not None and processor.entityChoices and 0 <= gesture_index < len(processor.entityChoices):
+                    processor.entityChoice = processor.entityChoices[gesture_index]
+                    lockState = toggle_lock(processor.entityChoice)
+                    if lockState is True:
+                        deviceStatus = 'locked'
+                    elif lockState is False:
+                        deviceStatus = 'unlocked'
+                    print('Device Status is', deviceStatus)
+                else:
+                    print("Invalid gesture or no devices found.")
+            else:
+                print("Second gesture required for Lock device")
+            time.sleep(1)
+        case "Weather" | "News":
+            # These are services, so no need for a second gesture
+            pass
+        case "Thermostat":
+            # Thermostat is a device, so we need the second gesture to select the entity instance
+            # Add your logic here
+            pass
         case _:
             print(".")
     return deviceChoice
@@ -178,19 +215,17 @@ def processGesture(firstGesture, secondGesture, thirdGesture=None, entityChoice=
 class VideoProcessor:
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
-        # self.hands = mp.solutions.hands.Hands(static_image_mode=False,
-        #                                       max_num_hands=1,
-        #                                       min_detection_confidence=0.5,
-        #                                       min_tracking_confidence=0.5)
+        self.hands = mp.solutions.hands.Hands(static_image_mode=False,
+                                              max_num_hands=1,
+                                              min_detection_confidence=0.5,
+                                              min_tracking_confidence=0.5)
         self.latest_gesture = 'No gesture detected yet'
         self.firstGesture = 'No gesture detected'
         self.secondGesture = 'No gesture detected'
-        self.thirdGesture = 'No gesture detected'
         self.deviceChoice = 'N/A'
         self.deviceStatus = 'N/A'
         self.firstQueue = deque(maxlen=30)
         self.secondQueue = deque(maxlen=30)
-        self.thirdQueue = deque(maxlen=30)
         self.entityChoice = None
         self.entityChoices = []
         
@@ -198,12 +233,10 @@ class VideoProcessor:
         self.latest_gesture = 'No gesture detected yet'
         self.firstGesture = 'No gesture detected'
         self.secondGesture = 'No gesture detected'
-        self.thirdGesture = 'No gesture detected'
         self.deviceChoice = 'N/A'
         self.deviceStatus = 'N/A'
         self.firstQueue = deque(maxlen=30)
         self.secondQueue = deque(maxlen=30)
-        self.thirdQueue = deque(maxlen=30)
         self.entityChoice = None
         self.entityChoices = []
     
@@ -226,8 +259,8 @@ class VideoProcessor:
         last_frame = None
         last_motion = None
         inMotion = False
-        # List of devices that require a third gesture
-        requires_third_gesture = ['Light']
+        # List of devices that require a second gesture
+        devices_requiring_second_gesture = ['Light', 'Thermostat', 'Lock']
         while True:
             detected, img = self.get_img()
 
@@ -253,60 +286,37 @@ class VideoProcessor:
                 print('first gesture set to:', self.firstGesture)
                 self.firstQueue.clear()
 
-                while True:
-                    detected, img = self.get_img()
-                    self.secondQueue.append(detected)
+                if self.firstGesture == 'thumb flat':
+                    self.clear()
+                    continue
 
-                    print('secondQueue:', self.secondQueue)
-                    print('set(secondQueue):', set(self.secondQueue))
-                    print('set(secondQueue).pop():', set(self.secondQueue).pop())
+                self.deviceChoice = determineDeviceChoice(self.firstGesture)
 
-                    if len(self.secondQueue) == 30 and len(set(self.secondQueue)) == 1 and set(self.secondQueue).pop() != 'No gesture detected':
-                        self.secondGesture = set(self.secondQueue).pop()
-                        print('second gesture set to:', self.secondGesture)
-                        if self.secondGesture=='thumb flat':
+                if self.deviceChoice in devices_requiring_second_gesture:
+                    self.entityChoices = get_all_devices(self.deviceChoice)
+                    print(f"Available {self.deviceChoice} options:", self.entityChoices)
+
+                    second_gesture_captured = False
+                    while not second_gesture_captured:
+                        detected, img = self.get_img()
+                        self.secondQueue.append(detected)
+
+                        if len(self.secondQueue) == 30 and len(set(self.secondQueue)) == 1 and set(self.secondQueue).pop() != 'No gesture detected':
+                            self.secondGesture = set(self.secondQueue).pop()
+                            print('second gesture set to:', self.secondGesture)
+                            processGesture(self.firstGesture, self.secondGesture)
+                            second_gesture_captured = True
                             self.clear()
-                            continue
-                        
-                        print('first and second gesture:',self.firstGesture,self.secondGesture)
-
-                        # Just determines the device choice, DOESN"T ACTUALLY DO ANYTHING in terms of performing actions.
-                        # This is in the case that the device requires a third gesture action for entity choice.
-                        print('first and second gesture:',self.firstGesture,self.secondGesture)
-                        self.deviceChoice = determineDeviceChoice(self.firstGesture, self.secondGesture)
-
-                        if self.deviceChoice in requires_third_gesture:
-                            # get devices immediately after the second gesture is detected and we know if it requires a third gesture
-                            self.entityChoices = get_all_devices(self.deviceChoice)
-                            while True:
-                                detected, img = self.get_img()
-                                self.thirdQueue.append(detected)
-
-                                if len(self.thirdQueue) == 30 and len(set(self.thirdQueue)) == 1 and set(self.thirdQueue).pop() != 'No gesture detected':
-                                    self.thirdGesture = set(self.thirdQueue).pop()
-                                    print('third gesture:', self.thirdGesture)
-                                    # Process the third gesture here, stored in ENTITYCHOICE
-                                    self.entityChoice = self.entityChoices[gesture_to_entity[self.thirdGesture]]
-                                    # Then send it off to process it.
-                                    self.deviceChoice = processGesture(self.firstGesture,self.secondGesture, self.thirdGesture, self.entityChoice)
-                                    self.clear()
-                                    break
-                        elif detected == 'thumb flat':
-                            # If the "back" signal is detected, clear the queues and continue to the next iteration
-                            self.clear()
-                            continue
-                        else:
-                            print("Waiting for third gesture")
-                            continue
-                    else:
-                        # If the device doesn't require gesture 3, should use None for thirdGesture by default.
-                        self.deviceChoice = processGesture(self.firstGesture,self.secondGesture)
-                        #time.sleep(1)
+                            if self.secondGesture=='thumb flat':
+                                self.clear()
+                                continue
+                        frame = self.format_image(img)
+                        yield (b'--frame\r\n'
+                               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                else:
+                        processGesture(self.firstGesture)
                         self.clear()
-                        break
-                    frame = self.format_image(img)
-                    yield (b'--frame\r\n'
-                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
             frame = self.format_image(img)
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
@@ -314,18 +324,19 @@ class VideoProcessor:
 app = Flask(__name__)
 CORS(app)
 #comment this out if mediapipe doesnt work
-# mpHands = mp.solutions.hands
-# hands = mpHands.Hands(static_image_mode=False,
-#                     max_num_hands=1,
-#                     min_detection_confidence=0.5,
-#                     min_tracking_confidence=0.5)
+mpHands = mp.solutions.hands
+hands = mpHands.Hands(static_image_mode=False,
+                    max_num_hands=1,
+                    min_detection_confidence=0.5,
+                    min_tracking_confidence=0.5)
 
 #until here
 #comment the next line in if mediapipe doesn't work
 #hands = ""
 #weather = asyncio.run(getweather())
-latest_gesture, firstGesture, secondGesture, thirdGesture = 'No gesture detected yet','No gesture detected','No gesture detected', 'No gesture detected'
-firstQueue,secondQueue,thirdQueue = deque(maxlen=30),deque(maxlen=30),deque(maxlen=30)
+
+latest_gesture, firstGesture, secondGesture = 'No gesture detected yet','No gesture detected','No gesture detected'
+firstQueue,secondQueue = deque(maxlen=30),deque(maxlen=30)
 processor=VideoProcessor()
 @app.route('/video_feed')
 def video_feed():
@@ -340,7 +351,7 @@ def index():
 @app.route('/current_gesture')
 def current_gesture():
     
-    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, thirdGesture = thirdGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
 
 @app.route('/current_gesture_sse')
 def current_gesture_sse():
@@ -356,7 +367,6 @@ def current_gesture_sse():
                 'entityChoices': processor.entityChoices,
                 'entityChoice': processor.deviceChoice,
                 'weatherData': global_weather,
-                'thirdGesture': processor.thirdGesture,
                 'entityChoice': processor.entityChoice,
                 'entityChoices': processor.entityChoices
             }
@@ -365,10 +375,60 @@ def current_gesture_sse():
 
     return Response(generate(), mimetype='text/event-stream')
 
-@app.route('/weather')
-def weather():
-    weather_data = global_weather
-    return jsonify(weather_data)
+@app.route('/perform_action', methods=['POST'])
+def perform_action():
+    data = request.get_json()
+    device_choice = data['deviceChoice']
+    entity_choice = data['entityChoice']
+
+    # Perform the desired action based on the device and entity choice
+    if device_choice == 'Light':
+        # Toggle the light
+        lightState = toggle_light(entity_choice)
+        if lightState is True:
+            deviceStatus = 'on'
+        elif lightState is False:
+            deviceStatus = 'off'
+        print('Device Status is', deviceStatus)
+        processor.clear()
+    elif device_choice == 'Lock':
+        lockState = toggle_lock(entity_choice)
+        if lockState is True:
+            deviceStatus = 'locked'
+        elif lockState is False:
+            deviceStatus = 'unlocked'
+        print('Device Status is', deviceStatus)
+        processor.clear()
+    elif device_choice == 'Thermostat':
+        # Perform action for thermostat
+        pass
+
+    return jsonify(success=True)
+
+@app.route('/get_entities', methods=['POST'])
+def get_entities():
+    data = request.get_json()
+    device_choice = data['deviceChoice']
+
+    if device_choice == 'Light':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    elif device_choice == 'Lock':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    else:
+        return jsonify(entityChoices=[])
+
+@app.route('/get_news')
+def get_news():
+    try:
+        news_data = get_recent_news()
+        if news_data:
+            return jsonify(news_data)
+        else:
+            return jsonify({'error': 'No news data available'}), 404
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch news'}), 500
 
 if __name__ == "__main__":
     app.run(debug=True) 

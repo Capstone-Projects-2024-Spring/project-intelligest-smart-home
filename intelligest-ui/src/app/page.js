@@ -24,13 +24,6 @@ export default function Home() {
   const [data, setData] = useState({});
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
-  const [time, setTime] = useState(new Date());
-
-  console.log("Date: ", Date())
-
-  useEffect(()=> {
-    setInterval(()=>setTime(new Date()), 1000)
-  }, [])
 
   useEffect(() => {
     async function fetchWeatherData() {
