@@ -32,24 +32,20 @@ export default function Home() {
   const [checkTask, setCheckTask] = useState(false);
 
   const [viewAlarm, setViewAlarm] = useState(false);
-  const [viewReminder, setViewReminder] = useState(false);
   const [getTime, setGetTime] = useState(new Date().toLocaleTimeString());
   const [userAlarmDate, setUserAlarmDate] = useState(new Date());
   const [userAlarmTime, setUserAlarmTime] = useState(new Date().toTimeString().split(" ")[0]);
   const [newAlarm, setNewAlarm] = useState([]);
   const [alarmNotification, setAlarmNotification] = useState(false);
 
+  const [viewReminder, setViewReminder] = useState(false);
   const [newReminder, setNewReminder] = useState("");
   const [userReminders, setUserReminders] = useState([]);
   const [reminderDate, setReminderDate] = useState(new Date());
   const [reminderTime, setReminderTime] = useState(new Date().toTimeString().split(" ")[0]);
 
-  const [getDOM, setGetDOM] = useState("");
   const [getError, setGetError] = useState(false);
   const [getErrorMsg, setGetErrorMsg] = useState("");
-  const newAlarmRef = useRef();
-  const alarmsRef = useRef();
-  const queryRef = useRef();
 
   const handleClick = (buttonName) => {
     console.log(buttonName);
@@ -99,7 +95,8 @@ export default function Home() {
 
   useEffect(()=>{
     (viewAlarm) && (document.getElementById('alarmDate').valueAsDate = new Date());
-  },[viewAlarm]);
+    (viewReminder) && (document.getElementById('reminderDate').valueAsDate = new Date());
+  },[viewAlarm, viewReminder]);
 
   const getToDoList=()=>{ setViewToDoList(true); }
   const getUpdateTask=(index)=>{
@@ -116,9 +113,6 @@ export default function Home() {
   const closeAlarm=()=>{ setViewAlarm(false); }
   const closeAlarmNotification=()=>{ setAlarmNotification(false); }
   const resetError=()=>{ setGetError(false); setGetErrorMsg(""); }
-  
-  function handleToDoListInputChange(event){ setNewTask(event.target.value); }
-  function handleReminderInputChange(event){ setNewReminder(event.target.value); }
 
   function getNewToDoListTask(){
     if(newTask.trim() !== ""){
@@ -162,10 +156,6 @@ export default function Home() {
     const isNewAlarm = userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime;
     var timeComponents = userAlarmTime.split(":");
     userAlarmDate.setHours(timeComponents[0], timeComponents[1], timeComponents[2]);
-    console.log("Current Date: " + currentDate);
-    console.log("Alarm Date: " + userAlarmDate);
-    console.log("Alarm Time: " + userAlarmTime);
-    setNewAlarm(getAlarms => [...getAlarms, isNewAlarm]);
     var alarmTimer = userAlarmDate.getTime() - currentDate.getTime();
     var timeoutID = setTimeout(()=>{
       setAlarmNotification(true);
@@ -173,11 +163,58 @@ export default function Home() {
       var getIndex = getCurrentAlarms.indexOf(isNewAlarm);
       deleteAlarmEvent(getIndex);
     },alarmTimer);
+    setNewAlarm(getAlarms => [...getAlarms, {isDate:isNewAlarm, isLinker:timeoutID}]);
   }
 
   function deleteAlarmEvent(index){
-    const updatedEvents = tasks.filter((_, i) => i !== index);
-    setNewAlarm(updatedEvents);
+      clearTimeout(newAlarm[index].isLinker);
+      const updatedAlarms = newAlarm.filter((_, i) => i !== index);
+      setNewAlarm(updatedAlarms);
+  }
+
+  function getReminderTask(){
+    if(newReminder.trim() == ""){
+      setGetError(true);
+      setGetErrorMsg("Enter a task...");
+      return;
+    }
+    var checkCurrentAlarms = [...newAlarm];
+    if(checkCurrentAlarms.includes(userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime)){
+      setGetError(true);
+      setGetErrorMsg("That time is already set");
+      return;
+    }
+    var currentDate = new Date();
+    var isUserDate = reminderDate.getMonth()+"/"+reminderDate.getDate()+"/"+reminderDate.getFullYear();
+    var getCurrentDate = currentDate.getMonth()+"/"+currentDate.getDate()+"/"+currentDate.getFullYear();
+    if(isUserDate < getCurrentDate){
+      setGetError(true);
+      setGetErrorMsg("Invalid Date");
+      return;
+    }
+    if(reminderDate == currentDate && reminderTime < currentDate.toTimeString().split(" ")[0]){
+      setGetError(true);
+      setGetErrorMsg("Invalid Time");
+      return;
+    }
+    const isNewReminderTime = reminderDate.toLocaleDateString("en-US") + ", " + reminderTime;
+    var timeComponents = reminderTime.split(":");
+    reminderDate.setHours(timeComponents[0], timeComponents[1], timeComponents[2]);
+    var reminderTimer = reminderDate.getTime() - currentDate.getTime();
+    console.log("Time until: " + reminderTimer)
+    var timeoutID = setTimeout(()=>{
+      setAlarmNotification(true);
+      var getCurrentReminders = [...userReminders];
+      var getIndex = getCurrentReminders.indexOf(isItem => isItem.task === newReminder);
+      deleteReminderTask(getIndex);
+    },reminderTimer);
+    setUserReminders(getReminders => [...getReminders, {task:newReminder, time:isNewReminderTime, isLinker:timeoutID}]);
+  }
+
+  function deleteReminderTask(index){
+    clearTimeout(userReminders[index].isLinker);
+    const updatedReminders = userReminders.filter((_, i) => i !== index);
+    setUserReminders(updatedReminders);
   }
  
   return(
@@ -303,12 +340,12 @@ export default function Home() {
             <br/>
             <button id="setAlarm" onClick={getNewAlarmEvent} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Set Alarm</button>
           </div>
-          <ul ref={alarmsRef} style={{marginTop:"10px", textAlign:"left"}}>
+          <ul style={{marginTop:"10px", textAlign:"left"}}>
             {newAlarm.map((item, index) => {
               return(
-              <li key={index} ref={newAlarmRef} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", padding:"10px", display:"flex", alignItems:"center", animation:"ease-in 0.5s"}}>
-                <span>{item}</span>
-                <button class="deleteAlarm" ref={queryRef} onClick={() => deleteAlarmEvent(index)} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Delete</button>
+              <li key={index} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", padding:"10px", display:"flex", alignItems:"center", animation:"ease-in 0.5s"}}>
+                <span>{item.isDate}</span>
+                <button class="deleteAlarm" onClick={() => deleteAlarmEvent(index)} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Delete</button>
               </li>);
             })}
           </ul>
@@ -330,20 +367,28 @@ export default function Home() {
         <Modal.Title>Reminder</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div>
-            <textarea type="text" placeholder="Enter an reminder..." style={{border:"1px solid black", borderRadius: "5px"}} value={newReminder} onChange={(e) =>{setNewReminder(e.target.value)}}/>
-            <div style={{display:"flex", flexDirection:"column", alignItems:"center", gap:"10px"}}>
-              <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-                <label for="alarmDate" style={{paddingRight:"10px"}}>Select Date: </label>
-                <input type="date" id="alarmDate" min="" style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmDate(new Date(e.target.value))}}/>
-              </div>
-              <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-                <label for="alarmTime" style={{paddingRight:"10px"}}>Select Time: </label>
-                <input type="time" id="alarmTime" value={userAlarmTime} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmTime((e.target.value))}}/>
-              </div>
+          <textarea type="text" placeholder="Enter an reminder..." style={{border:"1px solid black", borderRadius: "5px", width:"100%", height:"150px"}} value={newReminder} onChange={(e) =>{setNewReminder(e.target.value)}} contentEditable/>
+          <div style={{display:"flex", flexDirection:"column", alignItems:"center", padding:"10px", gap:"10px"}}>
+            <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <label for="reminderDate" style={{paddingRight:"10px"}}>Select Date: </label>
+              <input type="date" id="reminderDate" min="" style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setReminderDate(new Date(e.target.value))}}/>
             </div>
-            <button id="setReminder" onClick={getNewToDoListTask} style={{marginLeft:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", padding:"2px"}}>Set</button>
+            <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <label for="reminderTime" style={{paddingRight:"10px"}}>Select Time: </label>
+              <input type="time" id="reminderTime" value={reminderTime} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setReminderTime((e.target.value))}}/>
+            </div>
+            <button id="setReminder" onClick={getReminderTask} style={{marginLeft:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", padding:"10px"}}>Set</button>
           </div>
+          <ul style={{marginTop:"10px", textAlign:"left", display:"inline"}}>
+            {userReminders.map((item, index) => {
+              return(
+              <li key={index} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", padding:"10px", display:"flex", alignItems:"center", animation:"ease-in 0.5s"}}>
+                <span style={{width:"100px", whiteSpace:"nowrap" ,overflow:"hidden", textOverflow:"ellipsis", display:"inline-block"}}>{item.task}</span>
+                <span style={{display:"inline-block"}}>{item.time}</span>
+                <button class="deleteReminder" onClick={() => deleteReminderTask(index)} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Delete</button>
+              </li>);
+            })}
+          </ul>
         </Modal.Body>
       </Modal>
 
