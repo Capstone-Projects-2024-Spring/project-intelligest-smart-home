@@ -137,3 +137,20 @@ Objective: Easily view taks due for completion that can be updated or removed.
 3. IntelliGest UI displays the To-Do List UI.
 4. Inputs/Changes on the UI is updated.
 
+
+## Use Case 9: Set Alarm
+<Figure caption={"Use Case 9. Set Alarm"}>
+
+![Alarm](../../static/img/Alarm.png)
+
+</Figure>
+
+Scenario: A user wants to set an alarm.
+Objective: Easily set an digital alarm without complication.
+
+1. The user performs the gestures to set an Alarm.
+2. The user sees the IntelliGest caught the gesture.
+3. IntelliGest UI displays the Alarm UI.
+4. Inputs/Changes on the UI is updated.
+5. On timer UI displays a popup notifying about alarm.
+
