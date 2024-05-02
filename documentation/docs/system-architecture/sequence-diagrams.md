@@ -125,7 +125,7 @@ Objective: As a user, I want to easily turn on my TV without the need for my rem
 ## Use Case 8: Managing To-Do List
 <Figure caption={"Use Case 8. Managing To-Do List"}>
 
-![To-Do List](../../static/img/To-DoList)
+![ToDoList](../../static/img/ToDoList.png)
 
 </Figure>
 
