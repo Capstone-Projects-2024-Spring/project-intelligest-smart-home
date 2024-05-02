@@ -121,3 +121,19 @@ Objective: As a user, I want to easily turn on my TV without the need for my rem
 2. The user performs the action to turn on the TV.
 3. IntelliGest provides feedback that it is processing their request.
 4. The channel is automatically turned on by the system.
+
+## Use Case 8: Managing To-Do List
+<Figure caption={"Use Case 8. Managing To-Do List"}>
+
+![To-Do List](../../static/img/To-DoList)
+
+</Figure>
+
+Scenario: A user wants to add a task to a To-Do List.
+Objective: Easily view taks due for completion that can be updated or removed.
+
+1. The user performs the gestures to view a To-Do List.
+2. The user sees the IntelliGest caught the gesture.
+3. IntelliGest UI displays the To-Do List UI.
+4. Inputs/Changes on the UI is updated.
+
