@@ -12,10 +12,6 @@ import weather from "./gesture-imgs/weather.png";
 import livetranscription from "./gesture-imgs/to-dolist.png";
 import thumbsup from "./gesture-imgs/thumbsup.png";
 import sidewaysthumb from "./gesture-imgs/sidewaysthumb.png";
-import TimeAndLocation from "./components/TimeAndLocation";
-import Temperature from "./components/Temperature";
-import Forecast from "./components/Forecast";
-import getFormattedWeatherData from "@component/app/services/weatherService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -70,10 +66,30 @@ function Home() {
   //const [weather, setWeather] = useState(null);
   const [showNewsPopup, setShowNewsPopup] = useState(false);
   const [newsData, setNewsData] = useState([]);
-  
+
+  const [weatherData, setWeatherData] = useState(null);
+
   const handleClick = (buttonName) => {
     console.log(buttonName);
   };
+
+  useEffect(() => {
+    async function fetchWeatherData() {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/weather');
+        if (!response.ok) {
+          throw new Error('Failed to fetch weather data');
+        }
+        const tempData = await response.json();
+        setWeatherData(tempData);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchWeatherData();
+  }, []);
+
 
   useEffect(() => {
     const img = document.querySelector("#videoElement");
@@ -484,7 +500,7 @@ function Home() {
 
   return (
     <main className="flex min-h-screen flex-col">
-      <div className="bg-gray-200 min-h-screen flex justify-center items-center">
+      <div className="bg-gradient-to-br from-gray-100 to-gray-400 min-h-screen flex justify-center items-center">
         <div data-testid="HA-icon" className="Icon">
           <Link
             href="https://127.0.1.1:8123/"
@@ -836,6 +852,12 @@ function Home() {
           <p>Device Status: {data.deviceStatus}</p>
         </div>
       )}
+    </main>
+  );
+}
+
+export default Home;
+
       {/*<div className="fixed inset-0 flex justify-center items-center w-1/2 h-screen bg-white">
           <div className="mx-auto max-w-screen-md mt-4 py-5 px-32 bg-gradient-to-br from-cyan-700
           to-blue-700 h-fit shadow-xl">
@@ -889,9 +911,10 @@ function Home() {
               </div>
             ))} 
           </div>
-          */}
+
     </main>
   );
 }
+          */}
 
-export default Home;
+  
