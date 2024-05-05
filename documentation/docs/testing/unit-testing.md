@@ -272,3 +272,110 @@ def test_make_prediction(self):
         
         self.assertEqual(prediction, expected_prediction)
 ```
+
+## React.js Tests
+
+Video Feed
+
+```javascript
+test('Test for Video Feed', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/Video Feed/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+Home Assistant Icon
+
+```javascript
+test('Test for Home Assistant Icon', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/Home Assistant Icon/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+TV button
+
+```javascript
+test('Test for TV Gesture Button', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/TV Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+Light button
+
+```javascript
+test('Test for Light Gesture Button', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/Light Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+Alarm button
+
+```javascript
+test('Test for Alarm Gesture Button', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/Alarm Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+Weather button
+
+```javascript
+test('Test for Weather Gesture Button', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/Weather Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+Thermostat button
+
+```javascript
+test('Test for Thermostat Gesture Button', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/Thermostat Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+Locks button
+
+```javascript
+test('Test for Locks Gesture Button', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/Locks Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+Reminders button
+
+```javascript
+test('Test for Reminders Gesture Button', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/Reminders Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+To-do list button
+
+```javascript
+test('Test for To-do List Gesture Button', () => {
+  render(<App />);
+  const linkElement = screen.getByText(/To-do List Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+
+
+
+
+
