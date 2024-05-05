@@ -38,14 +38,14 @@ title: IntelliGest Home
 ---
 
 classDiagram
-    HomeAssistant <|--|> Dashboard : sends commands and updates
-    HomeAssistant <|--|> IntelliGestDevice : interacts with
-    HomeAssistant <|--|> PythonScripts : uses
-    UserInterface <|--|> JavaScriptCustomCards : uses
-    PythonScripts <|--|> Camera : captures image from
-    PythonScripts <|--|> TPU : loads model into
-    Camera <|--|> PythonScripts : sends image to
-    TPU <|--|> PythonScripts : sends prediction to
+    HomeAssistant <|-- Dashboard : sends commands and updates
+    HomeAssistant <|-- IntelliGestDevice : interacts with
+    HomeAssistant <|-- PythonScripts : uses
+    UserInterface <|-- JavaScriptCustomCards : uses
+    PythonScripts <|-- Camera : captures image from
+    PythonScripts <|-- TPU : loads model into
+    Camera <|-- PythonScripts : sends image to
+    TPU <|-- PythonScripts : sends prediction to
     class HomeAssistant {
         -devices[]
         -automations[]
