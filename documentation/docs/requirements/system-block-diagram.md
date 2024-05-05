@@ -8,7 +8,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"Figure 1. High-level design of the IntelliGest System application."}>
 
-![IntelliGest System Block Diagram](../../static/img/IntelliGestSystemBlockDiagram.png)
+![IntelliGest System Block Diagram](../../static/img/SystemBlockDiagram.png)
 
 </Figure>
 

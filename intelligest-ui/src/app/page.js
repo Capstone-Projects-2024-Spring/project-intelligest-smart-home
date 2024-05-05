@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import tv from "./gesture-imgs/TV.png";
@@ -18,10 +18,45 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLightbulb, faLock } from "@fortawesome/free-solid-svg-icons";
 import toDo from "./gesture-imgs/to-dolist.png";
 import Icon from '@mdi/react';
-import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
+
+import { mdiAccount, mdiAccountMultiple, mdiFlaskEmpty, mdiHomeAssistant } from '@mdi/js';
 import "react-toastify/dist/ReactToastify.css";
 
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 function Home() {
+  const [data, setData] = useState({}); // Declare 'data' in your component's state
+  const [lightState, setLightState] = useState("Inactive");
+  const [lockState, setLockState] = useState("Inactive");
+  const [thermostatState, setThermostatState] = useState("Inactive");
+  const [tvState, setTvState] = useState("Inactive");
+
+  const [viewToDoList, setViewToDoList] = useState(false);
+  const [newTask, setNewTask] = useState("");
+  const [tasks, setTasks] = useState([]);
+  const [viewUpdateTask, setViewUpdateTask] = useState(false);
+  const [getTaskIndex, setGetTaskIndex] = useState();
+  const [updateTask, setUpdateTask] = useState("");
+  const [checkTask, setCheckTask] = useState(false);
+
+  const [viewAlarm, setViewAlarm] = useState(false);
+  const [getTime, setGetTime] = useState(new Date().toLocaleTimeString());
+  const [userAlarmDate, setUserAlarmDate] = useState(new Date());
+  const [userAlarmTime, setUserAlarmTime] = useState(new Date().toTimeString().split(" ")[0]);
+  const [newAlarm, setNewAlarm] = useState([]);
+  const [alarmNotification, setAlarmNotification] = useState(false);
+
+  const [viewReminder, setViewReminder] = useState(false);
+  const [newReminder, setNewReminder] = useState("");
+  const [userReminders, setUserReminders] = useState([]);
+  const [reminderDate, setReminderDate] = useState(new Date());
+  const [reminderTime, setReminderTime] = useState(new Date().toTimeString().split(" ")[0]);
+
+  const [getError, setGetError] = useState(false);
+  const [getErrorMsg, setGetErrorMsg] = useState("");
+
   const [data, setData] = useState({});
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
   const [query, setQuery] = useState({ q: "Philadelphia" });
@@ -31,7 +66,9 @@ function Home() {
   //const [weather, setWeather] = useState(null);
   const [showNewsPopup, setShowNewsPopup] = useState(false);
   const [newsData, setNewsData] = useState([]);
+
   const [weatherData, setWeatherData] = useState(null);
+
   const handleClick = (buttonName) => {
     console.log(buttonName);
   };
@@ -94,10 +131,9 @@ function Home() {
   // }, []);
 
   useEffect(() => {
-    const eventSource = new EventSource(
-      "http://127.0.0.1:5000/current_gesture_sse"
-    );
-    eventSource.onmessage = function (event) {
+
+    const eventSource = new EventSource("http://127.0.0.1:5000/current_gesture_sse");
+    eventSource.onmessage = function(event){
       setData(JSON.parse(event.data));
     };
     return () => eventSource.close();
@@ -113,7 +149,158 @@ function Home() {
       setShowNewsPopup(false);
     }
   }, [data.deviceChoice]);
+    return ()=>{
+      eventSource.close();      
+    };
+  }, []);
 
+  //Capture the change of states in devices.
+  useEffect(() => {
+    switch(data.deviceChoice){
+      case 'Light':
+        (data.deviceStatus == 'on') && (setLightState("Active"));
+      case 'Lock':
+        (data.deviceStatus == 'on') && (setLockState("Active"));
+      case 'Thermostat':
+        (data.deviceStatus == 'on') && (setThermostatState("Active"));
+      case 'TV':
+        (data.deviceStatus == 'on') && (setTvState("Active"));
+      default:
+        console.log("Error");
+    }
+  },[data.lastestGesture]);
+
+  useEffect(()=>{
+    let isTimer = setInterval(()=>{
+      setGetTime(new Date().toLocaleTimeString())
+    },1000)
+    return()=>clearInterval(isTimer);
+  }, []);
+
+  useEffect(()=>{
+    (viewAlarm) && (document.getElementById('alarmDate').valueAsDate = new Date());
+    (viewReminder) && (document.getElementById('reminderDate').valueAsDate = new Date());
+  },[viewAlarm, viewReminder]);
+
+  const getToDoList=()=>{ setViewToDoList(true); }
+  const getUpdateTask=(index)=>{
+    setUpdateTask([...tasks][index]);
+    setGetTaskIndex(index);
+    setViewUpdateTask(true);
+  }
+  const getNegatedTask=()=>{ setCheckTask(!checkTask);}
+  const getReminder=()=>{ setViewReminder(true); }
+  const getAlarm=()=>{ setViewAlarm(true); }
+  const closeToDoList=()=>{ setViewToDoList(false); }
+  const closeUpdateTask=()=>{ setViewUpdateTask(false); }
+  const closeReminder=()=>{ setViewReminder(false); }
+  const closeAlarm=()=>{ setViewAlarm(false); }
+  const closeAlarmNotification=()=>{ setAlarmNotification(false); }
+  const resetError=()=>{ setGetError(false); setGetErrorMsg(""); }
+
+  function getNewToDoListTask(){
+    if(newTask.trim() !== ""){
+      setTasks(getTasks => [...getTasks, newTask]);
+      setNewTask("");
+    }
+  }
+
+  function editToDoListTask(){
+    var newTasks = [...tasks];
+    newTasks[getTaskIndex] = updateTask;
+    setTasks(newTasks);
+    setViewUpdateTask(false);
+  }
+
+  function deleteToDoListTask(index){
+    const updatedTasks = tasks.filter((_, i) => i !== index);
+    setTasks(updatedTasks);
+  }
+
+  function getNewAlarmEvent(){
+    var checkCurrentAlarms = [...newAlarm];
+    if(checkCurrentAlarms.includes(userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime)){
+      setGetError(true);
+      setGetErrorMsg("That time is already set");
+      return;
+    }
+    var currentDate = new Date();
+    var isUserDate = userAlarmDate.getMonth()+"/"+userAlarmDate.getDate()+"/"+userAlarmDate.getFullYear();
+    var getCurrentDate = currentDate.getMonth()+"/"+currentDate.getDate()+"/"+currentDate.getFullYear();
+    if(isUserDate < getCurrentDate){
+      setGetError(true);
+      setGetErrorMsg("Invalid Date");
+      return;
+    }
+    if(userAlarmDate == currentDate && userAlarmTime < currentDate.toTimeString().split(" ")[0]){
+      setGetError(true);
+      setGetErrorMsg("Invalid Time");
+      return;
+    }
+    const isNewAlarm = userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime;
+    var timeComponents = userAlarmTime.split(":");
+    userAlarmDate.setHours(timeComponents[0], timeComponents[1], timeComponents[2]);
+    var alarmTimer = userAlarmDate.getTime() - currentDate.getTime();
+    var timeoutID = setTimeout(()=>{
+      setAlarmNotification(true);
+      var getCurrentAlarms = [...newAlarm];
+      var getIndex = getCurrentAlarms.indexOf(isNewAlarm);
+      deleteAlarmEvent(getIndex);
+    },alarmTimer);
+    setNewAlarm(getAlarms => [...getAlarms, {isDate:isNewAlarm, isLinker:timeoutID}]);
+  }
+
+  function deleteAlarmEvent(index){
+      clearTimeout(newAlarm[index].isLinker);
+      const updatedAlarms = newAlarm.filter((_, i) => i !== index);
+      setNewAlarm(updatedAlarms);
+  }
+
+  function getReminderTask(){
+    if(newReminder.trim() == ""){
+      setGetError(true);
+      setGetErrorMsg("Enter a task...");
+      return;
+    }
+    var checkCurrentAlarms = [...newAlarm];
+    if(checkCurrentAlarms.includes(userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime)){
+      setGetError(true);
+      setGetErrorMsg("That time is already set");
+      return;
+    }
+    var currentDate = new Date();
+    var isUserDate = reminderDate.getMonth()+"/"+reminderDate.getDate()+"/"+reminderDate.getFullYear();
+    var getCurrentDate = currentDate.getMonth()+"/"+currentDate.getDate()+"/"+currentDate.getFullYear();
+    if(isUserDate < getCurrentDate){
+      setGetError(true);
+      setGetErrorMsg("Invalid Date");
+      return;
+    }
+    if(reminderDate == currentDate && reminderTime < currentDate.toTimeString().split(" ")[0]){
+      setGetError(true);
+      setGetErrorMsg("Invalid Time");
+      return;
+    }
+    const isNewReminderTime = reminderDate.toLocaleDateString("en-US") + ", " + reminderTime;
+    var timeComponents = reminderTime.split(":");
+    reminderDate.setHours(timeComponents[0], timeComponents[1], timeComponents[2]);
+    var reminderTimer = reminderDate.getTime() - currentDate.getTime();
+    console.log("Time until: " + reminderTimer)
+    var timeoutID = setTimeout(()=>{
+      setAlarmNotification(true);
+      var getCurrentReminders = [...userReminders];
+      var getIndex = getCurrentReminders.indexOf(isItem => isItem.task === newReminder);
+      deleteReminderTask(getIndex);
+    },reminderTimer);
+    setUserReminders(getReminders => [...getReminders, {task:newReminder, time:isNewReminderTime, isLinker:timeoutID}]);
+  }
+
+  function deleteReminderTask(index){
+    clearTimeout(userReminders[index].isLinker);
+    const updatedReminders = userReminders.filter((_, i) => i !== index);
+    setUserReminders(updatedReminders);
+  }
+ 
   useEffect(() => {
     if (
       data.firstGesture === "thumb flat" ||
@@ -337,7 +524,20 @@ function Home() {
             Entity Choice: {data.entityChoice} <br />
           </div>
         </div>
+        <div style={{ color:"gray",position:"absolute", top:"5px", right:"5px"}}>Devices 
+          <select style={{border:"black"}}>
+            <option label=" "> </option>
+            <option>Light : {lightState} </option>
+            <option>Lock : {lockState}</option>
+            <option>Thermostat : {thermostatState}</option>
+            <option>TV : {tvState}</option>
+          </select>
+        </div>
         <div className="grid grid-cols-4 gap-4">
+          <button onClick={() => handleClick("TV Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
+            <Image src={tv} alt="TV" width={140} height={50} />
+            TV
+          </button>
           <button
             onClick={handleNewsButtonClick}
             className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
@@ -356,8 +556,9 @@ function Home() {
             <Image src={light} alt="Lights gesture" width={140} height={50} />
             Lights
           </button>
-          <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
+          <button onClick={()=>getAlarm()} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image src={alarm} alt="Alarm gesture" width={140} height={50} />
+
             Alarm
           </button>
           <button
@@ -396,6 +597,16 @@ function Home() {
             />
             Locks
           </button>
+
+          <button onClick={() => getReminder()} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
+            <Image src={weather} alt="TV" width={140} height={50} />
+            Reminders
+          </button>
+          <button onClick={()=>getToDoList()} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
+            <Image src={toDo} alt="TV" width={140} height={80} />
+            To-do List
+          </button>
+        
           <button className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
             <Image
               src={locks}
@@ -416,6 +627,123 @@ function Home() {
           </button>
         </div>
       </div>
+      
+      <Modal show={viewToDoList} onHide={closeToDoList}>
+        <Modal.Header closeButton>
+        <Modal.Title>To-Do List</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <input type="text" placeholder="Enter an task..." style={{border:"1px solid black", borderRadius: "5px"}} value={newTask} onChange={(e)=>{setNewTask(e.target.value)}}/>
+            <button id="setAlarm" onClick={getNewToDoListTask} style={{marginLeft:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", padding:"2px"}}>Add</button>
+          </div>
+          <ul style={{textAlign:"left", display:"inline"}}>
+            {tasks.map((task, index)=>{
+              return(
+              <li key={index} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", animation:"ease-in 0.5s", marginTop:"10px"}}>
+                <span onClick={getNegatedTask} style={{textDecoration: checkTask ? 'line-through' : 'none'}}>{task}</span>
+                <button onClick={()=> getUpdateTask(index)} style={{padding:"2px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", marginLeft:"4px"}}> Edit</button>
+                <button onClick={() => deleteToDoListTask(index)} style={{padding:"2px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", right:"0"}}> Delete</button>
+              </li>)
+            })}
+          </ul>
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={viewUpdateTask} onHide={closeUpdateTask} centered>
+        <Modal.Header closeButton>
+        <Modal.Title>Update Task</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div>
+            <input type="text" style={{border:"1px solid black", borderRadius: "5px"}} value={updateTask} onChange={(e)=>{setUpdateTask(e.target.value)}}/>
+            <button onClick={editToDoListTask} style={{marginLeft:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", padding:"2px"}}>Update Task</button>
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={viewAlarm} onHide={closeAlarm}>
+      <Modal.Header closeButton>
+        <Modal.Title>Alarm</Modal.Title>
+      </Modal.Header>
+        <div style={{textAlign:"center", padding:"10px"}}>
+          <div style={{fontSize:"2rem", margin:"20px"}}>
+            {getTime}
+          </div>
+          <div style={{display:"flex", flexDirection:"column", alignItems:"center", gap:"10px"}}>
+            <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <label for="alarmDate" style={{paddingRight:"10px"}}>Select Date: </label>
+              <input type="date" id="alarmDate" min="" style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmDate(new Date(e.target.value))}}/>
+            </div>
+            <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <label for="alarmTime" style={{paddingRight:"10px"}}>Select Time: </label>
+              <input type="time" id="alarmTime" value={userAlarmTime} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setUserAlarmTime((e.target.value))}}/>
+            </div>
+            <br/>
+            <button id="setAlarm" onClick={getNewAlarmEvent} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Set Alarm</button>
+          </div>
+          <ul style={{marginTop:"10px", textAlign:"left"}}>
+            {newAlarm.map((item, index) => {
+              return(
+              <li key={index} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", padding:"10px", display:"flex", alignItems:"center", animation:"ease-in 0.5s"}}>
+                <span>{item.isDate}</span>
+                <button class="deleteAlarm" onClick={() => deleteAlarmEvent(index)} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Delete</button>
+              </li>);
+            })}
+          </ul>
+        </div>
+      </Modal>
+      
+      <Modal show={alarmNotification} onHide={closeAlarmNotification} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Notification</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Alarm!!!</Modal.Body>
+        <Modal.Footer>
+          <Button onClick={closeAlarmNotification}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={viewReminder} onHide={closeReminder}>
+        <Modal.Header closeButton>
+        <Modal.Title>Reminder</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <textarea type="text" placeholder="Enter an reminder..." style={{border:"1px solid black", borderRadius: "5px", width:"100%", height:"150px"}} value={newReminder} onChange={(e) =>{setNewReminder(e.target.value)}} contentEditable/>
+          <div style={{display:"flex", flexDirection:"column", alignItems:"center", padding:"10px", gap:"10px"}}>
+            <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <label for="reminderDate" style={{paddingRight:"10px"}}>Select Date: </label>
+              <input type="date" id="reminderDate" min="" style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setReminderDate(new Date(e.target.value))}}/>
+            </div>
+            <div style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <label for="reminderTime" style={{paddingRight:"10px"}}>Select Time: </label>
+              <input type="time" id="reminderTime" value={reminderTime} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}} onChange={(e)=>{setReminderTime((e.target.value))}}/>
+            </div>
+            <button id="setReminder" onClick={getReminderTask} style={{marginLeft:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px", padding:"10px"}}>Set</button>
+          </div>
+          <ul style={{marginTop:"10px", textAlign:"left", display:"inline"}}>
+            {userReminders.map((item, index) => {
+              return(
+              <li key={index} style={{backgroundColor:"lightgray",border:"1px solid darkgray", borderRadius:"5px", padding:"10px", display:"flex", alignItems:"center", animation:"ease-in 0.5s"}}>
+                <span style={{width:"100px", whiteSpace:"nowrap" ,overflow:"hidden", textOverflow:"ellipsis", display:"inline-block"}}>{item.task}</span>
+                <span style={{display:"inline-block"}}>{item.time}</span>
+                <button class="deleteReminder" onClick={() => deleteReminderTask(index)} style={{padding:"10px", fontSize:"1rem", border:"1px solid darkgray", borderRadius:"5px"}}>Delete</button>
+              </li>);
+            })}
+          </ul>
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={getError} onHide={resetError} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Error</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{getErrorMsg}</Modal.Body>
+      <Modal.Footer>
+        <Button onClick={resetError}>Close</Button>
+      </Modal.Footer>
+    </Modal>
+    
       {showWeatherPopup && (
         <div className="absolute right-0 top-0 w-1/2 h-screen bg-white p-4 overflow-auto">
           <button onClick={closePopup} className="absolute top-0 right-0 p-2">
