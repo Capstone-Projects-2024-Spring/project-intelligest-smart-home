@@ -5,6 +5,119 @@ description: Descriptions of classes, fields, and functions
 
 # Design Document - API
 
+## API Routes
+
+##### Returns Video Feed from Flask Server
+
+```python
+@app.route('/video_feed')
+def video_feed():
+    return Response(processor.gen_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+```
+
+##### Returns User's Gesture from Flask Server
+
+```python
+@app.route('/current_gesture')
+def current_gesture():
+    
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
+```
+
+##### Returns User's ____ from Flask Server
+
+```python
+@app.route('/current_gesture_sse')
+def current_gesture_sse():
+    def generate():
+        while True:
+            
+            data = {
+                'latestGesture': processor.latest_gesture,
+                'firstGesture': processor.firstGesture,
+                'secondGesture': processor.secondGesture,
+                'deviceChoice': processor.deviceChoice,
+                'deviceStatus': processor.deviceStatus,
+                'entityChoices': processor.entityChoices,
+                'entityChoice': processor.deviceChoice,
+                'weatherData': global_weather,
+                'entityChoice': processor.entityChoice,
+                'entityChoices': processor.entityChoices
+            }
+            yield f"data:{json.dumps(data)}\n\n"
+            #time.sleep(1) 
+
+    return Response(generate(), mimetype='text/event-stream')
+```
+
+##### Returns User's Performed action
+
+```python
+@app.route('/perform_action', methods=['POST'])
+def perform_action():
+    data = request.get_json()
+    device_choice = data['deviceChoice']
+    entity_choice = data['entityChoice']
+
+    # Perform the desired action based on the device and entity choice
+    if device_choice == 'Light':
+        # Toggle the light
+        lightState = toggle_light(entity_choice)
+        if lightState is True:
+            deviceStatus = 'on'
+        elif lightState is False:
+            deviceStatus = 'off'
+        print('Device Status is', deviceStatus)
+        processor.clear()
+    elif device_choice == 'Lock':
+        lockState = toggle_lock(entity_choice)
+        if lockState is True:
+            deviceStatus = 'locked'
+        elif lockState is False:
+            deviceStatus = 'unlocked'
+        print('Device Status is', deviceStatus)
+        processor.clear()
+    elif device_choice == 'Thermostat':
+        # Perform action for thermostat
+        pass
+
+    return jsonify(success=True)
+```
+
+##### Returns Device Entities from Flask Server
+
+```python
+@app.route('/get_entities', methods=['POST'])
+def get_entities():
+    data = request.get_json()
+    device_choice = data['deviceChoice']
+
+    if device_choice == 'Light':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    elif device_choice == 'Lock':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    else:
+        return jsonify(entityChoices=[])
+```
+
+##### Returns News from Flask Server
+
+```python
+@app.route('/get_news')
+def get_news():
+    try:
+        news_data = get_recent_news()
+        if news_data:
+            return jsonify(news_data)
+        else:
+            return jsonify({'error': 'No news data available'}), 404
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch news'}), 500
+```
+
 ## Home Assistant
 
 ### Class Purpose
@@ -290,6 +403,120 @@ Returns the list of calendar entities.
   }
 ]
 ```
+
+### API Routes
+
+##### Returns Video Feed from Flask Server
+
+```python
+@app.route('/video_feed')
+def video_feed():
+    return Response(processor.gen_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+```
+
+##### Returns User's Gesture from Flask Server
+
+```python
+@app.route('/current_gesture')
+def current_gesture():
+    
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
+```
+
+##### Returns User's ____ from Flask Server
+
+```python
+@app.route('/current_gesture_sse')
+def current_gesture_sse():
+    def generate():
+        while True:
+            
+            data = {
+                'latestGesture': processor.latest_gesture,
+                'firstGesture': processor.firstGesture,
+                'secondGesture': processor.secondGesture,
+                'deviceChoice': processor.deviceChoice,
+                'deviceStatus': processor.deviceStatus,
+                'entityChoices': processor.entityChoices,
+                'entityChoice': processor.deviceChoice,
+                'weatherData': global_weather,
+                'entityChoice': processor.entityChoice,
+                'entityChoices': processor.entityChoices
+            }
+            yield f"data:{json.dumps(data)}\n\n"
+            #time.sleep(1) 
+
+    return Response(generate(), mimetype='text/event-stream')
+```
+
+##### Returns User's ____ from Flask Server
+
+```python
+@app.route('/perform_action', methods=['POST'])
+def perform_action():
+    data = request.get_json()
+    device_choice = data['deviceChoice']
+    entity_choice = data['entityChoice']
+
+    # Perform the desired action based on the device and entity choice
+    if device_choice == 'Light':
+        # Toggle the light
+        lightState = toggle_light(entity_choice)
+        if lightState is True:
+            deviceStatus = 'on'
+        elif lightState is False:
+            deviceStatus = 'off'
+        print('Device Status is', deviceStatus)
+        processor.clear()
+    elif device_choice == 'Lock':
+        lockState = toggle_lock(entity_choice)
+        if lockState is True:
+            deviceStatus = 'locked'
+        elif lockState is False:
+            deviceStatus = 'unlocked'
+        print('Device Status is', deviceStatus)
+        processor.clear()
+    elif device_choice == 'Thermostat':
+        # Perform action for thermostat
+        pass
+
+    return jsonify(success=True)
+```
+
+##### Returns Device Entities from Flask Server
+
+```python
+@app.route('/get_entities', methods=['POST'])
+def get_entities():
+    data = request.get_json()
+    device_choice = data['deviceChoice']
+
+    if device_choice == 'Light':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    elif device_choice == 'Lock':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    else:
+        return jsonify(entityChoices=[])
+```
+
+##### Returns News from Flask Server
+
+```python
+@app.route('/get_news')
+def get_news():
+    try:
+        news_data = get_recent_news()
+        if news_data:
+            return jsonify(news_data)
+        else:
+            return jsonify({'error': 'No news data available'}), 404
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch news'}), 500
+```
+
 
 
 
