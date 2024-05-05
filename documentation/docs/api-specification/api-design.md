@@ -73,18 +73,31 @@ Stores the latest news data.
 Stores the fetched weather data.
 
 ##### `handleClick`
+Console logs out name of the Clicked button
+
 ##### `handleWeatherButtonClick` 
+Upon clicking Weather button, triggers the display of a weather popup
+
 ##### `handleNewsButtonClick` 
+Upon clicking News button, fetches and displays news data
+
 ##### `closePopup`
+Closes Weather Popup
+
 ##### `handleEntityChoice`
+Handles user entity choices by it sending a POST request to a local server endpoint (http://127.0.0.1:5000/perform_action) with JSON data containing information about device choice and an entity choice 
+
 ##### `handleLightButtonClick` 
+Handles Light button clicks, by sending POST request to a local server endpoint (http://127.0.0.1:5000/get_entities) with JSON data specifying a device choice of "Light".
+
 ##### `handleLockButtonClick` 
+Handles clicking Lock Button. It sends a POST request to a local server endpoint (http://127.0.0.1:5000/get_entities) with JSON data specifying a device choice of "Lock"
+
 ##### `getEntityIcon` 
 A function to get the appropriate icon for a given entity type.
 
 ##### `fetchWeather`
 A function to fetch weather data.
-
 
 ##### `-user_id`
 
@@ -102,6 +115,20 @@ On/Off/Other state of the device
 #### Methods
 
 ##### `Home()`
+It defines and initializes several state variables using the useState hook, including data related to weather, entity choices, and news, as well as flags for controlling the display of various popups and confirmation messages.
+
+It uses the useEffect hook to fetch weather data from a local server when the component mounts, set up an EventSource to receive real-time gesture data updates, and perform other side effects like setting up a video feed.
+
+It sets up additional useEffect hooks to handle changes in the received gesture data, device choices, entity choices, and device status.
+
+It defines several helper functions to handle button clicks related to weather, news, lights, locks, and entity choices.
+
+It defines a function to format the background color based on weather conditions.
+
+It renders a main layout with buttons for various device choices, displays relevant data and gesture information, and conditionally renders popups for weather, news, entity choices, and confirmation messages based on state variables.
+
+It exports the Home function as the default export of the module.
+
 ##### `RootLayout()`
 
 
