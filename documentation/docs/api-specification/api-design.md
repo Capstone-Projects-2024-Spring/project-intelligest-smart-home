@@ -272,29 +272,6 @@ Image used in processing
 
 This function captures an image or video frame.
 
-## TPU
-
-### Class Purpose
-
-TPU is responsible for loading all 8 Machine Learning Models and accurately identifies the User Hand Gesture and sends it to PythonScripts class.
-
-#### Data Fields / Attributes:
-
-##### `-model`
-
-This is the machine learning model loaded into the Coral TPU.
-
-#### Methods
-
-##### `+load_model()`
-
-Function loads Machine Learning model
-
-##### `+make_prediction()`
-
-This function makes a prediction based on the preprocessed image using the model loaded into the Coral TPU.
-
-
 ## Home Assistant RESTful API
 
 ### Class Purpose
