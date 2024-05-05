@@ -5,8 +5,6 @@ description: Descriptions of classes, fields, and functions
 
 # Design Document - API
 
-
-
 ## Home Assistant
 
 ### Class Purpose
@@ -49,6 +47,45 @@ The user interface is the Home Assistant dashboard that allows users to interact
 
 #### Data Fields / Attributes:
 
+
+##### `data` 
+Stores various data received from the server.
+
+##### `showWeatherPopup`
+Boolean state to control the visibility of the weather popup.
+
+##### `query`
+Stores the query parameters for fetching weather data.
+
+##### `units`
+Stores the units (metric or imperial) for weather data.
+
+##### `showEntityChoices`
+Boolean state to control the visibility of entity choices popup.
+
+##### `showConfirmation`
+Boolean state to control the visibility of the confirmation popup.
+
+##### `newsData` 
+Stores the latest news data.
+
+##### `weatherData` 
+Stores the fetched weather data.
+
+##### `handleClick`
+##### `handleWeatherButtonClick` 
+##### `handleNewsButtonClick` 
+##### `closePopup`
+##### `handleEntityChoice`
+##### `handleLightButtonClick` 
+##### `handleLockButtonClick` 
+##### `getEntityIcon` 
+A function to get the appropriate icon for a given entity type.
+
+##### `fetchWeather`
+A function to fetch weather data.
+
+
 ##### `-user_id`
 
 User ID
@@ -61,7 +98,12 @@ All 8 hand gestures for diffent devices
 
 On/Off/Other state of the device
 
+
 #### Methods
+
+##### `Home()`
+##### `RootLayout()`
+
 
 ##### `+send_command()`
 
