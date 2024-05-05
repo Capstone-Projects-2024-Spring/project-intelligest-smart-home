@@ -39,6 +39,7 @@ Function can update device to current status
 
 Function executes automation for that device
 
+
 ## User Interface
 
 ### Class Purpose
@@ -46,7 +47,6 @@ Function executes automation for that device
 The user interface is the Home Assistant dashboard that allows users to interact with the system. It sends user commands to the Home Assistant and displays the status of the devices. The dashboard is highly customizable and can display information from various components. We will be creating custom cards for the dashboard to display ASL images.
 
 #### Data Fields / Attributes:
-
 
 ##### `data` 
 Stores various data received from the server.
@@ -99,14 +99,6 @@ A function to get the appropriate icon for a given entity type.
 ##### `fetchWeather`
 A function to fetch weather data.
 
-##### `-user_id`
-
-User ID
-
-##### `-command`
-
-All 8 hand gestures for diffent devices
-
 ##### `-device_states[]`
 
 On/Off/Other state of the device
@@ -129,9 +121,6 @@ It renders a main layout with buttons for various device choices, displays relev
 
 It exports the Home function as the default export of the module.
 
-##### `RootLayout()`
-
-
 ##### `+send_command()`
 
 Function sends commands from User Interface
@@ -139,6 +128,7 @@ Function sends commands from User Interface
 ##### `+display_device_state()`
 
 Function displays different states of Home devices on User Interface
+
 
 ## Device
 
@@ -173,6 +163,7 @@ Function updates status of device
 ##### `+execute_capability()`
 
 Function executes capabilities of device
+
 
 ## PythonScripts
 
@@ -220,6 +211,7 @@ Function Pre-Processes Image of User's hand gestures
 
 Function makes prediction to identify correct hand gesture
 
+
 ## JavaScriptCustomCards
 
 ### Class Purpose
@@ -254,6 +246,7 @@ This function displays an `image` on the custom card.
 
 This function updates the `display_state` of the custom card.
 
+
 ## Camera
 
 ### Class Purpose
@@ -271,6 +264,7 @@ Image used in processing
 ##### `+capture_image()`
 
 This function captures an image or video frame.
+
 
 ## Home Assistant RESTful API
 
