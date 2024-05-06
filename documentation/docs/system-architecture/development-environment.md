@@ -12,11 +12,11 @@ A Raspberry Pi 4 running Raspbery Pi OS will be used for development and testing
 
 ### Docker
 
-Docker will be utilized to containerize both Home Assistant and a MQTT Broker server using [Eclipse Mosquitto](https://mosquitto.org/). A `docker-compose.yaml` file will be used to seamless share the shared docker containers under the same stack and deploy them together.
+Docker will be utilized to containerize Home Assistant. A `docker-compose.yaml` file will be used to seamless share the shared docker containers under the same stack and deploy them together.
 
 ### Image Detection Models
 
-Teachable Machine will be used to create a base model for hand gesture detection using Tensorflow Lite.
+Mediapipe model is used for hand gesture detection.
 
 OpenCV will be utilized for movement detection and hand isolation models.
 
@@ -32,8 +32,14 @@ OpenCV will be utilized for movement detection and hand isolation models.
 
 ### Langauges and Technologies
 
-- Python
-- JavaScript
-- YAML
+- MediaPipe
 - OpenCV
-- MQTT Messaging Protocol
+- React.js
+- Next.js
+- JavaScript
+- Python
+- YAML
+- HTML
+- TailwindCSS
+- Jupyter Notebook
+

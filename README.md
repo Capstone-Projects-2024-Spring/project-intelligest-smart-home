@@ -25,7 +25,6 @@ This system should be able to intake either a user’s hand signals/gesture or A
 
 The Home Assistant software will run off a Raspberry Pi or another capable device, which can be placed within the home of a user. Using either an external camera or an official Raspberry Pi Camera, photos can be sent to the backend to reference known ASL/Gestures and map to corresponding actions in Home Assistant.
 Building a custom integration in Home Assistant, IntelliGest Home can communicate the interpreted commands to Home Assistant for smart home device control.
-We could also utilize MQTT to send data from sensors/cameras to devices that are “subscribed” and use those messages in HA (Home Assistant) to perform actions.
 Due to the need for Machine Learning, a Python backend may be preferred but NodeJS could potentially be used. The backend will need to be hosted on a cloud provider. A front-end may not be required, but if so, it can utilize either NextJS, React, or another front-end Javascript framework.
 
 ## Background
@@ -46,7 +45,6 @@ The smart home ASL integration aims to provide an inclusive and accessible home 
 
 - Access to Home Assistant’s RESTful API
 - Software Development Tools or IDEs (i.e., VSCode)
-- Potential for a database (needed only if we want to store specific actions that can be mapped to gestures)
 
 ### Hardware Resources
 

@@ -8,7 +8,7 @@ import Figure from "../../src/components/Figure";
 
 <Figure caption={"An Acceptance Testing Sheet we will use for testing."}>
 
-![Acceptance Testing Sheet](../../static/img/AcceptanceTestingSheet.png)
+![Acceptance Testing Sheet](../../static/img/Acceptance.png)
 
 </Figure>
 
