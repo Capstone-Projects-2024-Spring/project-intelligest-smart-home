@@ -9,7 +9,7 @@ description: Descriptions of classes, fields, and functions
 
 ### Class Purpose
 
-The core of our system, acting as the server. It’s responsible for managing the state of all connected devices and automations. It communicates with the user interface to display device statuses. It also communicates with the IntelliGest system by receiving data payloads sent through an MQTT Broker which include a prediction for the action. It also interacts with the devices themselves to control their states based on user input and automation rules.
+The core of our system, acting as the server. It’s responsible for managing the state of all connected devices and automations. It communicates with the user interface to display device statuses. It also communicates with the IntelliGest system and MediaPipe model to predict for User hand gesture. It also interacts with the devices themselves to control their states based on user input and automation rules.
 
 #### Data Fields / Attributes:
 

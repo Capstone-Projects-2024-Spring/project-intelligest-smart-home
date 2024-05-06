@@ -8,7 +8,7 @@ sidebar_position: 2
 
 ### Home Assistant
 
-Home Assistant is the core of our system, acting as the server. It’s responsible for managing the state of all connected devices and automations. It communicates with the user interface to display device statuses. It also communicates with the IntelliGest system (Raspberry Pi) by receiving data payloads sent through an MQTT Broker which include a prediction for the action. It also interacts with the devices themselves to control their states based on user input and automation rules.
+Home Assistant is the core of our system, acting as the server. It’s responsible for managing the state of all connected devices and automations. It communicates with the user interface to display device statuses. It also communicates with the IntelliGest system (Raspberry Pi, Camera, Flask Server) and MediaPipe model to predict User's Hand gesture. It also interacts with the devices themselves to control their states based on user input and automation rules.
 
 ### Dashboard
 

@@ -6,9 +6,8 @@ sidebar_position: 4
 
 ## Functional Requirements
 
-- Users will set up MQTT/Home Assistant with their mobile phone or Tablet/iPad to receive notifications.
 - When the User wants to perform any task, they will perform ASL or a Gesture accordingly up to a certain distance from the IntelliGest Camera.
-- IntelliGest will process the visual request and will publish an MQTT packet to Home Assistant which will be subscribed.
+- IntelliGest will process the visual request using MediaPipe model 
   - Home Assistant will handle the action through the smart home.
 - For Tasks related to Home devices and appliances:
   - When IntelliGest catches a Gesture it will show a certain color on light strips to notify its retrieval.
@@ -28,7 +27,7 @@ sidebar_position: 4
 
 ## Nonfunctional Requirements
 - Users will set up the IntelliGest Smart Home by connecting the Device to the power supply and connecting it to the internet directly using ethernet. They can then view the dashboard at their [Home Assistant Dashboard](http://homeassistant.local:8123/).
-- Users will set up MQTT/Home Assistant with their Smart Home devices and appliances.
+- Users will set up Home Assistant with their Smart Home devices and appliances.
   - TV, AC, Thermostats, Light-bulbs, Security Cameras, Locks, Fans, Alarms, etc.
  - IntelliGest can also be used by individuals who can speak after adjusting some system   
     settings.
