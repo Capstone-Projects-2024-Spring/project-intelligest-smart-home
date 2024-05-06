@@ -11,7 +11,6 @@ sidebar_position: 2
         home_assistant = Mock(spec=HomeAssistant)
         user_interface = Mock(spec=UserInterface)
         python_scripts = Mock(spec=PythonScripts)
-        tpu = Mock(spec=TPU)
         intelligest_home = IntelliGestHome(home_assistant, user_interface, python_scripts, tpu)
 
         intelligest_home.connect_device()
@@ -46,7 +45,6 @@ sidebar_position: 2
         home_assistant = Mock(spec=HomeAssistant)
         user_interface = Mock(spec=UserInterface)
         python_scripts = Mock(spec=PythonScripts)
-        tpu = Mock(spec=TPU)
         intelligest_home = IntelliGestHome(home_assistant, user_interface, python_scripts, tpu)
 
         gesture = "Gesture for changing kitchen light color"
@@ -64,7 +62,6 @@ sidebar_position: 2
         home_assistant = Mock(spec=HomeAssistant)
         user_interface = Mock(spec=UserInterface)
         python_scripts = Mock(spec=PythonScripts)
-        tpu = Mock(spec=TPU)
 
         intelligest_home = IntelliGestHome(home_assistant, user_interface, python_scripts, tpu)
         smart_lock = Mock()
@@ -84,7 +81,6 @@ sidebar_position: 2
         home_assistant = Mock(spec=HomeAssistant)
         user_interface = Mock(spec=UserInterface)
         python_scripts = Mock(spec=PythonScripts)
-        tpu = Mock(spec=TPU)
 
         intelligest_home = IntelliGestHome(home_assistant, user_interface, python_scripts, tpu)
 
@@ -112,7 +108,6 @@ sidebar_position: 2
         home_assistant = Mock(spec=HomeAssistant)
         user_interface = Mock(spec=UserInterface)
         python_scripts = Mock(spec=PythonScripts)
-        tpu = Mock(spec=TPU)
 
         intelligest_home = IntelliGestHome(home_assistant, user_interface, python_scripts, tpu)
 
@@ -136,7 +131,6 @@ sidebar_position: 2
         home_assistant = Mock(spec=HomeAssistant)
         user_interface = Mock(spec=UserInterface)
         python_scripts = Mock(spec=PythonScripts)
-        tpu = Mock(spec=TPU)
 
         intelligest_home = IntelliGestHome(home_assistant, user_interface, python_scripts, tpu)
 

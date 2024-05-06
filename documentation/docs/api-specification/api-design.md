@@ -169,17 +169,17 @@ Function executes capabilities of device
 
 ### Class Purpose
 
-These are scripts that we will write to load the machine learning model into the Coral TPU, capture and pre-process images using OpenCV, and make predictions. The scripts will be run on a Raspberry Pi 4, with a Coral TPU co-processor.
+These are scripts that we will write to load the machine learning model pre-process images using OpenCV, and make predictions. The scripts will be run on a Raspberry Pi 4.
 
 The OpenCV library will be used to capture images or video frames from a camera connected to the Raspberry Pi. These images will then be preprocessed (e.g., resized, normalized) to be compatible with the input requirements of the TensorFlow Lite model.
 
-The TensorFlow Lite model, which has been trained to recognize ASL gestures, will then be loaded into the Coral TPU. The preprocessed images will be passed to this model to make predictions.
+The TensorFlow Lite model, which has been trained to recognize ASL gestures. The preprocessed images will be passed to this model to make predictions.
 
 #### Data Fields / Attributes
 
 ##### `-model`
 
-This is the machine learning model loaded into the Coral TPU.
+This is the machine learning model
 
 ##### `-interpreter`
 

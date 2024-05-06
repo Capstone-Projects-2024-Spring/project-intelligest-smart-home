@@ -52,7 +52,6 @@ The smart home ASL integration aims to provide an inclusive and accessible home 
 
 - Raspberry Pi
 - Cameras with video recording capabilities
-- [Google Coral TPU](https://coral.ai/products/accelerator)
 - Display
 - Smart Home Appliances
     - [Philips Hue](https://www.amazon.com/dp/B07R2MQ2PY?tag=georiot-us-default-20&th=1&ascsubtag=tomsguide-us-1323340612962130000-20&geniuslink=true)

@@ -12,7 +12,6 @@ sidebar_position: 3
 - Raspberry Pi OS
 - Power Supply
 - Touch Display
-- Coral USB TPU
 - ESP Microcontrollers
 - Cameras
 - Light Strips
