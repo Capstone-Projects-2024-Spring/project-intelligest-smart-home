@@ -48,55 +48,55 @@ The user interface is the Home Assistant dashboard that allows users to interact
 
 #### Data Fields / Attributes:
 
-##### `data` 
+##### `-data` 
 Stores various data received from the server.
 
-##### `showWeatherPopup`
+##### `-showWeatherPopup`
 Boolean state to control the visibility of the weather popup.
 
-##### `query`
+##### `-query`
 Stores the query parameters for fetching weather data.
 
-##### `units`
+##### `-units`
 Stores the units (metric or imperial) for weather data.
 
-##### `showEntityChoices`
+##### `-showEntityChoices`
 Boolean state to control the visibility of entity choices popup.
 
-##### `showConfirmation`
+##### `-showConfirmation`
 Boolean state to control the visibility of the confirmation popup.
 
-##### `newsData` 
+##### `-newsData` 
 Stores the latest news data.
 
-##### `weatherData` 
+##### `-weatherData` 
 Stores the fetched weather data.
 
-##### `handleClick`
+##### `-handleClick`
 Console logs out name of the Clicked button
 
-##### `handleWeatherButtonClick` 
+##### `-handleWeatherButtonClick` 
 Upon clicking Weather button, triggers the display of a weather popup
 
-##### `handleNewsButtonClick` 
+##### `-handleNewsButtonClick` 
 Upon clicking News button, fetches and displays news data
 
-##### `closePopup`
+##### `-closePopup`
 Closes Weather Popup
 
-##### `handleEntityChoice`
+##### `-handleEntityChoice`
 Handles user entity choices by it sending a POST request to a local server endpoint (http://127.0.0.1:5000/perform_action) with JSON data containing information about device choice and an entity choice 
 
-##### `handleLightButtonClick` 
+##### `-handleLightButtonClick` 
 Handles Light button clicks, by sending POST request to a local server endpoint (http://127.0.0.1:5000/get_entities) with JSON data specifying a device choice of "Light".
 
-##### `handleLockButtonClick` 
+##### `-handleLockButtonClick` 
 Handles clicking Lock Button. It sends a POST request to a local server endpoint (http://127.0.0.1:5000/get_entities) with JSON data specifying a device choice of "Lock"
 
-##### `getEntityIcon` 
+##### `-getEntityIcon` 
 A function to get the appropriate icon for a given entity type.
 
-##### `fetchWeather`
+##### `-fetchWeather`
 A function to fetch weather data.
 
 ##### `-device_states[]`
@@ -106,7 +106,7 @@ On/Off/Other state of the device
 
 #### Methods
 
-##### `Home()`
+##### `+Home()`
 It defines and initializes several state variables using the useState hook, including data related to weather, entity choices, and news, as well as flags for controlling the display of various popups and confirmation messages.
 
 It uses the useEffect hook to fetch weather data from a local server when the component mounts, set up an EventSource to receive real-time gesture data updates, and perform other side effects like setting up a video feed.

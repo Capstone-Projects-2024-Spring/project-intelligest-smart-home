@@ -55,9 +55,28 @@ classDiagram
         +execute_automation()
     }
     class UserInterface {
+        -showWeatherPopup
+        -showEntityChoices
+        -showConfirmation
+        -newsData
+        -weatherData
+        -handleClick
+        -handleWeatherButtonClick
+        -handleNewsButtonClick
+        -closePopup
+        -handleEntityChoice
+        -handleLightButtonClick
+        -handleLockButtonClick
+        -getEntityIcon
+        -fetchWeather
+        -device_states[]
+        -units
+        -data
+        -query
         -user_id
         -command
         -device_states[]
+        +Home()
         +send_command()
         +display_device_state()
     }
@@ -90,10 +109,5 @@ classDiagram
     class Camera {
         -image
         +capture_image()
-    }
-    class TPU {
-        -model
-        +load_model()
-        +make_prediction()
     }
 ```
