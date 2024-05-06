@@ -21,6 +21,8 @@ def test_add_device(self):
         
         self.assertEqual(len(home_assistant.devices), expected_devices_length)
 ```
+Verifies that the add_device method of the HomeAssistant class correctly adds a device to the device list.
+
 
 Method +remove_device()
 
@@ -37,6 +39,8 @@ def test_remove_device(self):
     
         self.assertEqual(len(home_assistant.devices), expected_devices_length)
 ```
+Test verifies that the remove_device method of the HomeAssistant class correctly removes a device from the device list.
+
 
 Method +update_device_status()
 
@@ -52,6 +56,8 @@ def test_update_device_status(self):
 
         self.assertEqual(home_assistant.devices[device_name].status, new_status)
 ```
+Test verifies that the update_device_status method of the HomeAssistant class correctly updates the status of a device.
+
 
 Method +execute_automation()
 
@@ -68,6 +74,8 @@ def test_execute_automation(self):
         
         self.assertEqual(result, expected_automation_executed)
 ```
+Test verifies that the execute_automation method of the HomeAssistant class correctly executes an automation for a given device.
+
 
 ## Class User Interface:
 
@@ -86,6 +94,8 @@ def test_send_command(self):
         
         self.assertEqual(result, expected_command_sent)
 ```
+Test verifies that the send_command method of the UserInterface class correctly sends a command to the Home Assistant.
+
 
 Method +display_device_state():
 
@@ -104,6 +114,8 @@ def test_display_device_state(self):
         
         self.assertEqual(result, expected_device_state_displayed)    
 ```
+Test verifies that the display_device_state method of the UserInterface class correctly displays the state of a device.
+
 
 ## Class Device 
 
@@ -120,6 +132,8 @@ def test_update_status(self):
         self.assertEqual(result, expected_status_updated)
         self.assertEqual(device.status, new_status)
 ```
+Test verifies that the update_status method of the Device class correctly updates the status of a device.
+
 
 Method +execute_capability():
 
@@ -134,6 +148,8 @@ def test_execute_capability(self):
         result = device.execute_capability(capability, value)
         self.assertEqual(result, expected_capability_executed)
 ```
+Test verifies that the execute_capability method of the Device class correctly executes a capability on a device.
+
 
 ## Class PythonScripts:
 
@@ -148,6 +164,8 @@ def test_load_model(self):
         result = python_scripts.load_model(model_path)
         self.assertEqual(result, expected_model_loaded)
 ```
+Test verifies that the load_model method of the PythonScripts class correctly loads a machine learning model from a file.
+
 
 Method +capture_image():
 
@@ -159,6 +177,8 @@ def test_capture_image(self):
         result = python_scripts.capture_image()
         self.assertEqual(result, expected_image_captured)
 ```
+Test verifies that the capture_image method of the PythonScripts class correctly captures an image.
+
 
 Method +preprocess_image():
 
@@ -171,6 +191,8 @@ def test_preprocess_image(self):
         result = python_scripts.preprocess_image(image)
         self.assertEqual(result, expected_image_preprocessed)
 ```
+Verifies that the preprocess_image method of the PythonScripts class correctly preprocesses an image.
+
 
 Method +make_prediction():
 
@@ -183,6 +205,8 @@ def test_make_prediction(self):
         
         self.assertEqual(prediction, expected_prediction)
 ```
+Verifies that the make_prediction method of the PythonScripts class correctly makes a prediction using a pre-trained model.
+
 
 ## Class JavaScript Custom Cards
 
@@ -197,6 +221,8 @@ def test_create_card(self):
         result = javascript_custom_cards.create_card(card_id)
         self.assertEqual(result, expected_card_created)
 ```
+Verifies that the create_card method of the JavaScriptCustomCards class correctly creates a custom card.
+
 
 Method +display_image():
 
@@ -214,6 +240,8 @@ def test_display_image(self):
     
         self.assertEqual(result, expected_image_displayed)
 ```
+Verifies that the display_image method of the JavaScriptCustomCards class correctly displays an image on a custom card.
+
 
 Method +update_display_state():
 
@@ -228,6 +256,8 @@ def test_update_display_state(self):
         
         self.assertEqual(result, expected_display_state_updated)
 ```
+Verifies that the update_display_state method of the JavaScriptCustomCards class correctly updates the display state of a custom
+
 
 ## Class Camera
 
@@ -247,28 +277,124 @@ def test_capture_image(self):
         self.assertEqual(result, expected_image_captured)
         python_scripts.preprocess_image.assert_called_once()
 ```
+Verifies that the capture_image method of the Camera class correctly captures an image and preprocesses it.
 
-## Class TPU 
 
-Method +load_model():
 
-```python
-def test_load_model(self):
-        tpu = TPU()
-        expected_model_loaded = True
-        result = tpu.load_model()
+## React.js Tests
 
-        self.assertEqual(result, expected_model_loaded)
+Video Feed
+
+```javascript
+test('Test for Video Feed', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/Video Feed/i);
+  expect(linkElement).toBeInTheDocument();
+});
 ```
+Verifies if Video Feed is rendered on User Interface
 
-Method +make_prediction():
 
-```python
-def test_make_prediction(self):
-        tpu = TPU()
-        preprocessed_image = Mock()
-        expected_prediction = "A"
-        prediction = tpu.make_prediction(preprocessed_image)
-        
-        self.assertEqual(prediction, expected_prediction)
+Home Assistant Icon
+
+```javascript
+test('Test for Home Assistant Icon', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/Home Assistant Icon/i);
+  expect(linkElement).toBeInTheDocument();
+});
 ```
+Verifies if Home Assistant Icon is rendered on User Interface
+
+TV button
+
+```javascript
+test('Test for TV Gesture Button', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/TV Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+Verifies if TV button is rendered on User Interface
+
+Light button
+
+```javascript
+test('Test for Light Gesture Button', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/Light Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+Verifies if Light button is rendered on User Interface
+
+Alarm button
+
+```javascript
+test('Test for Alarm Gesture Button', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/Alarm Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+Verifies if Alarm button is rendered on User Interface
+
+Weather button
+
+```javascript
+test('Test for Weather Gesture Button', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/Weather Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+Verifies if Weather button is rendered on User Interface
+
+Thermostat button
+
+```javascript
+test('Test for Thermostat Gesture Button', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/Thermostat Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+Verifies if Thermostat button is rendered on User Interface
+
+Locks button
+
+```javascript
+test('Test for Locks Gesture Button', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/Locks Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+Verifies if Locks button is rendered on User Interface
+
+Reminders button
+
+```javascript
+test('Test for Reminders Gesture Button', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/Reminders Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+Verifies if Reminders button is rendered on User Interface
+
+To-do list button
+
+```javascript
+test('Test for To-do List Gesture Button', () => {
+  render(<Home />);
+  const linkElement = screen.getByText(/To-do List Gesture Button/i);
+  expect(linkElement).toBeInTheDocument();
+});
+```
+Verifies if To-do button is rendered on User Interface
+
+
+
+
+

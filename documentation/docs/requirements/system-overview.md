@@ -10,7 +10,7 @@ IntelliGest Home revolutionizes the landscape of smart home accessibility by int
 
 ## Conceptual Design
 
-The product will be prototyped on a Raspberry Pi 4 running the Raspberry Pi OS with a Coral USB TPU for machine learning co-processing. It will utilize the Home Assistant API for connecting IoT devices and controlling them. MQTT will be utilized as a messaging broker between the IntelliGest Home, Home Assistant, and IoT devices around the user’s home. A backend written in Python may be preferred due to Home Assistant utilizing Python. 
+The product will be prototyped on a Raspberry Pi 4 running the Raspberry Pi OS and there will be machine learning co-processing. It will utilize the Home Assistant API for connecting IoT devices and controlling them. MQTT will be utilized as a messaging broker between the IntelliGest Home, Home Assistant, and IoT devices around the user’s home. A backend written in Python may be preferred due to Home Assistant utilizing Python. 
 
 ### Background
 Most at-home smart systems require the user to perform verbal actions to control their smart. Products like Apple’s HomeKit, Amazon’s Alexa, and Google’s Home all fit under this umbrella leading the market of smart home devices. Unlike these services, IntelliGest Home strives to create an inclusive and intuitive smart home experience for those who are deaf, non-verbal, or a combination of the two. This product provides a service to a community who often gets overlooked in the smart home sphere. Using cameras and advanced machine learning technology, IntelliGest will recognize ASL and gestures to control a smart home; something that the current competitors do not provide.  

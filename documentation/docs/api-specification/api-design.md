@@ -39,6 +39,7 @@ Function can update device to current status
 
 Function executes automation for that device
 
+
 ## User Interface
 
 ### Class Purpose
@@ -47,19 +48,78 @@ The user interface is the Home Assistant dashboard that allows users to interact
 
 #### Data Fields / Attributes:
 
-##### `-user_id`
+##### `-data` 
+Stores various data received from the server.
 
-User ID
+##### `-showWeatherPopup`
+Boolean state to control the visibility of the weather popup.
 
-##### `-command`
+##### `-query`
+Stores the query parameters for fetching weather data.
 
-All 8 hand gestures for diffent devices
+##### `-units`
+Stores the units (metric or imperial) for weather data.
+
+##### `-showEntityChoices`
+Boolean state to control the visibility of entity choices popup.
+
+##### `-showConfirmation`
+Boolean state to control the visibility of the confirmation popup.
+
+##### `-newsData` 
+Stores the latest news data.
+
+##### `-weatherData` 
+Stores the fetched weather data.
+
+##### `-handleClick`
+Console logs out name of the Clicked button
+
+##### `-handleWeatherButtonClick` 
+Upon clicking Weather button, triggers the display of a weather popup
+
+##### `-handleNewsButtonClick` 
+Upon clicking News button, fetches and displays news data
+
+##### `-closePopup`
+Closes Weather Popup
+
+##### `-handleEntityChoice`
+Handles user entity choices by it sending a POST request to a local server endpoint (http://127.0.0.1:5000/perform_action) with JSON data containing information about device choice and an entity choice 
+
+##### `-handleLightButtonClick` 
+Handles Light button clicks, by sending POST request to a local server endpoint (http://127.0.0.1:5000/get_entities) with JSON data specifying a device choice of "Light".
+
+##### `-handleLockButtonClick` 
+Handles clicking Lock Button. It sends a POST request to a local server endpoint (http://127.0.0.1:5000/get_entities) with JSON data specifying a device choice of "Lock"
+
+##### `-getEntityIcon` 
+A function to get the appropriate icon for a given entity type.
+
+##### `-fetchWeather`
+A function to fetch weather data.
 
 ##### `-device_states[]`
 
 On/Off/Other state of the device
 
+
 #### Methods
+
+##### `+Home()`
+It defines and initializes several state variables using the useState hook, including data related to weather, entity choices, and news, as well as flags for controlling the display of various popups and confirmation messages.
+
+It uses the useEffect hook to fetch weather data from a local server when the component mounts, set up an EventSource to receive real-time gesture data updates, and perform other side effects like setting up a video feed.
+
+It sets up additional useEffect hooks to handle changes in the received gesture data, device choices, entity choices, and device status.
+
+It defines several helper functions to handle button clicks related to weather, news, lights, locks, and entity choices.
+
+It defines a function to format the background color based on weather conditions.
+
+It renders a main layout with buttons for various device choices, displays relevant data and gesture information, and conditionally renders popups for weather, news, entity choices, and confirmation messages based on state variables.
+
+It exports the Home function as the default export of the module.
 
 ##### `+send_command()`
 
@@ -68,6 +128,7 @@ Function sends commands from User Interface
 ##### `+display_device_state()`
 
 Function displays different states of Home devices on User Interface
+
 
 ## Device
 
@@ -103,21 +164,22 @@ Function updates status of device
 
 Function executes capabilities of device
 
+
 ## PythonScripts
 
 ### Class Purpose
 
-These are scripts that we will write to load the machine learning model into the Coral TPU, capture and pre-process images using OpenCV, and make predictions. The scripts will be run on a Raspberry Pi 4, with a Coral TPU co-processor.
+These are scripts that we will write to load the machine learning model pre-process images using OpenCV, and make predictions. The scripts will be run on a Raspberry Pi 4.
 
 The OpenCV library will be used to capture images or video frames from a camera connected to the Raspberry Pi. These images will then be preprocessed (e.g., resized, normalized) to be compatible with the input requirements of the TensorFlow Lite model.
 
-The TensorFlow Lite model, which has been trained to recognize ASL gestures, will then be loaded into the Coral TPU. The preprocessed images will be passed to this model to make predictions.
+The TensorFlow Lite model, which has been trained to recognize ASL gestures. The preprocessed images will be passed to this model to make predictions.
 
 #### Data Fields / Attributes
 
 ##### `-model`
 
-This is the machine learning model loaded into the Coral TPU.
+This is the machine learning model
 
 ##### `-interpreter`
 
@@ -148,6 +210,7 @@ Function Pre-Processes Image of User's hand gestures
 ##### `+make_prediction()`
 
 Function makes prediction to identify correct hand gesture
+
 
 ## JavaScriptCustomCards
 
@@ -183,6 +246,7 @@ This function displays an `image` on the custom card.
 
 This function updates the `display_state` of the custom card.
 
+
 ## Camera
 
 ### Class Purpose
@@ -200,28 +264,6 @@ Image used in processing
 ##### `+capture_image()`
 
 This function captures an image or video frame.
-
-## TPU
-
-### Class Purpose
-
-TPU is responsible for loading all 8 Machine Learning Models and accurately identifies the User Hand Gesture and sends it to PythonScripts class.
-
-#### Data Fields / Attributes:
-
-##### `-model`
-
-This is the machine learning model loaded into the Coral TPU.
-
-#### Methods
-
-##### `+load_model()`
-
-Function loads Machine Learning model
-
-##### `+make_prediction()`
-
-This function makes a prediction based on the preprocessed image using the model loaded into the Coral TPU.
 
 
 ## Home Assistant RESTful API
@@ -291,9 +333,115 @@ Returns the list of calendar entities.
 ]
 ```
 
+## API Routes
 
+##### Returns Video Feed from Flask Server
 
+```python
+@app.route('/video_feed')
+def video_feed():
+    return Response(processor.gen_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+```
 
+##### Returns User's Gesture from Flask Server
 
+```python
+@app.route('/current_gesture')
+def current_gesture():
+    
+    return jsonify(gesture=latest_gesture, firstGesture = firstGesture, secondGesture = secondGesture, deviceChoice=deviceChoice, deviceStatus=deviceStatus,global_weather=global_weather, entityChoices=entityChoices, entityChoice=entityChoice)
+```
 
+##### Returns User's ____ from Flask Server
 
+```python
+@app.route('/current_gesture_sse')
+def current_gesture_sse():
+    def generate():
+        while True:
+            
+            data = {
+                'latestGesture': processor.latest_gesture,
+                'firstGesture': processor.firstGesture,
+                'secondGesture': processor.secondGesture,
+                'deviceChoice': processor.deviceChoice,
+                'deviceStatus': processor.deviceStatus,
+                'entityChoices': processor.entityChoices,
+                'entityChoice': processor.deviceChoice,
+                'weatherData': global_weather,
+                'entityChoice': processor.entityChoice,
+                'entityChoices': processor.entityChoices
+            }
+            yield f"data:{json.dumps(data)}\n\n"
+            #time.sleep(1) 
+
+    return Response(generate(), mimetype='text/event-stream')
+```
+
+##### Returns User's Performed action
+
+```python
+@app.route('/perform_action', methods=['POST'])
+def perform_action():
+    data = request.get_json()
+    device_choice = data['deviceChoice']
+    entity_choice = data['entityChoice']
+
+    # Perform the desired action based on the device and entity choice
+    if device_choice == 'Light':
+        # Toggle the light
+        lightState = toggle_light(entity_choice)
+        if lightState is True:
+            deviceStatus = 'on'
+        elif lightState is False:
+            deviceStatus = 'off'
+        print('Device Status is', deviceStatus)
+        processor.clear()
+    elif device_choice == 'Lock':
+        lockState = toggle_lock(entity_choice)
+        if lockState is True:
+            deviceStatus = 'locked'
+        elif lockState is False:
+            deviceStatus = 'unlocked'
+        print('Device Status is', deviceStatus)
+        processor.clear()
+    elif device_choice == 'Thermostat':
+        # Perform action for thermostat
+        pass
+
+    return jsonify(success=True)
+```
+
+##### Returns Device Entities from Flask Server
+
+```python
+@app.route('/get_entities', methods=['POST'])
+def get_entities():
+    data = request.get_json()
+    device_choice = data['deviceChoice']
+
+    if device_choice == 'Light':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    elif device_choice == 'Lock':
+        entity_choices = get_all_devices(device_choice)
+        return jsonify(entityChoices=entity_choices)
+    else:
+        return jsonify(entityChoices=[])
+```
+
+##### Returns News from Flask Server
+
+```python
+@app.route('/get_news')
+def get_news():
+    try:
+        news_data = get_recent_news()
+        if news_data:
+            return jsonify(news_data)
+        else:
+            return jsonify({'error': 'No news data available'}), 404
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch news'}), 500
+```
