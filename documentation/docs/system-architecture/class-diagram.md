@@ -24,7 +24,7 @@ These are scripts that we will write to load the Machine Learning model to captu
 
 The OpenCV library will be used to capture images or video frames from a camera connected to the Raspberry Pi. These images will then be preprocessed (e.g., resized, normalized) to be compatible with the input requirements of the TensorFlow Lite model.
 
-The TensorFlow Lite model, which has been trained to recognize ASL gestures. The preprocessed images will be passed to this model to make predictions.
+The MediaPipe model has been trained to recognize ASL gestures. The preprocessed images will be passed to this model to make predictions.
 
 ### Javascript Custom Lovelace Cards
 
@@ -42,8 +42,7 @@ classDiagram
     HomeAssistant <|-- IntelliGestDevice : interacts with
     HomeAssistant <|-- PythonScripts : uses
     UserInterface <|-- JavaScriptCustomCards : uses
-    PythonScripts <|-- Camera : captures image from
-    Camera <|-- PythonScripts : sends image to
+    Camera --|> PythonScripts : Sends User's Hand Gesture image
     class HomeAssistant {
         -devices[]
         -automations[]
