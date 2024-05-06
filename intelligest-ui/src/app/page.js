@@ -21,6 +21,8 @@ import Icon from '@mdi/react';
 import { mdiAccount, mdiAccountMultiple, mdiHomeAssistant } from '@mdi/js';
 import "react-toastify/dist/ReactToastify.css";
 
+
+  
 function Home() {
   const [data, setData] = useState({});
   const [showWeatherPopup, setShowWeatherPopup] = useState(false);
@@ -29,9 +31,18 @@ function Home() {
   const [showEntityChoices, setShowEntityChoices] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   //const [weather, setWeather] = useState(null);
+
+  
+  const [lightState, setLightState] = useState("Inactive");
+  const [lockState, setLockState] = useState("Inactive");
+  const [thermostatState, setThermostatState] = useState("Inactive");
+  const [tvState, setTvState] = useState("Inactive");
+
   const [showNewsPopup, setShowNewsPopup] = useState(false);
   const [newsData, setNewsData] = useState([]);
+
   const [weatherData, setWeatherData] = useState(null);
+
   const handleClick = (buttonName) => {
     console.log(buttonName);
   };
@@ -138,6 +149,26 @@ function Home() {
         setWeather(data);
       });
     };
+
+  }, []);
+
+  //Capture the change of states in devices.
+  useEffect(() => {
+    switch(data.deviceChoice){
+      case 'Light':
+        (data.deviceStatus == 'on') && (setLightState("Active"));
+      case 'Lock':
+        (data.deviceStatus == 'on') && (setLockState("Active"));
+      case 'Thermostat':
+        (data.deviceStatus == 'on') && (setThermostatState("Active"));
+      case 'TV':
+        (data.deviceStatus == 'on') && (setTvState("Active"));
+      default:
+        console.log("Error");
+    }
+  },[data.lastestGesture]);
+ 
+
 
     fetchWeather();
   }, [query, units]);
@@ -282,6 +313,7 @@ function Home() {
     }
   };
 
+
   const handleLockButtonClick = async () => {
     try {
       const response = await fetch("http://127.0.0.1:5000/get_entities", {
@@ -311,6 +343,7 @@ function Home() {
     }
   };
 
+
   return (
     <main className="flex min-h-screen flex-col">
       <div className="bg-gradient-to-br from-gray-100 to-gray-400 min-h-screen flex justify-center items-center">
@@ -337,9 +370,30 @@ function Home() {
             Entity Choice: {data.entityChoice} <br />
           </div>
         </div>
+
+
+        <div style={{ color:"gray",position:"absolute", top:"5px", right:"5px"}}>Devices 
+          <select style={{border:"black"}}>
+            <option label=" "> </option>
+            <option>Light : {lightState} </option>
+            <option>Lock : {lockState}</option>
+            <option>Thermostat : {thermostatState}</option>
+            <option>TV : {tvState}</option>
+          </select>
+        </div>
+
+        <div data-testid="button-test" className="grid grid-cols-4 gap-4">
+          <button onClick={() => handleClick("TV Button Pressed")} className="hover:bg-gray-300 text-black font-bold py-2 px-4 rounded">
+            <Image src={tv} alt="TV" width={140} height={50} />
+            TV
+          </button>
+          <button onClick={() => handleClick("Light Button Pressed")}
+
         <div className="grid grid-cols-4 gap-4">
           <button
+
             onClick={handleNewsButtonClick}
+
             className={`hover:bg-gray-300 text-black font-bold py-2 px-4 rounded ${
               data.deviceChoice === "News" ? "bg-blue-300" : ""
             }`}
