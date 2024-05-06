@@ -20,8 +20,6 @@ sidebar_position: 4
   - This Information must be requestable and able to be displayed by the device on screen
       - Weather: Temperature/precipitation over next 24 hours.
       - Top News: Major events and top stores of the past week.
-      - To-Do List: Entirely of the user's creation.
-      - Reminders: Entirely of the user's creation.
 - If users want to change or add Gesture + Task, in Account Settings they can change or add that Gesture + Task using Google’s Teachable Machine.
 
 
