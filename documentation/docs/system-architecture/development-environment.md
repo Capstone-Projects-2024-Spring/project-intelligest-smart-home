@@ -40,6 +40,6 @@ OpenCV will be utilized for movement detection and hand isolation models.
 - Python
 - YAML
 - HTML
-- CSS
+- TailwindCSS
 - Jupyter Notebook
 

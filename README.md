@@ -45,7 +45,6 @@ The smart home ASL integration aims to provide an inclusive and accessible home 
 
 - Access to Home Assistant’s RESTful API
 - Software Development Tools or IDEs (i.e., VSCode)
-- Potential for a database (needed only if we want to store specific actions that can be mapped to gestures)
 
 ### Hardware Resources
 
