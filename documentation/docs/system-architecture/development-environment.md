@@ -16,7 +16,7 @@ Docker will be utilized to containerize Home Assistant. A `docker-compose.yaml` 
 
 ### Image Detection Models
 
-Teachable Machine will be used to create a base model for hand gesture detection using Tensorflow Lite.
+Mediapipe model is used for hand gesture detection.
 
 OpenCV will be utilized for movement detection and hand isolation models.
 

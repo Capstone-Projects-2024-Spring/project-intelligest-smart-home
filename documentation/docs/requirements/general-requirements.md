@@ -14,5 +14,3 @@ sidebar_position: 3
 - Touch Display
 - ESP Microcontrollers
 - Cameras
-- Light Strips
-- Speakers
