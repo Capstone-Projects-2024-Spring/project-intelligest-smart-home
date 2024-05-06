@@ -43,9 +43,7 @@ classDiagram
     HomeAssistant <|-- PythonScripts : uses
     UserInterface <|-- JavaScriptCustomCards : uses
     PythonScripts <|-- Camera : captures image from
-    PythonScripts <|-- TPU : loads model into
     Camera <|-- PythonScripts : sends image to
-    TPU <|-- PythonScripts : sends prediction to
     class HomeAssistant {
         -devices[]
         -automations[]
