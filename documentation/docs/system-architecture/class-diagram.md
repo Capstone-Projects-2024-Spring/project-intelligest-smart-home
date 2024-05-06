@@ -18,6 +18,15 @@ IntelliGest's Dashboard allows users to interact with the system. It sends user 
 
 It includes the actual Smart Home Appliances: Lights, TV, Thermostats, Alaram, and Locks. This devices can be controlled. They communicate with Home Assistant to receive commands and send status updates. The devices are controlled using the built-in components provided by Home Assistant, but can be written to include other devices.
 
+### User Interface
+
+User Interface is the place from where User can control and manage all of this Home Appliances. Here user will able to get Weather and Latest News just by clicking a button. Plus, User will also able to see hand gesture detected by the IntelliGest. Also, user can also access to Home Assistant Dashboard
+
+On left of display, it has Video feed, Hand Gesture detected by User and Home Assistant Icon
+
+While on right, it has 8 buttons for each of the features and Home appliances such as Light, Weather, News, Locks, Thermostat, TV, Reminders, and To-do list
+
+
 ### Python Scripts
 
 These are scripts that we will write to load the Machine Learning model to capture and pre-process images using OpenCV, and make predictions. The scripts will be run on a Raspberry Pi 4
@@ -26,9 +35,7 @@ The OpenCV library will be used to capture images or video frames from a camera 
 
 The MediaPipe model has been trained to recognize ASL gestures. The preprocessed images will be passed to this model to make predictions.
 
-### Javascript Custom Lovelace Cards
 
-These are custom cards that we will create for the Home Assistant dashboard to display ASL images. The cards will be written in JavaScript and Home Assistant frontend development framework and will be used to enhance the user interface for our targeted demographic and provide necessary visual feedback when required.
 
 ## Class and Component Diagram
 
@@ -38,11 +45,10 @@ title: IntelliGest Home
 ---
 
 classDiagram
-    HomeAssistant <|-- Dashboard : sends commands and updates
     HomeAssistant <|-- IntelliGestDevice : interacts with
     HomeAssistant <|-- PythonScripts : uses
-    UserInterface <|-- JavaScriptCustomCards : uses
     Camera --|> PythonScripts : Sends User's Hand Gesture image
+    PythonScripts --|> UserInterface : Sends detected Hand Gesture and Status of Devices 
     class HomeAssistant {
         -devices[]
         -automations[]
@@ -94,14 +100,6 @@ classDiagram
         +capture_image()
         +preprocess_image()
         +make_prediction()
-    }
-    class JavaScriptCustomCards {
-        -card_id
-        -image
-        -display_state
-        +create_card()
-        +display_image()
-        +update_display_state()
     }
     class Camera {
         -image
