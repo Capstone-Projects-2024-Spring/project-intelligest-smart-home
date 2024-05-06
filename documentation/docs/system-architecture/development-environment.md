@@ -39,5 +39,7 @@ OpenCV will be utilized for movement detection and hand isolation models.
 - JavaScript
 - Python
 - YAML
-
+- HTML
+- CSS
+- Jupyter Notebook
 
