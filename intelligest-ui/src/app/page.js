@@ -26,6 +26,9 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+var followAlarms = [], trackAlarmTimeout = [];
+var followReminders = [], trackReminderTimeout = [];
+
 function Home() {
   const [data, setData] = useState({}); // Declare 'data' in your component's state
   const [lightState, setLightState] = useState("Inactive");
@@ -34,26 +37,31 @@ function Home() {
   const [tvState, setTvState] = useState("Inactive");
 
   const [viewToDoList, setViewToDoList] = useState(false);
-  const [newTask, setNewTask] = useState("");
-  const [tasks, setTasks] = useState([]);
   const [viewUpdateTask, setViewUpdateTask] = useState(false);
-  const [getTaskIndex, setGetTaskIndex] = useState();
-  const [updateTask, setUpdateTask] = useState("");
   const [checkTask, setCheckTask] = useState(false);
+  const [newTask, setNewTask] = useState("");
+  const [updateTask, setUpdateTask] = useState("");
+  const [getTaskIndex, setGetTaskIndex] = useState();
+  const [tasks, setTasks] = useState([]);
 
   const [viewAlarm, setViewAlarm] = useState(false);
   const [getTime, setGetTime] = useState(new Date().toLocaleTimeString());
   const [userAlarmDate, setUserAlarmDate] = useState(new Date());
   const [userAlarmTime, setUserAlarmTime] = useState(new Date().toTimeString().split(" ")[0]);
   const [newAlarm, setNewAlarm] = useState([]);
-  const [alarmNotification, setAlarmNotification] = useState(false);
+  
+  const [isReference, setIsReference] = useState([]);
 
   const [viewReminder, setViewReminder] = useState(false);
   const [newReminder, setNewReminder] = useState("");
-  const [userReminders, setUserReminders] = useState([]);
   const [reminderDate, setReminderDate] = useState(new Date());
   const [reminderTime, setReminderTime] = useState(new Date().toTimeString().split(" ")[0]);
+  const [userReminders, setUserReminders] = useState([]);
 
+  const [remReference, setRemReference] = useState([]);
+
+  const [notification, setNotification] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
   const [getError, setGetError] = useState(false);
   const [getErrorMsg, setGetErrorMsg] = useState("");
 
@@ -91,54 +99,30 @@ function Home() {
   }, []);
 
 
-  useEffect(() => {
+  useEffect(()=>{
     const img = document.querySelector("#videoElement");
     img.src = "http://127.0.0.1:5000/video_feed";
     img.style.width = "640px";
-  }, []);
-
-  // useEffect(() => {
-  //   const videoPlayer = videoRef.current; // Get the current value of the ref
-
-  //   const loadVideo = () => {
-  //     fetch('/video_feed')
-  //       .then((response) => response.body)
-  //       .then((body) => {
-  //         const reader = body.getReader();
-  //         const stream = new ReadableStream({
-  //           start(controller) {
-  //             function push() {
-  //               reader.read().then(({ done, value }) => {
-  //                 if (done) {
-  //                   controller.close();
-  //                   return;
-  //                 }
-  //                 controller.enqueue(new Uint8Array(value));
-  //                 push();
-  //               });
-  //             }
-  //             push();
-  //           },
-  //         });
-  //         videoPlayer.srcObject = new MediaSource(stream);
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error fetching video feed:', error);
-  //       });
-  //   };
-
-  //   loadVideo();
-  // }, []);
-
-  useEffect(() => {
-
     const eventSource = new EventSource("http://127.0.0.1:5000/current_gesture_sse");
     eventSource.onmessage = function(event){
       setData(JSON.parse(event.data));
     };
-    return () => eventSource.close();
-  }, []);
+    return ()=>{eventSource.close();};
+  },[]);
 
+  useEffect(()=>{
+    var isTimer = setInterval(()=>{ setGetTime(new Date().toLocaleTimeString())},1000);
+    var storageKeys = ['To-Do List Task', 'Update Task', 'Alarm Event', 'Reminder Event'];
+    for(var isState = 0; isState < storageKeys.length; isState++){
+      const isItem = getItem(storageKeys[isState]);
+      (isState == 0 && isItem) && (setTasks(isItem));
+      (isState == 1 && isItem) && (setUpdateTask(isItem));
+      (isState == 2 && isItem) && (setNewAlarm(isItem));
+      (isState == 3 && isItem) && (setUserReminders(isItem));
+    }
+    return()=>clearInterval(isTimer);
+  },[]);
+  
   useEffect(() => {
     if (data.deviceChoice === "Weather") {
       setShowWeatherPopup(true);
@@ -187,6 +171,7 @@ function Home() {
     setUpdateTask([...tasks][index]);
     setGetTaskIndex(index);
     setViewUpdateTask(true);
+    setItem('Update Task', updateTask);
   }
   const getNegatedTask=()=>{ setCheckTask(!checkTask);}
   const getReminder=()=>{ setViewReminder(true); }
@@ -195,14 +180,32 @@ function Home() {
   const closeUpdateTask=()=>{ setViewUpdateTask(false); }
   const closeReminder=()=>{ setViewReminder(false); }
   const closeAlarm=()=>{ setViewAlarm(false); }
-  const closeAlarmNotification=()=>{ setAlarmNotification(false); }
+  const closeNotification=()=>{ setNotification(false); }
   const resetError=()=>{ setGetError(false); setGetErrorMsg(""); }
+
+function setItem(key, value){
+    if(typeof value === 'object'){
+      value = JSON.stringify(value);
+    }
+    localStorage.setItem(key, value);
+  }
+  
+  function getItem(key){
+    if (key){
+      try{
+        return JSON.parse(localStorage.getItem(key));
+      }catch(e){
+        return localStorage.getItem(key);
+      }
+    }
+  } 
 
   function getNewToDoListTask(){
     if(newTask.trim() !== ""){
       setTasks(getTasks => [...getTasks, newTask]);
       setNewTask("");
     }
+    setItem('To-Do List Task', tasks);
   }
 
   function editToDoListTask(){
@@ -210,29 +213,34 @@ function Home() {
     newTasks[getTaskIndex] = updateTask;
     setTasks(newTasks);
     setViewUpdateTask(false);
+    setItem('To-Do List Task', tasks);
   }
 
   function deleteToDoListTask(index){
     const updatedTasks = tasks.filter((_, i) => i !== index);
     setTasks(updatedTasks);
+    setItem('To-Do List Task', tasks);
   }
 
   function getNewAlarmEvent(){
-    var checkCurrentAlarms = [...newAlarm];
-    if(checkCurrentAlarms.includes(userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime)){
+    if([...newAlarm].includes(userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime)){
       setGetError(true);
-      setGetErrorMsg("That time is already set");
+      setGetErrorMsg("That period is already set");
       return;
     }
     var currentDate = new Date();
     var isUserDate = userAlarmDate.getMonth()+"/"+userAlarmDate.getDate()+"/"+userAlarmDate.getFullYear();
+    const defUserDate = new Date(isUserDate);
+    console.log("User Date: " + isUserDate);
     var getCurrentDate = currentDate.getMonth()+"/"+currentDate.getDate()+"/"+currentDate.getFullYear();
-    if(isUserDate < getCurrentDate){
+    const defCurrentDate = new Date(getCurrentDate);
+    console.log("Current Date: " + getCurrentDate);
+    if(Date.parse(defUserDate) < Date.parse(defCurrentDate)){
       setGetError(true);
       setGetErrorMsg("Invalid Date");
       return;
     }
-    if(userAlarmDate == currentDate && userAlarmTime < currentDate.toTimeString().split(" ")[0]){
+    if(Date.parse(new Date(userAlarmDate)) == Date.parse(defCurrentDate) && userAlarmTime < currentDate.toTimeString().split(" ")[0]){
       setGetError(true);
       setGetErrorMsg("Invalid Time");
       return;
@@ -241,19 +249,38 @@ function Home() {
     var timeComponents = userAlarmTime.split(":");
     userAlarmDate.setHours(timeComponents[0], timeComponents[1], timeComponents[2]);
     var alarmTimer = userAlarmDate.getTime() - currentDate.getTime();
+    setNewAlarm(getAlarms => [...getAlarms, isNewAlarm]);
     var timeoutID = setTimeout(()=>{
-      setAlarmNotification(true);
-      var getCurrentAlarms = [...newAlarm];
-      var getIndex = getCurrentAlarms.indexOf(isNewAlarm);
-      deleteAlarmEvent(getIndex);
+      var index = followAlarms.indexOf(trackAlarmTimeout[0]);
+      console.log("Index: " + index);
+      console.log("This alarm is for: " + trackAlarmTimeout[0]);
+      trackAlarmTimeout.shift();
+      followAlarms.splice(index,1);
+      const updatedAlarms = newAlarm.filter((_, i) => i !== index);
+      setNewAlarm(updatedAlarms);
+      setNotificationMsg("Alarm!!!");
+      setNotification(true);
+      setItem('Alarm Event', newAlarm);
     },alarmTimer);
-    setNewAlarm(getAlarms => [...getAlarms, {isDate:isNewAlarm, isLinker:timeoutID}]);
+    console.log("timeout reference: " + timeoutID);
+    setIsReference(getRef=>[...getRef, timeoutID]);
+    followAlarms.push(timeoutID);
+    console.log(followAlarms);
+    trackAlarmTimeout.push(timeoutID);
+    trackAlarmTimeout.sort(function(a, b){return a-b});
+    setItem('Alarm Event', newAlarm);
   }
 
   function deleteAlarmEvent(index){
-      clearTimeout(newAlarm[index].isLinker);
-      const updatedAlarms = newAlarm.filter((_, i) => i !== index);
-      setNewAlarm(updatedAlarms);
+    var getTimeout = [...isReference];
+    console.log("Current Alarms: " + getTimeout);
+    console.log("Delete at: " + index + " value: " + getTimeout[index]);
+    clearTimeout(getTimeout[index]);
+    const updatedAlarms = newAlarm.filter((_, i) => i !== index);
+    setNewAlarm(updatedAlarms);
+    getTimeout.splice(index,1);
+    setIsReference(getTimeout);
+    setItem('Alarm Event', newAlarm);
   }
 
   function getReminderTask(){
@@ -262,21 +289,24 @@ function Home() {
       setGetErrorMsg("Enter a task...");
       return;
     }
-    var checkCurrentAlarms = [...newAlarm];
-    if(checkCurrentAlarms.includes(userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime)){
+    if([...newAlarm].includes(userAlarmDate.toLocaleDateString("en-US") + ", " + userAlarmTime)){
       setGetError(true);
       setGetErrorMsg("That time is already set");
       return;
     }
     var currentDate = new Date();
     var isUserDate = reminderDate.getMonth()+"/"+reminderDate.getDate()+"/"+reminderDate.getFullYear();
+    const defUserDate = new Date(isUserDate);
+    console.log("User Date: " + isUserDate);
     var getCurrentDate = currentDate.getMonth()+"/"+currentDate.getDate()+"/"+currentDate.getFullYear();
-    if(isUserDate < getCurrentDate){
+    const defCurrentDate = new Date(getCurrentDate);
+    console.log("Current Date: " + getCurrentDate);
+    if(Date.parse(defUserDate) < Date.parse(defCurrentDate)){
       setGetError(true);
       setGetErrorMsg("Invalid Date");
       return;
     }
-    if(reminderDate == currentDate && reminderTime < currentDate.toTimeString().split(" ")[0]){
+    if(Date.parse(new Date(reminderDate)) == Date.parse(defCurrentDate) && reminderTime < currentDate.toTimeString().split(" ")[0]){
       setGetError(true);
       setGetErrorMsg("Invalid Time");
       return;
@@ -285,20 +315,38 @@ function Home() {
     var timeComponents = reminderTime.split(":");
     reminderDate.setHours(timeComponents[0], timeComponents[1], timeComponents[2]);
     var reminderTimer = reminderDate.getTime() - currentDate.getTime();
-    console.log("Time until: " + reminderTimer)
+    setUserReminders(getReminders => [...getReminders, {task:newReminder, time:isNewReminderTime}]);
     var timeoutID = setTimeout(()=>{
-      setAlarmNotification(true);
-      var getCurrentReminders = [...userReminders];
-      var getIndex = getCurrentReminders.indexOf(isItem => isItem.task === newReminder);
-      deleteReminderTask(getIndex);
+      var index = followReminders.indexOf(trackReminderTimeout[0]);
+      console.log("Index: " + index);
+      console.log("This reminder is for: " + trackReminderTimeout[0]);
+      trackReminderTimeout.shift();
+      followReminders.splice(index,1);
+      const updatedAlarms = newAlarm.filter((_, i) => i !== index);
+      setUserReminders(updatedAlarms);
+      setNotificationMsg(newReminder);
+      setNotification(true);
+      setItem('Reminder Event', userReminders);
     },reminderTimer);
-    setUserReminders(getReminders => [...getReminders, {task:newReminder, time:isNewReminderTime, isLinker:timeoutID}]);
+    console.log("timeout reference: " + timeoutID);
+    setRemReference(getRef=>[...getRef, timeoutID]);
+    followReminders.push(timeoutID);
+    console.log(followReminders);
+    trackReminderTimeout.push(timeoutID);
+    trackReminderTimeout.sort(function(a, b){return a-b});
+    setItem('Reminder Event', userReminders);
   }
 
   function deleteReminderTask(index){
-    clearTimeout(userReminders[index].isLinker);
+    var getTimeout = [...remReference];
+    console.log("Current Reninder: " + getTimeout);
+    console.log("Delete at: " + index + " value: " + getTimeout[index]);
+    clearTimeout(getTimeout[index]);
     const updatedReminders = userReminders.filter((_, i) => i !== index);
     setUserReminders(updatedReminders);
+    getTimeout.splice(index,1);
+    setRemReference(getTimeout);
+    setItem('Reminder Event', userReminders);
   }
  
   useEffect(() => {
@@ -693,16 +741,6 @@ function Home() {
           </ul>
         </div>
       </Modal>
-      
-      <Modal show={alarmNotification} onHide={closeAlarmNotification} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Notification</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Alarm!!!</Modal.Body>
-        <Modal.Footer>
-          <Button onClick={closeAlarmNotification}>Close</Button>
-        </Modal.Footer>
-      </Modal>
 
       <Modal show={viewReminder} onHide={closeReminder}>
         <Modal.Header closeButton>
@@ -732,6 +770,16 @@ function Home() {
             })}
           </ul>
         </Modal.Body>
+      </Modal>
+
+      <Modal show={notification} onHide={closeNotification} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Notification</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>{notificationMsg}</Modal.Body>
+        <Modal.Footer>
+          <Button onClick={closeNotification}>Close</Button>
+        </Modal.Footer>
       </Modal>
 
       <Modal show={getError} onHide={resetError} centered>
