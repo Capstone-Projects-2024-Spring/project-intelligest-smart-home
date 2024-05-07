@@ -100,8 +100,71 @@ A function to get the appropriate icon for a given entity type.
 A function to fetch weather data.
 
 ##### `-device_states[]`
-
 On/Off/Other state of the device
+
+##### `-getToDoList`
+Sets state to view To-Do List modal
+
+##### `-getUpdateTask`
+Set state to refernce the specific task that will be updated and state to view Update task modal for user input. Stores the set updateTask data with the appropriate localstorage key.
+
+##### `-getNegatedTask`
+negates the current state of the state value.
+
+##### `-getReminder`
+Set state to view reminder input popup modal. 
+
+##### `-getAlarm`
+Set state to view alarm setter popup modal.
+
+##### `-closeToDoList`
+Set state to close the input to-do list popup modal.
+
+##### `-closeUpdateTask`
+Set state to close the input updateTask popup modal.
+
+##### `-closeReminder`
+Set state to close the input reminder popup modal.
+
+##### `-closeAlarm`
+Set state to close the alarm setter popup modal.
+
+##### `-closeNotification`
+Set state to close the notification popup modal.
+
+##### `-resetError`
+Set state to close the error popup modal and reset the errorMessage.
+
+##### `-setItem`
+A function that sets the localstorage of the data passed in a key-value manner.
+
+##### `-getItem`
+A function that returns the localstorage of stored data of the key passed.
+
+##### `-getNewToDoListTask`
+A function that appends a new user inputted task to the usestate array of tasks and set the changes made to the appropriate localstorage key.
+
+##### `-editToDoListTask`
+A function that set the state for a popup modal to edit and update previously inputted & stored tasks. Any changes made are stored to the appropriate localstorage key.
+
+##### `-getNewToDoListTask`
+A function that appends a new task to the usestate array of tasks and set the changes made to the appropriate localstorage key.
+
+##### `-deleteToDoListTask`
+A function that deletes/removes a task at the specific index passed and updates the array of tasks. Sets the changes made to the appropriate localstorage key.
+
+##### `-getNewAlarmEvent`
+A function that verifies user input and creates a countdown timer for the alarm, and upon completion it sets the state to display a modal popup to display a notification that the time is up.  The entries for completed timers are removed from the usestate array. It stores the data in a localstorage key.
+
+##### `-deleteAlarmEvent`
+A function that removes the countdown timer for a set alarm event and removes its entry from the usestate variable storage, and updates the state of the alarm entities. Stores changes in the relevant localstorage key.
+
+##### `-getReminderTask`
+A function that verifies user input and creates a countdown timer for the reminder, and upon completion it sets the state to display a modal popup to display a notification with the user inpputed reminder task that the time is up, it serves as an alert. The entries for completed timers are removed from the usestate array. It stores the data in a relevant localstorage key.
+
+##### `-deleteReminderTask`
+A function that removes the countdown timer for a set reminder event and removes its entry from the usestate variable storage, and updates the state of the reminder entities. It stores changes in the reminder states in the relevant localstorage key.
+
 
 
 #### Methods
